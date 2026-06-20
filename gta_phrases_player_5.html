@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GTA実況フレーズ 聞き流しプレイヤー</title>
+<style>
+  :root {
+    --bg: #14110f;
+    --panel: #1c1815;
+    --amber: #ff8c2e;
+    --amber-dim: #c4691a;
+    --text: #ede5d8;
+    --text-dim: #968d7f;
+    --line: #2e2822;
+    --red: #d4453a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber-dim);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 4px 0 24px;
+    letter-spacing: -0.01em;
+  }
+  h1 span { color: var(--amber); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .now-playing {
+    text-align: center;
+    padding: 28px 16px;
+  }
+  .cat-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    border-radius: 99px;
+    padding: 3px 10px;
+    margin-bottom: 16px;
+  }
+  .phrase-en {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .phrase-jp {
+    font-size: 15px;
+    color: var(--text-dim);
+  }
+
+  .progress {
+    height: 3px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 20px 0 4px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--amber);
+    width: 0%;
+    transition: width 0.2s linear;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .btn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .btn:hover { border-color: var(--amber-dim); }
+  .btn-skip { width: 44px; height: 44px; font-size: 16px; }
+  .btn-play {
+    width: 64px; height: 64px;
+    font-size: 22px;
+    background: var(--amber);
+    border: none;
+    color: #1a1208;
+  }
+  .btn-play:hover { background: #ffa14f; }
+
+  .settings-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .settings-row > div { flex: 1; }
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+  select, input[type=range] {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .cat-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .cat-chip {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+  }
+  .cat-chip.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(255,140,46,0.08);
+  }
+
+  .list-title {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .phrase-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .phrase-row:hover { background: var(--bg); }
+  .phrase-row.current { background: rgba(255,140,46,0.1); }
+  .phrase-row .en { font-weight: 600; }
+  .phrase-row .jp { color: var(--text-dim); font-size: 12px; }
+  .phrase-row .idx {
+    color: var(--amber-dim);
+    font-size: 11px;
+    width: 24px;
+    flex-shrink: 0;
+  }
+  .row-main { display: flex; gap: 10px; align-items: baseline; flex: 1; min-width: 0; }
+  .row-main .en, .row-main .jp { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .status-buttons {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .status-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: 0.15s;
+  }
+  .status-btn:hover { border-color: var(--amber-dim); }
+  .status-btn.active-learning {
+    background: rgba(196,105,26,0.25);
+    border-color: var(--amber-dim);
+    color: var(--amber);
+  }
+  .status-btn.active-known {
+    background: rgba(255,140,46,0.3);
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+  .status-btn.active-speakable {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #1a1208;
+  }
+
+  .now-playing .status-buttons {
+    justify-content: center;
+    margin: 14px 0 0;
+  }
+  .now-playing .status-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+  .status-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 11px;
+  }
+  .stat-pill {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+  .stat-pill .num { font-size: 16px; font-weight: 700; color: var(--amber); display: block; }
+  .stat-pill .label { color: var(--text-dim); }
+
+  .status-filter-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .status-chip {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .status-chip.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(255,140,46,0.08);
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">GTA英語実況 / 聞き流し</div>
+  <h1>フレーズ<span>プレイヤー</span></h1>
+
+  <div class="panel now-playing">
+    <div class="cat-tag" id="catTag">状況描写</div>
+    <div class="phrase-en" id="phraseEn">Loading...</div>
+    <div class="phrase-jp" id="phraseJp"></div>
+
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-label"><span id="curIdx">0</span><span id="totalIdx">0</span></div>
+
+    <div class="controls">
+      <button class="btn btn-skip" id="prevBtn">⏮</button>
+      <button class="btn btn-play" id="playBtn">▶</button>
+      <button class="btn btn-skip" id="nextBtn">⏭</button>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <label>速度</label>
+        <select id="rateSelect">
+          <option value="0.8">遅め (0.8x)</option>
+          <option value="1" selected>標準 (1.0x)</option>
+          <option value="1.2">やや速い (1.2x)</option>
+        </select>
+      </div>
+      <div>
+        <label>リピート回数</label>
+        <select id="repeatSelect">
+          <option value="1">1回</option>
+          <option value="2" selected>2回</option>
+          <option value="3">3回</option>
+        </select>
+      </div>
+      <div>
+        <label>日本語も読む</label>
+        <select id="jpToggle">
+          <option value="no" selected>英語のみ</option>
+          <option value="yes">英→日</option>
+        </select>
+      </div>
+    </div>
+    <div class="hint" id="voiceHint"></div>
+
+    <div class="status-buttons" id="nowPlayingStatus"></div>
+    <div class="status-label">タップして習熟度を記録(端末に保存されます)</div>
+  </div>
+
+  <div class="panel">
+    <div class="stats-row" id="statsRow"></div>
+    <div class="status-filter-row" id="statusFilters"></div>
+  </div>
+
+  <div class="panel">
+    <div class="cat-filters" id="catFilters"></div>
+  </div>
+
+  <div class="panel">
+    <div class="list-title">フレーズ一覧（タップで再生）</div>
+    <div id="listContainer"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {cat:"状況描写", en:"I'm being chased", jp:"追われている"},
+  {cat:"状況描写", en:"Steal a car", jp:"車を盗む"},
+  {cat:"状況描写", en:"The cops are after me", jp:"警察に追われてる"},
+  {cat:"状況描写", en:"I got shot", jp:"撃たれた"},
+  {cat:"状況描写", en:"I'm dead", jp:"死んだ"},
+  {cat:"状況描写", en:"Take cover", jp:"隠れる"},
+  {cat:"状況描写", en:"I crashed", jp:"クラッシュした"},
+  {cat:"状況描写", en:"I failed the mission", jp:"ミッション失敗"},
+  {cat:"状況描写", en:"Let's try again", jp:"やり直す"},
+
+  {cat:"銃撃戦", en:"Reload", jp:"リロードする"},
+  {cat:"銃撃戦", en:"I'm out of ammo", jp:"弾切れだ"},
+  {cat:"銃撃戦", en:"I took him down", jp:"仕留めた"},
+  {cat:"銃撃戦", en:"Headshot", jp:"ヘッドショット"},
+  {cat:"銃撃戦", en:"Shoot back", jp:"撃ち返せ"},
+  {cat:"銃撃戦", en:"Cover me", jp:"援護して"},
+  {cat:"銃撃戦", en:"I'm surrounded", jp:"囲まれてる"},
+  {cat:"銃撃戦", en:"I keep missing", jp:"弾が当たらない"},
+
+  {cat:"運転", en:"Drift", jp:"ドリフトする"},
+  {cat:"運転", en:"Ram into", jp:"ぶつかる"},
+  {cat:"運転", en:"Run a red light", jp:"信号無視する"},
+  {cat:"運転", en:"Lose the cops", jp:"警察をまく"},
+  {cat:"運転", en:"I'm going too fast", jp:"スピード出しすぎ"},
+  {cat:"運転", en:"I missed the turn", jp:"ハンドル切り損ねた"},
+  {cat:"運転", en:"I flipped the car", jp:"横転した"},
+  {cat:"運転", en:"Switch cars", jp:"車を乗り換える"},
+
+  {cat:"ミッション", en:"Checkpoint", jp:"チェックポイント"},
+  {cat:"ミッション", en:"Objective", jp:"目的"},
+  {cat:"ミッション", en:"Side mission", jp:"サブミッション"},
+  {cat:"ミッション", en:"Fail state", jp:"ミッション失敗条件"},
+  {cat:"ミッション", en:"Save the game", jp:"セーブする"},
+  {cat:"ミッション", en:"Load the game", jp:"ロードする"},
+  {cat:"ミッション", en:"Progress", jp:"進行状況"},
+
+  {cat:"感情リアクション", en:"Oh no!", jp:"やばい！"},
+  {cat:"感情リアクション", en:"No way! Are you serious!?", jp:"マジか！"},
+  {cat:"感情リアクション", en:"Oh come on!", jp:"うわ最悪"},
+  {cat:"感情リアクション", en:"Let's go!", jp:"よっしゃ！"},
+  {cat:"感情リアクション", en:"I can't believe this", jp:"信じられない"},
+  {cat:"感情リアクション", en:"What is happening!?", jp:"何が起きてるんだ"},
+  {cat:"感情リアクション", en:"You've got to be kidding me", jp:"ふざけんな"},
+  {cat:"感情リアクション", en:"I'm freaking out", jp:"焦ってる"},
+  {cat:"感情リアクション", en:"I'm done", jp:"もうダメだ"},
+
+  {cat:"感情の強弱", en:"Huh? Wait, what?", jp:"あれ？え、何が起きた"},
+  {cat:"感情の強弱", en:"Hold on, what just happened?", jp:"ちょっと待て、今何が"},
+  {cat:"感情の強弱", en:"Oh my god", jp:"マジか（強め）"},
+  {cat:"感情の強弱", en:"I'm losing my mind", jp:"もう無理（限界）"},
+
+  {cat:"カオス・パニック", en:"This is a mess", jp:"めちゃくちゃだ"},
+  {cat:"カオス・パニック", en:"I'm completely screwed", jp:"完全に詰んだ"},
+  {cat:"カオス・パニック", en:"This is a disaster", jp:"大惨事"},
+  {cat:"カオス・パニック", en:"I have no idea what's going on", jp:"わけがわからない"},
+  {cat:"カオス・パニック", en:"I don't even care anymore", jp:"もう知らん"},
+  {cat:"カオス・パニック", en:"How did this happen!?", jp:"何でこうなった"},
+  {cat:"カオス・パニック", en:"This is out of control", jp:"制御不能"},
+  {cat:"カオス・パニック", en:"That's it, I'm done", jp:"終わった"},
+
+  {cat:"実況つなぎ", en:"Okay so...", jp:"えーっと"},
+  {cat:"実況つなぎ", en:"What should I do next?", jp:"次は何しよう"},
+  {cat:"実況つなぎ", en:"Hold on", jp:"ちょっと待って"},
+  {cat:"実況つなぎ", en:"Let's see", jp:"見てみよう"},
+  {cat:"実況つなぎ", en:"Here we go", jp:"行くぞ"},
+  {cat:"実況つなぎ", en:"This is actually insane", jp:"マジでこれやばい"},
+  {cat:"実況つなぎ", en:"I don't know, let's just go", jp:"わからん、行こう"},
+
+  {cat:"ミス・誤解", en:"I think it says...", jp:"たぶんこう言ってる"},
+  {cat:"ミス・誤解", en:"I'm not sure, but...", jp:"自信ないけど"},
+  {cat:"ミス・誤解", en:"I have no idea what this means", jp:"全然わからん"},
+  {cat:"ミス・誤解", en:"I'll just go this way", jp:"とりあえずこっち行く"},
+  {cat:"ミス・誤解", en:"Let me ask ChatGPT", jp:"ChatGPTに聞いてみよう"},
+  {cat:"ミス・誤解", en:"I might have misunderstood", jp:"間違えたかも"},
+  {cat:"ミス・誤解", en:"Whatever, let's just go with it", jp:"まあいいや"},
+];
+
+let activeCats = new Set(DATA.map(d => d.cat));
+let filtered = [...DATA];
+let curIndex = 0;
+let isPlaying = false;
+let repeatCount = 1;
+let repeatTotal = 2;
+let synth = window.speechSynthesis;
+let englishVoice = null;
+let japaneseVoice = null;
+let activeStatusFilter = 'all';
+
+const STORAGE_KEY = 'phraseStatus_gta_v1';
+
+function loadStatusMap() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveStatusMap() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(statusMap));
+  } catch (e) {}
+}
+
+let statusMap = loadStatusMap();
+
+const STATUS_DEFS = [
+  { key: 'learning', icon: '!', label: '未習得' },
+  { key: 'known', icon: '◯', label: '覚えた' },
+  { key: 'speakable', icon: '★', label: '話せる' },
+];
+
+function getStatus(item) {
+  return statusMap[item.en] || 'none';
+}
+
+function setStatus(item, status) {
+  if (statusMap[item.en] === status) {
+    delete statusMap[item.en];
+  } else {
+    statusMap[item.en] = status;
+  }
+  saveStatusMap();
+  renderList();
+  renderNowPlayingStatus();
+  renderStats();
+}
+
+function buildStatusButtonsEl(item) {
+  const wrap = document.createElement('div');
+  wrap.className = 'status-buttons';
+  STATUS_DEFS.forEach(def => {
+    const btn = document.createElement('button');
+    btn.className = 'status-btn';
+    btn.textContent = def.icon;
+    btn.title = def.label;
+    if (getStatus(item) === def.key) btn.classList.add('active-' + def.key);
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      setStatus(item, def.key);
+    };
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
+function renderNowPlayingStatus() {
+  const el = document.getElementById('nowPlayingStatus');
+  el.innerHTML = '';
+  if (filtered.length === 0) return;
+  el.appendChild(buildStatusButtonsEl(filtered[curIndex]));
+}
+
+function renderStats() {
+  const counts = { none: 0, learning: 0, known: 0, speakable: 0 };
+  DATA.forEach(d => {
+    const s = getStatus(d);
+    counts[s] = (counts[s] || 0) + 1;
+  });
+  const statsRow = document.getElementById('statsRow');
+  statsRow.innerHTML = `
+    <div class="stat-pill"><span class="num">${counts.speakable}</span><span class="label">話せる</span></div>
+    <div class="stat-pill"><span class="num">${counts.known}</span><span class="label">覚えた</span></div>
+    <div class="stat-pill"><span class="num">${counts.learning}</span><span class="label">未習得</span></div>
+    <div class="stat-pill"><span class="num">${counts.none}</span><span class="label">未チェック</span></div>
+  `;
+}
+
+function buildStatusFilters() {
+  const container = document.getElementById('statusFilters');
+  container.innerHTML = '';
+  const allDefs = [
+    { key: 'all', label: 'すべて' },
+    { key: 'speakable', label: '★話せる' },
+    { key: 'known', label: '◯覚えた' },
+    { key: 'learning', label: '!未習得' },
+    { key: 'none', label: '未チェック' },
+  ];
+  allDefs.forEach(def => {
+    const chip = document.createElement('div');
+    chip.className = 'status-chip' + (activeStatusFilter === def.key ? ' active' : '');
+    chip.textContent = def.label;
+    chip.onclick = () => {
+      activeStatusFilter = def.key;
+      applyFilter();
+      buildStatusFilters();
+    };
+    container.appendChild(chip);
+  });
+}
+
+const phraseEn = document.getElementById('phraseEn');
+const phraseJp = document.getElementById('phraseJp');
+const catTag = document.getElementById('catTag');
+const progressBar = document.getElementById('progressBar');
+const curIdxEl = document.getElementById('curIdx');
+const totalIdxEl = document.getElementById('totalIdx');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const rateSelect = document.getElementById('rateSelect');
+const repeatSelect = document.getElementById('repeatSelect');
+const jpToggle = document.getElementById('jpToggle');
+const catFilters = document.getElementById('catFilters');
+const listContainer = document.getElementById('listContainer');
+const voiceHint = document.getElementById('voiceHint');
+
+function loadVoices() {
+  const voices = synth.getVoices();
+  englishVoice = voices.find(v => v.lang.startsWith('en')) || null;
+  japaneseVoice = voices.find(v => v.lang.startsWith('ja')) || null;
+  if (!englishVoice) {
+    voiceHint.textContent = '英語音声が見つかりません。ブラウザ設定で英語の音声をインストールしてください。';
+  } else {
+    voiceHint.textContent = '';
+  }
+}
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+loadVoices();
+
+function buildFilters() {
+  const cats = [...new Set(DATA.map(d => d.cat))];
+  catFilters.innerHTML = '';
+  cats.forEach(cat => {
+    const chip = document.createElement('div');
+    chip.className = 'cat-chip active';
+    chip.textContent = cat;
+    chip.onclick = () => {
+      if (activeCats.has(cat)) {
+        if (activeCats.size === 1) return;
+        activeCats.delete(cat);
+        chip.classList.remove('active');
+      } else {
+        activeCats.add(cat);
+        chip.classList.add('active');
+      }
+      applyFilter();
+    };
+    catFilters.appendChild(chip);
+  });
+}
+
+function applyFilter() {
+  filtered = DATA.filter(d => {
+    if (!activeCats.has(d.cat)) return false;
+    if (activeStatusFilter !== 'all' && getStatus(d) !== activeStatusFilter) return false;
+    return true;
+  });
+  curIndex = 0;
+  renderList();
+  updateDisplay();
+}
+
+function renderList() {
+  listContainer.innerHTML = '';
+  filtered.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'phrase-row' + (i === curIndex ? ' current' : '');
+    const mainDiv = document.createElement('div');
+    mainDiv.className = 'row-main';
+    mainDiv.innerHTML = `
+      <span class="idx">${i + 1}</span>
+      <span class="en">${item.en}</span>
+      <span class="jp">${item.jp}</span>
+    `;
+    mainDiv.onclick = () => {
+      stopSpeaking();
+      curIndex = i;
+      updateDisplay();
+      if (isPlaying) speakCurrent();
+    };
+    row.appendChild(mainDiv);
+    row.appendChild(buildStatusButtonsEl(item));
+    listContainer.appendChild(row);
+  });
+}
+
+function updateDisplay() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  catTag.textContent = item.cat;
+  phraseEn.textContent = item.en;
+  phraseJp.textContent = item.jp;
+  curIdxEl.textContent = (curIndex + 1) + ' / ' + filtered.length;
+  totalIdxEl.textContent = '';
+  progressBar.style.width = ((curIndex) / Math.max(filtered.length - 1, 1)) * 100 + '%';
+
+  document.querySelectorAll('.phrase-row').forEach((r, i) => {
+    r.classList.toggle('current', i === curIndex);
+  });
+  renderNowPlayingStatus();
+}
+
+function speakCurrent() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  const rate = parseFloat(rateSelect.value);
+  const wantJp = jpToggle.value === 'yes';
+
+  const uttEn = new SpeechSynthesisUtterance(item.en);
+  uttEn.lang = 'en-US';
+  uttEn.rate = rate;
+  if (englishVoice) uttEn.voice = englishVoice;
+
+  uttEn.onend = () => {
+    repeatCount++;
+    if (repeatCount < repeatTotal) {
+      if (isPlaying) speakCurrent();
+      return;
+    }
+    repeatCount = 0;
+    if (wantJp && japaneseVoice) {
+      const uttJp = new SpeechSynthesisUtterance(item.jp);
+      uttJp.lang = 'ja-JP';
+      uttJp.voice = japaneseVoice;
+      uttJp.rate = 1;
+      uttJp.onend = () => { if (isPlaying) goNext(true); };
+      synth.speak(uttJp);
+    } else {
+      if (isPlaying) goNext(true);
+    }
+  };
+
+  synth.cancel();
+  synth.speak(uttEn);
+}
+
+function goNext(auto) {
+  curIndex = (curIndex + 1) % filtered.length;
+  updateDisplay();
+  if (isPlaying) speakCurrent();
+}
+
+function goPrev() {
+  stopSpeaking();
+  curIndex = (curIndex - 1 + filtered.length) % filtered.length;
+  updateDisplay();
+  if (isPlaying) speakCurrent();
+}
+
+function stopSpeaking() {
+  synth.cancel();
+  repeatCount = 0;
+}
+
+playBtn.onclick = () => {
+  isPlaying = !isPlaying;
+  playBtn.textContent = isPlaying ? '⏸' : '▶';
+  if (isPlaying) {
+    repeatCount = 0;
+    speakCurrent();
+  } else {
+    stopSpeaking();
+  }
+};
+
+nextBtn.onclick = () => { stopSpeaking(); goNext(); };
+prevBtn.onclick = goPrev;
+
+repeatSelect.onchange = () => { repeatTotal = parseInt(repeatSelect.value); };
+
+buildFilters();
+buildStatusFilters();
+renderStats();
+renderList();
+updateDisplay();
+</script>
+</body>
+</html>

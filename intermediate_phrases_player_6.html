@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>中級フレーズ(GTA選別版) 聞き流しプレイヤー</title>
+<style>
+  :root {
+    --bg: #14110f;
+    --panel: #1c1815;
+    --amber: #ff8c2e;
+    --amber-dim: #c4691a;
+    --text: #ede5d8;
+    --text-dim: #968d7f;
+    --line: #2e2822;
+    --red: #d4453a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber-dim);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 4px 0 24px;
+    letter-spacing: -0.01em;
+  }
+  h1 span { color: var(--amber); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .now-playing {
+    text-align: center;
+    padding: 28px 16px;
+  }
+  .cat-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    border-radius: 99px;
+    padding: 3px 10px;
+    margin-bottom: 16px;
+  }
+  .phrase-en {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .phrase-jp {
+    font-size: 15px;
+    color: var(--text-dim);
+  }
+
+  .progress {
+    height: 3px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 20px 0 4px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--amber);
+    width: 0%;
+    transition: width 0.2s linear;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .btn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .btn:hover { border-color: var(--amber-dim); }
+  .btn-skip { width: 44px; height: 44px; font-size: 16px; }
+  .btn-play {
+    width: 64px; height: 64px;
+    font-size: 22px;
+    background: var(--amber);
+    border: none;
+    color: #1a1208;
+  }
+  .btn-play:hover { background: #ffa14f; }
+
+  .settings-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .settings-row > div { flex: 1; }
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+  select, input[type=range] {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .cat-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .cat-chip {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+  }
+  .cat-chip.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(255,140,46,0.08);
+  }
+
+  .list-title {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .phrase-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .phrase-row:hover { background: var(--bg); }
+  .phrase-row.current { background: rgba(255,140,46,0.1); }
+  .phrase-row .en { font-weight: 600; }
+  .phrase-row .jp { color: var(--text-dim); font-size: 12px; }
+  .phrase-row .idx {
+    color: var(--amber-dim);
+    font-size: 11px;
+    width: 24px;
+    flex-shrink: 0;
+  }
+  .row-main { display: flex; gap: 10px; align-items: baseline; flex: 1; min-width: 0; }
+  .row-main .en, .row-main .jp { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .status-buttons {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .status-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: 0.15s;
+  }
+  .status-btn:hover { border-color: var(--amber-dim); }
+  .status-btn.active-learning {
+    background: rgba(196,105,26,0.25);
+    border-color: var(--amber-dim);
+    color: var(--amber);
+  }
+  .status-btn.active-known {
+    background: rgba(255,140,46,0.3);
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+  .status-btn.active-speakable {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #1a1208;
+  }
+
+  .now-playing .status-buttons {
+    justify-content: center;
+    margin: 14px 0 0;
+  }
+  .now-playing .status-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+  .status-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 11px;
+  }
+  .stat-pill {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+  .stat-pill .num { font-size: 16px; font-weight: 700; color: var(--amber); display: block; }
+  .stat-pill .label { color: var(--text-dim); }
+
+  .status-filter-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .status-chip {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .status-chip.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(255,140,46,0.08);
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">瞬間英作文 中級 / GTA選別版</div>
+  <h1>中級<span>フレーズ</span></h1>
+
+  <div class="panel now-playing">
+    <div class="cat-tag" id="catTag">状況描写</div>
+    <div class="phrase-en" id="phraseEn">Loading...</div>
+    <div class="phrase-jp" id="phraseJp"></div>
+
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-label"><span id="curIdx">0</span><span id="totalIdx">0</span></div>
+
+    <div class="controls">
+      <button class="btn btn-skip" id="prevBtn">⏮</button>
+      <button class="btn btn-play" id="playBtn">▶</button>
+      <button class="btn btn-skip" id="nextBtn">⏭</button>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <label>速度</label>
+        <select id="rateSelect">
+          <option value="0.8">遅め (0.8x)</option>
+          <option value="1" selected>標準 (1.0x)</option>
+          <option value="1.2">やや速い (1.2x)</option>
+        </select>
+      </div>
+      <div>
+        <label>リピート回数</label>
+        <select id="repeatSelect">
+          <option value="1">1回</option>
+          <option value="2" selected>2回</option>
+          <option value="3">3回</option>
+        </select>
+      </div>
+      <div>
+        <label>日本語も読む</label>
+        <select id="jpToggle">
+          <option value="no" selected>英語のみ</option>
+          <option value="yes">英→日</option>
+        </select>
+      </div>
+    </div>
+    <div class="hint" id="voiceHint"></div>
+
+    <div class="status-buttons" id="nowPlayingStatus"></div>
+    <div class="status-label">タップして習熟度を記録(端末に保存されます)</div>
+  </div>
+
+  <div class="panel">
+    <div class="stats-row" id="statsRow"></div>
+    <div class="status-filter-row" id="statusFilters"></div>
+  </div>
+
+  <div class="panel">
+    <div class="cat-filters" id="catFilters"></div>
+  </div>
+
+  <div class="panel">
+    <div class="list-title">フレーズ一覧（タップで再生）</div>
+    <div id="listContainer"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {cat:"基本文型", en:"The room smells good", jp:"部屋がいい匂いがする"},
+  {cat:"to不定詞", en:"I had to study yesterday", jp:"昨日勉強しなきゃだった"},
+  {cat:"to不定詞", en:"We are glad to see you again", jp:"また会えて嬉しいです"},
+  {cat:"基本文型", en:"It is the coldest today this year", jp:"今年で今日が一番寒い"},
+  {cat:"to不定詞", en:"She studies hard to become a doctor", jp:"医者になるために猛勉強してる"},
+  {cat:"基本文型", en:"They finished their work early", jp:"彼らは仕事を早く終えた"},
+  {cat:"to不定詞", en:"She gave this flower to him", jp:"彼女はこの花を彼にあげた"},
+  {cat:"基本文型", en:"I will run five kilometers tomorrow", jp:"明日5キロ走る"},
+  {cat:"to不定詞", en:"I will take a trip to Europe next year", jp:"来年ヨーロッパ旅行する"},
+  {cat:"比較・最上級", en:"She runs faster than me", jp:"彼女は私より速く走る"},
+  {cat:"比較・最上級", en:"His cake is sweeter than mine", jp:"彼のケーキは私のより甘い"},
+  {cat:"現在完了", en:"Has she been studying English for a year", jp:"彼女は1年間英語を勉強してるの？"},
+  {cat:"比較・最上級", en:"This bag is bigger than the other", jp:"このバッグはもう片方より大きい"},
+  {cat:"助動詞", en:"I have to work today", jp:"今日仕事しなきゃ"},
+  {cat:"基本文型", en:"This car is not the newest in the world", jp:"この車は世界で一番新しいわけじゃない"},
+  {cat:"to不定詞", en:"We went to the park yesterday", jp:"昨日公園に行った"},
+  {cat:"to不定詞", en:"Were you going to attend the meeting", jp:"会議に出る予定だった？"},
+  {cat:"基本文型", en:"The fruit grew ripe", jp:"果物が熟した"},
+  {cat:"基本文型", en:"I wasn't singing at the party then", jp:"あの時パーティで歌ってなかった"},
+  {cat:"基本文型", en:"These flowers are loved by her", jp:"これらの花は彼女に愛されている"},
+  {cat:"助動詞", en:"Shall I open the window", jp:"窓開けようか"},
+  {cat:"基本文型", en:"She bought her baby a toy", jp:"彼女は赤ちゃんにおもちゃを買った"},
+  {cat:"基本文型", en:"I made this cake for my mother", jp:"母のためにこのケーキを作った"},
+  {cat:"基本文型", en:"He played the guitar", jp:"彼はギターを弾いた"},
+  {cat:"基本文型", en:"Can she read a book fast", jp:"彼女は本を速く読める？"},
+  {cat:"基本文型", en:"Are those your pictures", jp:"それらはあなたの写真？"},
+  {cat:"進行形", en:"I am eating breakfast", jp:"朝食食べてる"},
+  {cat:"助動詞", en:"Shall I turn on the light", jp:"電気つけようか"},
+  {cat:"基本文型", en:"Will you please marry me", jp:"結婚してくれる？"},
+  {cat:"基本文型", en:"I gave my dog a bone", jp:"犬に骨をあげた"},
+  {cat:"基本文型", en:"Who is the tallest person in your family", jp:"あなたの家族で一番背が高いのは誰？"},
+  {cat:"to不定詞", en:"I'm not going to watch TV tonight", jp:"今夜テレビ見ない"},
+  {cat:"比較・最上級", en:"She is taller than him", jp:"彼女は彼より背が高い"},
+  {cat:"現在完了", en:"I have known him for three years", jp:"彼とは3年来の知り合いだ"},
+  {cat:"基本文型", en:"What did you eat this morning", jp:"今朝何食べた？"},
+  {cat:"基本文型", en:"Could you fix the broken chair yesterday", jp:"昨日壊れた椅子を直せた？"},
+  {cat:"基本文型", en:"Can you swim well", jp:"上手に泳げる？"},
+  {cat:"to不定詞", en:"She was nervous to give a speech", jp:"彼女はスピーチで緊張してた"},
+  {cat:"助動詞", en:"You must not speak here", jp:"ここで話しちゃダメ"},
+  {cat:"基本文型", en:"I will eat sushi tonight", jp:"今夜寿司食べる"},
+  {cat:"受動態", en:"The cake was baked by my mom", jp:"ケーキは母が焼いた"},
+  {cat:"to不定詞", en:"She writes a letter to me", jp:"彼女は私に手紙を書く"},
+  {cat:"助動詞", en:"Shall we go to the park together", jp:"一緒に公園行こうか"},
+  {cat:"比較・最上級", en:"The music was as calming as the ocean", jp:"その音楽は海のように落ち着く"},
+  {cat:"現在完了", en:"Has he ever been to Japan", jp:"彼は日本に行ったことある？"},
+  {cat:"比較・最上級", en:"This car is faster than that one", jp:"この車はあれより速い"},
+  {cat:"基本文型", en:"Is this room the quietest in your house", jp:"この部屋は家で一番静か？"},
+  {cat:"助動詞", en:"I need to buy groceries", jp:"食料品買わなきゃ"},
+  {cat:"感嘆文", en:"How brave she is", jp:"彼女はなんて勇敢なんだ"},
+  {cat:"現在完了", en:"I have visited the museum twice", jp:"その美術館に2回行ったことある"},
+  {cat:"基本文型", en:"He can jump the highest in the team", jp:"彼はチームで一番高くジャンプできる"},
+  {cat:"助動詞", en:"She must not be late", jp:"彼女は遅れちゃダメだ"},
+  {cat:"to不定詞", en:"Are you going to join us", jp:"一緒に来る？"},
+  {cat:"基本文型", en:"She watched the movie", jp:"彼女は映画を見た"},
+  {cat:"現在完了", en:"She has been a teacher for 20 years", jp:"彼女は20年間先生をしている"},
+  {cat:"基本文型", en:"It will be sunny tomorrow", jp:"明日は晴れるだろう"},
+  {cat:"基本文型", en:"The train will arrive at 10 pm", jp:"電車は夜10時に着く"},
+  {cat:"to不定詞", en:"They weren't listening to the teacher", jp:"彼らは先生の話を聞いてなかった"},
+  {cat:"現在完了", en:"I have seen the movie yet", jp:"もうその映画を見た"},
+  {cat:"比較・最上級", en:"The soup wasn't as warm as I wanted", jp:"スープは思ったほど温かくなかった"},
+  {cat:"基本文型", en:"I let my roommate my car", jp:"ルームメイトに車を貸した"},
+  {cat:"現在完了", en:"Have you ever seen a lion", jp:"ライオン見たことある？"},
+  {cat:"基本文型", en:"I will finish the project by Friday", jp:"金曜までにプロジェクトを終える"},
+  {cat:"基本文型", en:"He likes reading books in his free time", jp:"彼は暇な時に読書するのが好き"},
+  {cat:"to不定詞", en:"They were excited to travel abroad", jp:"彼らは海外旅行にワクワクしてた"},
+  {cat:"現在完了", en:"She has a lot of work to finish", jp:"彼女は終わらせる仕事がたくさんある"},
+  {cat:"現在完了", en:"Do you have time to talk with me", jp:"話す時間ある？"},
+  {cat:"to不定詞", en:"Are you going to meet your friends", jp:"友達に会う予定？"},
+  {cat:"受動態", en:"The movie was watched by many people", jp:"その映画は多くの人に見られた"},
+  {cat:"感嘆文", en:"What a delicious meal this is", jp:"なんて美味しい料理だ"},
+  {cat:"基本文型", en:"He was the tallest in the room", jp:"彼は部屋で一番背が高かった"},
+  {cat:"基本文型", en:"She didn't study for her exam", jp:"彼女は試験勉強しなかった"},
+  {cat:"基本文型", en:"They bought their parents a gift", jp:"両親にプレゼントを買った"},
+  {cat:"進行形", en:"I am saving money to go abroad", jp:"海外に行くためにお金を貯めてる"},
+  {cat:"比較・最上級", en:"This sky is as blue as an ocean", jp:"この空は海のように青い"},
+  {cat:"to不定詞", en:"I sent this package to you", jp:"あなたにこの荷物を送った"},
+  {cat:"現在完了", en:"I have been studying for three hours", jp:"3時間勉強し続けている"},
+  {cat:"基本文型", en:"The sky remains clear", jp:"空は晴れたままだ"},
+  {cat:"現在完了", en:"She has never seen this movie", jp:"彼女はこの映画を見たことがない"},
+  {cat:"to不定詞", en:"I brought the food to you", jp:"あなたに食べ物を持ってきた"},
+  {cat:"to不定詞", en:"He doesn't enjoy listening to music", jp:"彼は音楽を聴くのを楽しまない"},
+  {cat:"基本文型", en:"I hate waiting in line", jp:"列に並んで待つのが嫌い"},
+  {cat:"現在完了", en:"Have you ever been to Kyoto", jp:"京都に行ったことある？"},
+  {cat:"to不定詞", en:"They decided to go on a hike", jp:"ハイキングに行くことにした"},
+  {cat:"to不定詞", en:"She isn't going to come tomorrow", jp:"彼女は明日来ない予定"},
+  {cat:"to不定詞", en:"They lent the book to us", jp:"彼らは私たちに本を貸した"},
+  {cat:"to不定詞", en:"I am proud to be here", jp:"ここにいられて誇らしい"},
+  {cat:"基本文型", en:"The situation becomes complex", jp:"状況が複雑になる"},
+  {cat:"基本文型", en:"He ran the fastest in the race", jp:"彼はレースで一番速く走った"},
+  {cat:"比較・最上級", en:"A car is as fast as a motorcycle", jp:"車はバイクと同じくらい速い"},
+  {cat:"to不定詞", en:"He was not able to lift the heavy box", jp:"彼は重い箱を持ち上げられなかった"},
+  {cat:"to不定詞", en:"She is scared to try skydiving", jp:"彼女はスカイダイビングを怖がってる"},
+  {cat:"to不定詞", en:"He isn't going to play basketball", jp:"彼はバスケをしない予定"},
+  {cat:"比較・最上級", en:"Which do you like more books or movies", jp:"本と映画どっちが好き？"},
+  {cat:"基本文型", en:"Can you paint the wall next week", jp:"来週壁を塗れる？"},
+  {cat:"基本文型", en:"Where was she born", jp:"彼女はどこで生まれた？"},
+  {cat:"基本文型", en:"I studied hard when I was a student", jp:"学生の時は猛勉強した"},
+  {cat:"基本文型", en:"I feel happy when I see her", jp:"彼女に会うと幸せを感じる"},
+  {cat:"受動態", en:"This office was cleaned by staff", jp:"このオフィスはスタッフに掃除された"},
+  {cat:"現在完了", en:"I don't have any friends to hang out", jp:"遊ぶ友達がいない"},
+  {cat:"比較・最上級", en:"They danced better than us at the party", jp:"彼らはパーティで私たちより上手に踊った"},
+  {cat:"助動詞", en:"You may leave early", jp:"早く帰ってもいいよ"},
+  {cat:"基本文型", en:"Were you running in the park then", jp:"あの時公園で走ってた？"},
+  {cat:"基本文型", en:"She is good at cooking", jp:"彼女は料理が上手だ"},
+  {cat:"基本文型", en:"The water turned cold", jp:"水が冷たくなった"},
+  {cat:"基本文型", en:"This car runs the smoothest of all", jp:"この車は全部の中で一番スムーズに走る"},
+  {cat:"基本文型", en:"She swims the fastest in her class", jp:"彼女はクラスで一番速く泳ぐ"},
+  {cat:"助動詞", en:"I won't play the game", jp:"このゲームやらない"},
+  {cat:"進行形", en:"To visit the museum is interesting", jp:"美術館を訪れることは興味深い"},
+  {cat:"助動詞", en:"He didn't have to go", jp:"彼は行かなくてよかった"},
+  {cat:"比較・最上級", en:"That movie is the most popular of all", jp:"あの映画は全部の中で一番人気だ"},
+  {cat:"基本文型", en:"She dances the best in that group", jp:"彼女はそのグループで一番上手に踊る"},
+  {cat:"to不定詞", en:"He was able to solve the difficult math", jp:"彼は難しい数学を解けた"},
+  {cat:"基本文型", en:"Who is taller you or your father", jp:"あなたとお父さんどっちが背が高い？"},
+  {cat:"助動詞", en:"Did you have to work late", jp:"残業しなきゃいけなかった？"},
+  {cat:"基本文型", en:"This cake is eaten by my mother", jp:"このケーキは私の母に食べられる"},
+  {cat:"比較・最上級", en:"The river is not as wide as a lake", jp:"川は湖ほど広くない"},
+  {cat:"現在完了", en:"I have never learned how to swim", jp:"泳ぎ方を習ったことがない"},
+  {cat:"基本文型", en:"I don't like eating junk food", jp:"ジャンクフードを食べるのが好きじゃない"},
+  {cat:"現在完了", en:"He has not played soccer for a year", jp:"彼は1年間サッカーをしていない"},
+  {cat:"基本文型", en:"Will you please pass the salt", jp:"塩取ってくれる？"},
+  {cat:"基本文型", en:"I saw the sun when I woke up", jp:"起きた時太陽を見た"},
+  {cat:"to不定詞", en:"I hope to meet you again", jp:"また会えるといいな"},
+  {cat:"to不定詞", en:"I'm going to study", jp:"勉強するつもり"},
+  {cat:"助動詞", en:"Must you work tomorrow", jp:"明日働かなきゃいけないの？"},
+  {cat:"感嘆文", en:"What a funny story this is", jp:"なんて面白い話だ"},
+  {cat:"比較・最上級", en:"He is as strong as a bear", jp:"彼は熊みたいに強い"},
+  {cat:"比較・最上級", en:"He is busier than his colleague", jp:"彼は同僚より忙しい"},
+  {cat:"基本文型", en:"Is he disliked by you", jp:"彼はあなたに嫌われてるの？"},
+  {cat:"基本文型", en:"Class begins when the bell rings", jp:"ベルが鳴ると授業が始まる"},
+  {cat:"比較・最上級", en:"The song was the most beautiful of all", jp:"その曲が全部の中で一番美しかった"},
+  {cat:"比較・最上級", en:"My bag is cheaper than his", jp:"私のバッグは彼のより安い"},
+  {cat:"基本文型", en:"The music sounds soft", jp:"その音楽は柔らかく聞こえる"},
+  {cat:"基本文型", en:"She stopped talking", jp:"彼女は話すのをやめた"},
+  {cat:"比較・最上級", en:"It is warmer today than yesterday", jp:"今日は昨日より暖かい"},
+  {cat:"to不定詞", en:"He goes to the gym to be healthy", jp:"彼は健康のためにジムに行く"},
+  {cat:"to不定詞", en:"He wasn't speaking to his friend then", jp:"あの時友達と話してなかった"},
+  {cat:"基本文型", en:"I told you this problem", jp:"あなたにこの問題を伝えた"},
+  {cat:"現在完了", en:"They have already booked their flight", jp:"彼らはもう飛行機を予約した"},
+  {cat:"基本文型", en:"I will become 20 years old next year", jp:"来年20歳になる"},
+  {cat:"基本文型", en:"Which do you prefer coffee or tea", jp:"コーヒーと紅茶どっちが好き？"},
+  {cat:"基本文型", en:"I will go home when he finishes work", jp:"彼が仕事を終えたら帰る"},
+  {cat:"比較・最上級", en:"The movie wasn't as scary as the book", jp:"映画は本ほど怖くなかった"},
+  {cat:"比較・最上級", en:"Summer is hotter than spring", jp:"夏は春より暑い"},
+  {cat:"基本文型", en:"They didn't watch the movie last night", jp:"昨夜映画を見なかった"},
+  {cat:"基本文型", en:"I will see my friends this weekend", jp:"今週末友達に会う"},
+  {cat:"感嘆文", en:"How hard he works", jp:"彼はなんて働き者なんだ"},
+  {cat:"to不定詞", en:"I was happy to help you", jp:"手伝えて嬉しかった"},
+  {cat:"基本文型", en:"The desk is made in Japan", jp:"この机は日本製だ"},
+  {cat:"助動詞", en:"The movie won't be watched by anyone", jp:"その映画は誰にも見られないだろう"},
+  {cat:"比較・最上級", en:"Is the cake as sweet as the ice cream", jp:"ケーキはアイスと同じくらい甘い？"},
+  {cat:"基本文型", en:"This is the smallest smartphone in Japan", jp:"これは日本で一番小さいスマホだ"},
+  {cat:"基本文型", en:"She is the fastest runner in her class", jp:"彼女はクラスで一番速いランナーだ"},
+  {cat:"to不定詞", en:"They travel to Paris to see the Eiffel", jp:"エッフェル塔を見るためにパリに旅行する"},
+  {cat:"to不定詞", en:"They traveled to Paris to see the Eiffel", jp:"エッフェル塔を見るためにパリに旅行した"},
+  {cat:"現在完了", en:"Do you have plans to travel", jp:"旅行の予定ある？"},
+  {cat:"基本文型", en:"She seems busy", jp:"彼女は忙しそうだ"},
+  {cat:"基本文型", en:"She feels happy", jp:"彼女は幸せを感じている"},
+  {cat:"基本文型", en:"Driving a car is dangerous", jp:"車の運転は危険だ"},
+  {cat:"to不定詞", en:"I was sorry to hear it", jp:"それを聞いて残念だった"},
+  {cat:"現在完了", en:"I am lucky to have you", jp:"あなたがいてラッキーだ"},
+  {cat:"基本文型", en:"I stay at home when it rains", jp:"雨が降ると家にいる"},
+  {cat:"基本文型", en:"I will buy a car", jp:"車を買うつもりだ"},
+  {cat:"基本文型", en:"That building is the tallest in the city", jp:"あの建物は街で一番高い"},
+  {cat:"現在完了", en:"Have you finished reading that book yet", jp:"もうその本読み終わった？"},
+  {cat:"進行形", en:"I was eating dinner then", jp:"あの時夕食を食べていた"},
+  {cat:"助動詞", en:"You don't have to worry", jp:"心配しなくていい"},
+  {cat:"基本文型", en:"They made their friends a cake", jp:"友達にケーキを作ってあげた"},
+  {cat:"比較・最上級", en:"This mountain is higher than that Hill", jp:"この山はあの丘より高い"},
+  {cat:"助動詞", en:"I won't join the club", jp:"そのクラブには入らない"},
+  {cat:"現在完了", en:"He hasn't watched TV since yesterday", jp:"彼は昨日からテレビを見ていない"},
+  {cat:"基本文型", en:"What kind of material is used for this", jp:"これにはどんな素材が使われてる？"},
+  {cat:"基本文型", en:"I will study English tomorrow", jp:"明日英語を勉強する"},
+  {cat:"現在完了", en:"She has a dress to go to the party", jp:"彼女はパーティに行くドレスを持っている"},
+  {cat:"比較・最上級", en:"The city wasn't as noisy as I expected", jp:"街は思ったほどうるさくなかった"},
+  {cat:"感嘆文", en:"How was this chair made", jp:"この椅子はどうやって作られた？"},
+  {cat:"基本文型", en:"He didn't play basketball with his", jp:"彼は仲間とバスケをしなかった"},
+  {cat:"基本文型", en:"He says that he loves her", jp:"彼は彼女を愛してると言う"},
+  {cat:"比較・最上級", en:"She sings more beautifully than her", jp:"彼女は仲間より美しく歌う"},
+  {cat:"感嘆文", en:"What a beautiful girl she is", jp:"なんて美しい女性だ"},
+  {cat:"比較・最上級", en:"My friend swims better than me", jp:"友達は私より上手に泳ぐ"},
+  {cat:"進行形", en:"He was playing the piano then", jp:"あの時ピアノを弾いていた"},
+  {cat:"比較・最上級", en:"He is more talented than his brother", jp:"彼は兄弟より才能がある"},
+  {cat:"現在完了", en:"They have not arrived yet", jp:"まだ到着していない"},
+  {cat:"感嘆文", en:"What a beautiful day it is today", jp:"なんていい天気だ"},
+  {cat:"現在完了", en:"I have just taken a shower", jp:"ちょうどシャワーを浴びたところだ"},
+  {cat:"基本文型", en:"Will you please come with me", jp:"一緒に来てくれる？"},
+  {cat:"to不定詞", en:"I am excited to learn a new language", jp:"新しい言語を学ぶのにワクワクしている"},
+  {cat:"基本文型", en:"I lived in Japan when I was young", jp:"若い頃日本に住んでいた"},
+  {cat:"基本文型", en:"Will you please lend me money", jp:"お金貸してくれる？"},
+  {cat:"助動詞", en:"I don't have to go to the meeting", jp:"会議に行かなくていい"},
+  {cat:"受動態", en:"The letter was written by John", jp:"その手紙はジョンによって書かれた"},
+  {cat:"基本文型", en:"He enjoys playing guitar", jp:"彼はギターを弾くのを楽しんでいる"},
+  {cat:"基本文型", en:"My students will take an exam next week", jp:"生徒たちは来週試験を受ける"},
+  {cat:"基本文型", en:"He cooked his family a meal", jp:"彼は家族に食事を作った"},
+  {cat:"助動詞", en:"Shall I help you with it", jp:"それ手伝おうか"},
+  {cat:"感嘆文", en:"What a wonderful time we had", jp:"なんて素晴らしい時間だった"},
+  {cat:"助動詞", en:"May I use the restroom", jp:"トイレ使っていい？"},
+  {cat:"to不定詞", en:"He works hard to support his family", jp:"彼は家族を養うために懸命に働く"},
+  {cat:"to不定詞", en:"She explained the problem to him", jp:"彼女は彼にその問題を説明した"},
+  {cat:"to不定詞", en:"I wasn't listening to the music then", jp:"あの時音楽を聴いてなかった"},
+  {cat:"基本文型", en:"Did you stop smoking", jp:"タバコやめた？"},
+  {cat:"to不定詞", en:"Did he choose to play soccer", jp:"彼はサッカーをすることを選んだ？"},
+  {cat:"基本文型", en:"Were you watching TV then", jp:"あの時テレビ見てた？"},
+  {cat:"現在完了", en:"Did you have anything to eat", jp:"何か食べた？"},
+  {cat:"現在完了", en:"I have read that book before", jp:"前にその本を読んだことがある"},
+  {cat:"to不定詞", en:"I went to the park to play soccer", jp:"サッカーをするために公園に行った"},
+  {cat:"基本文型", en:"Is this box made from plastic", jp:"この箱はプラスチック製？"},
+  {cat:"to不定詞", en:"She was not able to find her lost cat", jp:"彼女はいなくなった猫を見つけられなかった"},
+  {cat:"比較・最上級", en:"The car isn't faster than the bicycle", jp:"その車は自転車より速くない"},
+  {cat:"基本文型", en:"My boss gave me a book", jp:"上司が私に本をくれた"},
+  {cat:"基本文型", en:"The party will be fun", jp:"パーティは楽しいだろう"},
+  {cat:"現在完了", en:"They have traveled to Europe three times", jp:"彼らは3回ヨーロッパに旅行したことがある"},
+  {cat:"助動詞", en:"They may not be coming", jp:"彼らは来ないかもしれない"},
+  {cat:"基本文型", en:"She sent her friend this letter", jp:"彼女は友達にこの手紙を送った"},
+  {cat:"比較・最上級", en:"Was the test as difficult as they said", jp:"テストは彼らが言うほど難しかった？"},
+  {cat:"基本文型", en:"The cake tasted sweet", jp:"ケーキは甘い味がした"},
+  {cat:"受動態", en:"The letter was written by my friend", jp:"その手紙は友達によって書かれた"},
+  {cat:"助動詞", en:"Must we attend the meeting", jp:"会議に出席しなきゃいけない？"},
+  {cat:"基本文型", en:"Cheese is made from milk", jp:"チーズは牛乳から作られる"},
+  {cat:"比較・最上級", en:"She sings louder than me", jp:"彼女は私より大きな声で歌う"},
+  {cat:"to不定詞", en:"He showed these pictures to us", jp:"彼はこれらの写真を私たちに見せた"},
+  {cat:"現在完了", en:"She has to take care of the baby", jp:"彼女は赤ちゃんの世話をしなきゃいけない"},
+  {cat:"基本文型", en:"This flower will Bloom next spring", jp:"この花は来春咲くだろう"},
+  {cat:"to不定詞", en:"They are able to play the piano", jp:"彼らはピアノを弾ける"},
+  {cat:"基本文型", en:"She doesn't know that ocean is salty", jp:"彼女は海がしょっぱいことを知らない"},
+  {cat:"to不定詞", en:"They're going to travel next week", jp:"彼らは来週旅行する予定"},
+  {cat:"現在完了", en:"I have had this car for five years", jp:"5年間この車を持っている"},
+  {cat:"現在完了", en:"I have never met the person", jp:"その人に会ったことがない"},
+  {cat:"基本文型", en:"When did she write the letter", jp:"彼女はいつその手紙を書いた？"},
+  {cat:"進行形", en:"He is learning Spanish to communicate", jp:"彼はコミュニケーションのためにスペイン語を学んでいる"},
+  {cat:"現在完了", en:"She has to finish the project", jp:"彼女はプロジェクトを終わらせなきゃいけない"},
+  {cat:"助動詞", en:"Do we have to pay for this dinner", jp:"この夕食代を払わなきゃいけない？"},
+  {cat:"基本文型", en:"They weren't waiting for the bus then", jp:"あの時バスを待ってなかった"},
+  {cat:"to不定詞", en:"I forgot to bring my key", jp:"鍵を持ってくるの忘れた"},
+  {cat:"助動詞", en:"Do you have to go now", jp:"今行かなきゃいけない？"},
+  {cat:"to不定詞", en:"Did you remember to turn off the lights", jp:"電気消すの覚えてた？"},
+  {cat:"to不定詞", en:"I want to travel the world", jp:"世界を旅したい"},
+  {cat:"感嘆文", en:"How fast he runs", jp:"彼はなんて速く走るんだ"},
+  {cat:"比較・最上級", en:"He can play piano better than anyone", jp:"彼は誰よりも上手にピアノを弾ける"},
+  {cat:"助動詞", en:"I must study", jp:"勉強しなきゃ"},
+  {cat:"現在完了", en:"Kyoto has many places to visit", jp:"京都には訪れる場所がたくさんある"},
+  {cat:"基本文型", en:"Will you please help me", jp:"手伝ってくれる？"},
+  {cat:"to不定詞", en:"His name is known to everyone", jp:"彼の名前はみんなに知られている"},
+  {cat:"現在完了", en:"Has he finished his work", jp:"彼は仕事を終えた？"},
+  {cat:"基本文型", en:"Who is the smartest person you know", jp:"あなたが知ってる中で一番賢い人は誰？"},
+  {cat:"進行形", en:"We were going to have a picnic yesterday", jp:"昨日ピクニックする予定だった"},
+  {cat:"現在完了", en:"She has not received the email yet", jp:"まだメールを受け取っていない"},
+  {cat:"基本文型", en:"The teacher gave his students a test", jp:"先生は生徒にテストを与えた"},
+  {cat:"to不定詞", en:"He offers the job to her", jp:"彼は彼女にその仕事を提供する"},
+  {cat:"基本文型", en:"Who runs faster John or Mary", jp:"ジョンとメアリーどっちが速く走る？"},
+  {cat:"現在完了", en:"He has not been sleeping well for two", jp:"彼はここ2日よく眠れていない"},
+  {cat:"助動詞", en:"He may be tired", jp:"彼は疲れてるかも"},
+  {cat:"進行形", en:"He is going to start a new job next week", jp:"彼は来週新しい仕事を始める予定"},
+  {cat:"助動詞", en:"You must be careful", jp:"気をつけなきゃダメだ"},
+  {cat:"to不定詞", en:"To read a good book is enjoyable", jp:"良い本を読むことは楽しい"},
+  {cat:"to不定詞", en:"I am able to run fast", jp:"速く走れる"},
+  {cat:"現在完了", en:"I have something important to tell you", jp:"あなたに伝えたい大事なことがある"},
+  {cat:"基本文型", en:"They believe that it will rain tomorrow", jp:"彼らは明日雨が降ると信じている"},
+  {cat:"to不定詞", en:"I will go to the park", jp:"公園に行く"},
+  {cat:"to不定詞", en:"I don't want to be late for the meeting", jp:"会議に遅れたくない"},
+  {cat:"基本文型", en:"He works the longest hours in the office", jp:"彼はオフィスで一番長時間働く"},
+  {cat:"進行形", en:"They were studying for the exam then", jp:"あの時試験勉強していた"},
+  {cat:"現在完了", en:"We have already finished the project", jp:"もうプロジェクトを終えた"},
+  {cat:"感嘆文", en:"How talented he is", jp:"彼はなんて才能があるんだ"},
+  {cat:"現在完了", en:"They have been working on the project", jp:"彼らはずっとプロジェクトに取り組んでいる"},
+  {cat:"比較・最上級", en:"This cat is smaller than my cat", jp:"この猫は私の猫より小さい"},
+  {cat:"現在完了", en:"That shop will have a sale next week", jp:"あの店は来週セールをするだろう"},
+  {cat:"to不定詞", en:"I am able to speak French fluently", jp:"フランス語を流暢に話せる"},
+  {cat:"基本文型", en:"Did he visit the museum yesterday", jp:"昨日美術館に行った？"},
+  {cat:"助動詞", en:"Shall we have dinner together", jp:"一緒に夕食食べようか"},
+  {cat:"現在完了", en:"I haven't done my homework yet", jp:"まだ宿題をやってない"},
+  {cat:"比較・最上級", en:"Her cooking is more delicious than mine", jp:"彼女の料理は私のより美味しい"},
+  {cat:"受動態", en:"This music was played by the band", jp:"この音楽はバンドによって演奏された"},
+  {cat:"基本文型", en:"We'll start when she arrives", jp:"彼女が着いたら始めよう"},
+  {cat:"基本文型", en:"Does he believe that he'll pass the exam", jp:"彼は試験に受かると信じてる？"},
+  {cat:"基本文型", en:"Will the train arrive on time", jp:"電車は時間通りに着く？"},
+  {cat:"基本文型", en:"He looks tired", jp:"彼は疲れて見える"},
+];
+
+let activeCats = new Set(DATA.map(d => d.cat));
+let filtered = [...DATA];
+let curIndex = 0;
+let isPlaying = false;
+let repeatCount = 1;
+let repeatTotal = 2;
+let synth = window.speechSynthesis;
+let englishVoice = null;
+let japaneseVoice = null;
+let activeStatusFilter = 'all';
+
+const STORAGE_KEY = 'phraseStatus_intermediate_v1';
+
+function loadStatusMap() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveStatusMap() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(statusMap));
+  } catch (e) {}
+}
+
+let statusMap = loadStatusMap();
+
+const STATUS_DEFS = [
+  { key: 'learning', icon: '!', label: '未習得' },
+  { key: 'known', icon: '◯', label: '覚えた' },
+  { key: 'speakable', icon: '★', label: '話せる' },
+];
+
+function getStatus(item) {
+  return statusMap[item.en] || 'none';
+}
+
+function setStatus(item, status) {
+  if (statusMap[item.en] === status) {
+    delete statusMap[item.en];
+  } else {
+    statusMap[item.en] = status;
+  }
+  saveStatusMap();
+  renderList();
+  renderNowPlayingStatus();
+  renderStats();
+}
+
+function buildStatusButtonsEl(item, large) {
+  const wrap = document.createElement('div');
+  wrap.className = 'status-buttons';
+  STATUS_DEFS.forEach(def => {
+    const btn = document.createElement('button');
+    btn.className = 'status-btn';
+    btn.textContent = def.icon;
+    btn.title = def.label;
+    if (getStatus(item) === def.key) btn.classList.add('active-' + def.key);
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      setStatus(item, def.key);
+    };
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
+function renderNowPlayingStatus() {
+  const el = document.getElementById('nowPlayingStatus');
+  el.innerHTML = '';
+  if (filtered.length === 0) return;
+  el.appendChild(buildStatusButtonsEl(filtered[curIndex], true));
+}
+
+function renderStats() {
+  const counts = { none: 0, learning: 0, known: 0, speakable: 0 };
+  DATA.forEach(d => {
+    const s = getStatus(d);
+    counts[s] = (counts[s] || 0) + 1;
+  });
+  const statsRow = document.getElementById('statsRow');
+  statsRow.innerHTML = `
+    <div class="stat-pill"><span class="num">${counts.speakable}</span><span class="label">話せる</span></div>
+    <div class="stat-pill"><span class="num">${counts.known}</span><span class="label">覚えた</span></div>
+    <div class="stat-pill"><span class="num">${counts.learning}</span><span class="label">未習得</span></div>
+    <div class="stat-pill"><span class="num">${counts.none}</span><span class="label">未チェック</span></div>
+  `;
+}
+
+function buildStatusFilters() {
+  const container = document.getElementById('statusFilters');
+  container.innerHTML = '';
+  const allDefs = [
+    { key: 'all', label: 'すべて' },
+    { key: 'speakable', label: '★話せる' },
+    { key: 'known', label: '◯覚えた' },
+    { key: 'learning', label: '!未習得' },
+    { key: 'none', label: '未チェック' },
+  ];
+  allDefs.forEach(def => {
+    const chip = document.createElement('div');
+    chip.className = 'status-chip' + (activeStatusFilter === def.key ? ' active' : '');
+    chip.textContent = def.label;
+    chip.onclick = () => {
+      activeStatusFilter = def.key;
+      applyFilter();
+      buildStatusFilters();
+    };
+    container.appendChild(chip);
+  });
+}
+
+
+const phraseEn = document.getElementById('phraseEn');
+const phraseJp = document.getElementById('phraseJp');
+const catTag = document.getElementById('catTag');
+const progressBar = document.getElementById('progressBar');
+const curIdxEl = document.getElementById('curIdx');
+const totalIdxEl = document.getElementById('totalIdx');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const rateSelect = document.getElementById('rateSelect');
+const repeatSelect = document.getElementById('repeatSelect');
+const jpToggle = document.getElementById('jpToggle');
+const catFilters = document.getElementById('catFilters');
+const listContainer = document.getElementById('listContainer');
+const voiceHint = document.getElementById('voiceHint');
+
+function loadVoices() {
+  const voices = synth.getVoices();
+  englishVoice = voices.find(v => v.lang.startsWith('en')) || null;
+  japaneseVoice = voices.find(v => v.lang.startsWith('ja')) || null;
+  if (!englishVoice) {
+    voiceHint.textContent = '英語音声が見つかりません。ブラウザ設定で英語の音声をインストールしてください。';
+  } else {
+    voiceHint.textContent = '';
+  }
+}
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+loadVoices();
+
+function buildFilters() {
+  const cats = [...new Set(DATA.map(d => d.cat))];
+  catFilters.innerHTML = '';
+  cats.forEach(cat => {
+    const chip = document.createElement('div');
+    chip.className = 'cat-chip active';
+    chip.textContent = cat;
+    chip.onclick = () => {
+      if (activeCats.has(cat)) {
+        if (activeCats.size === 1) return;
+        activeCats.delete(cat);
+        chip.classList.remove('active');
+      } else {
+        activeCats.add(cat);
+        chip.classList.add('active');
+      }
+      applyFilter();
+    };
+    catFilters.appendChild(chip);
+  });
+}
+
+function applyFilter() {
+  filtered = DATA.filter(d => {
+    if (!activeCats.has(d.cat)) return false;
+    if (activeStatusFilter !== 'all' && getStatus(d) !== activeStatusFilter) return false;
+    return true;
+  });
+  curIndex = 0;
+  renderList();
+  updateDisplay();
+}
+
+function renderList() {
+  listContainer.innerHTML = '';
+  filtered.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'phrase-row' + (i === curIndex ? ' current' : '');
+    const mainDiv = document.createElement('div');
+    mainDiv.className = 'row-main';
+    mainDiv.innerHTML = `
+      <span class="idx">${i + 1}</span>
+      <span class="en">${item.en}</span>
+      <span class="jp">${item.jp}</span>
+    `;
+    mainDiv.onclick = () => {
+      stopSpeaking();
+      curIndex = i;
+      updateDisplay();
+      if (isPlaying) speakCurrent();
+    };
+    row.appendChild(mainDiv);
+    row.appendChild(buildStatusButtonsEl(item, false));
+    listContainer.appendChild(row);
+  });
+}
+
+function updateDisplay() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  catTag.textContent = item.cat;
+  phraseEn.textContent = item.en;
+  phraseJp.textContent = item.jp;
+  curIdxEl.textContent = (curIndex + 1) + ' / ' + filtered.length;
+  totalIdxEl.textContent = '';
+  progressBar.style.width = ((curIndex) / Math.max(filtered.length - 1, 1)) * 100 + '%';
+
+  document.querySelectorAll('.phrase-row').forEach((r, i) => {
+    r.classList.toggle('current', i === curIndex);
+  });
+  renderNowPlayingStatus();
+}
+
+function speakCurrent() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  const rate = parseFloat(rateSelect.value);
+  const wantJp = jpToggle.value === 'yes';
+
+  const uttEn = new SpeechSynthesisUtterance(item.en);
+  uttEn.lang = 'en-US';
+  uttEn.rate = rate;
+  if (englishVoice) uttEn.voice = englishVoice;
+
+  uttEn.onend = () => {
+    repeatCount++;
+    if (repeatCount < repeatTotal) {
+      if (isPlaying) speakCurrent();
+      return;
+    }
+    repeatCount = 0;
+    if (wantJp && japaneseVoice) {
+      const uttJp = new SpeechSynthesisUtterance(item.jp);
+      uttJp.lang = 'ja-JP';
+      uttJp.voice = japaneseVoice;
+      uttJp.rate = 1;
+      uttJp.onend = () => { if (isPlaying) goNext(true); };
+      synth.speak(uttJp);
+    } else {
+      if (isPlaying) goNext(true);
+    }
+  };
+
+  synth.cancel();
+  synth.speak(uttEn);
+}
+
+function goNext(auto) {
+  curIndex = (curIndex + 1) % filtered.length;
+  updateDisplay();
+  if (isPlaying) speakCurrent();
+}
+
+function goPrev() {
+  stopSpeaking();
+  curIndex = (curIndex - 1 + filtered.length) % filtered.length;
+  updateDisplay();
+  if (isPlaying) speakCurrent();
+}
+
+function stopSpeaking() {
+  synth.cancel();
+  repeatCount = 0;
+}
+
+playBtn.onclick = () => {
+  isPlaying = !isPlaying;
+  playBtn.textContent = isPlaying ? '⏸' : '▶';
+  if (isPlaying) {
+    repeatCount = 0;
+    speakCurrent();
+  } else {
+    stopSpeaking();
+  }
+};
+
+nextBtn.onclick = () => { stopSpeaking(); goNext(); };
+prevBtn.onclick = goPrev;
+
+repeatSelect.onchange = () => { repeatTotal = parseInt(repeatSelect.value); };
+
+buildFilters();
+buildStatusFilters();
+renderStats();
+renderList();
+updateDisplay();
+</script>
+</body>
+</html>
