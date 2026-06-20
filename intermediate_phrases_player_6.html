@@ -461,6 +461,7 @@
   <div class="panel">
     <div class="stats-row" id="statsRow"></div>
     <div class="status-filter-row" id="statusFilters"></div>
+    <div class="status-filter-row" id="excludeSpeakableRow" style="margin-top:8px;"></div>
   </div>
 
   <div class="panel">
@@ -765,6 +766,7 @@ let synth = window.speechSynthesis;
 let englishVoice = null;
 let japaneseVoice = null;
 let activeStatusFilter = 'all';
+let excludeSpeakable = false;
 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
 const APP_KEY = 'intermediate'; // distinguishes this app's data from the gta player
@@ -954,11 +956,26 @@ function applyFilter() {
   filtered = DATA.filter(d => {
     if (!activeCats.has(d.cat)) return false;
     if (activeStatusFilter !== 'all' && getStatus(d) !== activeStatusFilter) return false;
+    if (excludeSpeakable && getStatus(d) === 'speakable') return false;
     return true;
   });
   curIndex = 0;
   renderList();
   updateDisplay();
+}
+
+function buildExcludeSpeakableToggle() {
+  const container = document.getElementById('excludeSpeakableRow');
+  container.innerHTML = '';
+  const chip = document.createElement('div');
+  chip.className = 'status-chip' + (excludeSpeakable ? ' active' : '');
+  chip.textContent = excludeSpeakable ? '★話せるは流さない (ON)' : '★話せるも流す (OFF)';
+  chip.onclick = () => {
+    excludeSpeakable = !excludeSpeakable;
+    buildExcludeSpeakableToggle();
+    applyFilter();
+  };
+  container.appendChild(chip);
 }
 
 function renderList() {
@@ -1157,6 +1174,7 @@ function initApp() {
   buildFilters();
   buildStatusFilters();
   buildModeFilters();
+  buildExcludeSpeakableToggle();
   renderStats();
   renderList();
   updateDisplay();
