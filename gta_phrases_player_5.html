@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -294,9 +295,85 @@
     line-height: 1.6;
     margin-top: 4px;
   }
+
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .login-box {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px 24px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-box h2 { font-size: 18px; margin: 0 0 6px; }
+  .login-box p { font-size: 12px; color: var(--text-dim); margin: 0 0 20px; }
+  .login-box input {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .login-box button {
+    width: 100%;
+    background: var(--amber);
+    border: none;
+    color: #1a1208;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .login-status {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 10px;
+    min-height: 14px;
+  }
+  .sync-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    color: var(--text-dim);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 4px 10px;
+    z-index: 10;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
 <div class="wrap">
   <div class="eyebrow">GTA英語実況 / 聞き流し</div>
   <h1>フレーズ<span>プレイヤー</span></h1>
@@ -451,24 +528,48 @@ let englishVoice = null;
 let japaneseVoice = null;
 let activeStatusFilter = 'all';
 
-const STORAGE_KEY = 'phraseStatus_gta_v1';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'gta'; // distinguishes this app's data from the intermediate player
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
 
-function loadStatusMap() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch (e) {
-    return {};
-  }
+let currentUser = null;
+let statusMap = {};
+let saveTimer = null;
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  setSyncBadge('保存中...');
+  saveTimer = setTimeout(saveStatusMap, 600);
 }
 
 function saveStatusMap() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(statusMap));
-  } catch (e) {}
+  if (!currentUser) return;
+  const payload = JSON.stringify(statusMap);
+  const url = GAS_URL + '?action=save&user=' + encodeURIComponent(APP_KEY + ':' + currentUser) + '&data=' + encodeURIComponent(payload);
+  fetch(url)
+    .then(r => r.json())
+    .then(() => setSyncBadge('保存済み'))
+    .catch(() => setSyncBadge('保存失敗(通信を確認)'));
 }
 
-let statusMap = loadStatusMap();
+function loadFromServer(user) {
+  const url = GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY + ':' + user);
+  return fetch(url)
+    .then(r => r.json())
+    .then(res => {
+      try {
+        statusMap = JSON.parse(res.data || '{}');
+      } catch (e) {
+        statusMap = {};
+      }
+    });
+}
+
+function setSyncBadge(text) {
+  const badge = document.getElementById('syncBadge');
+  badge.style.display = 'block';
+  badge.textContent = text;
+}
 
 const STATUS_DEFS = [
   { key: 'learning', icon: '!', label: '未習得' },
@@ -486,7 +587,7 @@ function setStatus(item, status) {
   } else {
     statusMap[item.en] = status;
   }
-  saveStatusMap();
+  scheduleSave();
   renderList();
   renderNowPlayingStatus();
   renderStats();
@@ -725,11 +826,51 @@ prevBtn.onclick = goPrev;
 
 repeatSelect.onchange = () => { repeatTotal = parseInt(repeatSelect.value); };
 
-buildFilters();
-buildStatusFilters();
-renderStats();
-renderList();
-updateDisplay();
+function initApp() {
+  buildFilters();
+  buildStatusFilters();
+  renderStats();
+  renderList();
+  updateDisplay();
+}
+
+function startSession(user) {
+  currentUser = user;
+  localStorage.setItem(LOCAL_USER_KEY, user);
+  document.getElementById('loginStatus').textContent = '読み込み中...';
+  loadFromServer(user).then(() => {
+    document.getElementById('loginOverlay').style.display = 'none';
+    setSyncBadge(user + ' で同期中');
+    initApp();
+  }).catch(() => {
+    document.getElementById('loginStatus').textContent = '通信に失敗しました。もう一度お試しください。';
+  });
+}
+
+document.getElementById('loginBtn').onclick = () => {
+  const val = document.getElementById('passInput').value.trim();
+  if (!val) {
+    document.getElementById('loginStatus').textContent = '合言葉を入力してください';
+    return;
+  }
+  startSession(val);
+};
+document.getElementById('passInput').onkeydown = (e) => {
+  if (e.key === 'Enter') document.getElementById('loginBtn').click();
+};
+
+document.getElementById('syncBadge').onclick = () => {
+  if (currentUser) loadFromServer(currentUser).then(() => {
+    setSyncBadge(currentUser + ' で同期中(更新済み)');
+    initApp();
+  });
+};
+
+const savedUser = localStorage.getItem(LOCAL_USER_KEY);
+if (savedUser) {
+  document.getElementById('passInput').value = savedUser;
+  startSession(savedUser);
+}
 </script>
 </body>
 </html>
