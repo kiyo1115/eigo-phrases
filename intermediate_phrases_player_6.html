@@ -767,13 +767,15 @@ let englishVoice = null;
 let japaneseVoice = null;
 let activeStatusFilter = 'all';
 let excludeSpeakable = false;
+let appMode = 'listen'; // 'listen' or 'quiz'
+let quizTimer = null;
 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
 const APP_KEY = 'intermediate'; // distinguishes this app's data from the gta player
 const LOCAL_USER_KEY = 'phraseAppUser_v1';
 
 let currentUser = null;
-let statusMap = {};
+let statusMap = { listen: {}, quiz: {} };
 let saveTimer = null;
 
 function loadStatusMap() {
@@ -802,9 +804,15 @@ function loadFromServer(user) {
     .then(r => r.json())
     .then(res => {
       try {
-        statusMap = JSON.parse(res.data || '{}');
+        const parsed = JSON.parse(res.data || '{}');
+        // migrate old flat-format data (pre mode-split) into "listen" bucket
+        if (parsed && (parsed.listen || parsed.quiz)) {
+          statusMap = { listen: parsed.listen || {}, quiz: parsed.quiz || {} };
+        } else {
+          statusMap = { listen: parsed || {}, quiz: {} };
+        }
       } catch (e) {
-        statusMap = {};
+        statusMap = { listen: {}, quiz: {} };
       }
     });
 }
@@ -821,15 +829,20 @@ const STATUS_DEFS = [
   { key: 'speakable', icon: '★', label: '話せる' },
 ];
 
+function currentBucket() {
+  return statusMap[appMode];
+}
+
 function getStatus(item) {
-  return statusMap[item.en] || 'none';
+  return currentBucket()[item.en] || 'none';
 }
 
 function setStatus(item, status) {
-  if (statusMap[item.en] === status) {
-    delete statusMap[item.en];
+  const bucket = currentBucket();
+  if (bucket[item.en] === status) {
+    delete bucket[item.en];
   } else {
-    statusMap[item.en] = status;
+    bucket[item.en] = status;
   }
   scheduleSave();
   renderList();
@@ -1002,9 +1015,6 @@ function renderList() {
   });
 }
 
-let appMode = 'listen'; // 'listen' or 'quiz'
-let quizTimer = null;
-
 function updateDisplay() {
   if (filtered.length === 0) return;
   const item = filtered[curIndex];
@@ -1147,6 +1157,8 @@ function buildModeFilters() {
       document.getElementById('jpToggleWrap').style.display = (appMode === 'listen') ? 'block' : 'none';
       document.getElementById('thinkTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
       buildModeFilters();
+      applyFilter();
+      renderStats();
       updateDisplay();
     };
     container.appendChild(chip);
