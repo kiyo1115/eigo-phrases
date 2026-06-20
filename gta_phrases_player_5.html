@@ -397,8 +397,13 @@
   <div class="eyebrow">GTA英語実況 / 聞き流し</div>
   <h1>フレーズ<span>プレイヤー</span></h1>
 
+  <div class="panel" style="padding:14px 20px;">
+    <div class="status-filter-row" id="modeFilters" style="margin-top:0;"></div>
+  </div>
+
   <div class="panel now-playing">
     <div class="cat-tag" id="catTag">状況描写</div>
+    <div class="phrase-jp" id="phraseJpQuiz" style="display:none; font-size:26px; font-weight:700; color:var(--text); margin-bottom:18px;"></div>
     <div class="phrase-en" id="phraseEn">Loading...</div>
     <div class="phrase-jp" id="phraseJp"></div>
 
@@ -428,11 +433,21 @@
           <option value="3" selected>3回</option>
         </select>
       </div>
-      <div>
+      <div id="jpToggleWrap">
         <label>日本語も読む</label>
         <select id="jpToggle">
           <option value="no">英語のみ</option>
           <option value="yes" selected>英→日</option>
+        </select>
+      </div>
+      <div id="thinkTimeWrap" style="display:none;">
+        <label>考える時間</label>
+        <select id="thinkTimeSelect">
+          <option value="3000">3秒</option>
+          <option value="5000" selected>5秒</option>
+          <option value="8000">8秒</option>
+          <option value="15000">15秒</option>
+          <option value="20000">20秒</option>
         </select>
       </div>
     </div>
@@ -548,13 +563,15 @@ let englishVoice = null;
 let japaneseVoice = null;
 let activeStatusFilter = 'all';
 let excludeSpeakable = false;
+let appMode = 'listen'; // 'listen' or 'quiz'
+let quizTimer = null;
 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
 const APP_KEY = 'gta'; // distinguishes this app's data from the intermediate player
 const LOCAL_USER_KEY = 'phraseAppUser_v1';
 
 let currentUser = null;
-let statusMap = {};
+let statusMap = { listen: {}, quiz: {} };
 let saveTimer = null;
 
 function scheduleSave() {
@@ -579,9 +596,14 @@ function loadFromServer(user) {
     .then(r => r.json())
     .then(res => {
       try {
-        statusMap = JSON.parse(res.data || '{}');
+        const parsed = JSON.parse(res.data || '{}');
+        if (parsed && (parsed.listen || parsed.quiz)) {
+          statusMap = { listen: parsed.listen || {}, quiz: parsed.quiz || {} };
+        } else {
+          statusMap = { listen: parsed || {}, quiz: {} };
+        }
       } catch (e) {
-        statusMap = {};
+        statusMap = { listen: {}, quiz: {} };
       }
     });
 }
@@ -598,15 +620,20 @@ const STATUS_DEFS = [
   { key: 'speakable', icon: '★', label: '話せる' },
 ];
 
+function currentBucket() {
+  return statusMap[appMode];
+}
+
 function getStatus(item) {
-  return statusMap[item.en] || 'none';
+  return currentBucket()[item.en] || 'none';
 }
 
 function setStatus(item, status) {
-  if (statusMap[item.en] === status) {
-    delete statusMap[item.en];
+  const bucket = currentBucket();
+  if (bucket[item.en] === status) {
+    delete bucket[item.en];
   } else {
-    statusMap[item.en] = status;
+    bucket[item.en] = status;
   }
   scheduleSave();
   renderList();
@@ -782,16 +809,36 @@ function updateDisplay() {
   if (filtered.length === 0) return;
   const item = filtered[curIndex];
   catTag.textContent = item.cat;
-  phraseEn.textContent = item.en;
-  phraseJp.textContent = item.jp;
   curIdxEl.textContent = (curIndex + 1) + ' / ' + filtered.length;
   totalIdxEl.textContent = '';
   progressBar.style.width = ((curIndex) / Math.max(filtered.length - 1, 1)) * 100 + '%';
+
+  const phraseJpQuiz = document.getElementById('phraseJpQuiz');
+
+  if (appMode === 'quiz') {
+    phraseJpQuiz.style.display = 'block';
+    phraseJpQuiz.textContent = item.jp;
+    phraseEn.textContent = '？？？';
+    phraseEn.style.opacity = '0.3';
+    phraseJp.textContent = '';
+  } else {
+    phraseJpQuiz.style.display = 'none';
+    phraseEn.textContent = item.en;
+    phraseEn.style.opacity = '1';
+    phraseJp.textContent = item.jp;
+  }
 
   document.querySelectorAll('.phrase-row').forEach((r, i) => {
     r.classList.toggle('current', i === curIndex);
   });
   renderNowPlayingStatus();
+}
+
+function revealAnswer() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  phraseEn.textContent = item.en;
+  phraseEn.style.opacity = '1';
 }
 
 function speakCurrent() {
@@ -800,6 +847,38 @@ function speakCurrent() {
   const rate = parseFloat(rateSelect.value);
   const wantJp = jpToggle.value === 'yes';
 
+  if (appMode === 'quiz') {
+    const thinkMs = parseInt(document.getElementById('thinkTimeSelect').value);
+    clearTimeout(quizTimer);
+
+    if (japaneseVoice) {
+      const uttJpFirst = new SpeechSynthesisUtterance(item.jp);
+      uttJpFirst.lang = 'ja-JP';
+      uttJpFirst.voice = japaneseVoice;
+      uttJpFirst.rate = 1;
+      uttJpFirst.onend = () => {
+        quizTimer = setTimeout(() => {
+          if (!isPlaying) return;
+          revealAnswer();
+          speakEnglishThenAdvance(item, rate);
+        }, thinkMs);
+      };
+      synth.cancel();
+      synth.speak(uttJpFirst);
+    } else {
+      quizTimer = setTimeout(() => {
+        if (!isPlaying) return;
+        revealAnswer();
+        speakEnglishThenAdvance(item, rate);
+      }, thinkMs);
+    }
+    return;
+  }
+
+  speakEnglishThenAdvance(item, rate, wantJp);
+}
+
+function speakEnglishThenAdvance(item, rate, wantJp) {
   const uttEn = new SpeechSynthesisUtterance(item.en);
   uttEn.lang = 'en-US';
   uttEn.rate = rate;
@@ -808,7 +887,7 @@ function speakCurrent() {
   uttEn.onend = () => {
     repeatCount++;
     if (repeatCount < repeatTotal) {
-      if (isPlaying) speakCurrent();
+      if (isPlaying) speakEnglishThenAdvance(item, rate, wantJp);
       return;
     }
     repeatCount = 0;
@@ -843,7 +922,35 @@ function goPrev() {
 
 function stopSpeaking() {
   synth.cancel();
+  clearTimeout(quizTimer);
   repeatCount = 0;
+}
+
+function buildModeFilters() {
+  const container = document.getElementById('modeFilters');
+  container.innerHTML = '';
+  const modes = [
+    { key: 'listen', label: '聞き流しモード' },
+    { key: 'quiz', label: 'クイズモード(日本語→考える→答え)' },
+  ];
+  modes.forEach(m => {
+    const chip = document.createElement('div');
+    chip.className = 'status-chip' + (appMode === m.key ? ' active' : '');
+    chip.textContent = m.label;
+    chip.onclick = () => {
+      stopSpeaking();
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      appMode = m.key;
+      document.getElementById('jpToggleWrap').style.display = (appMode === 'listen') ? 'block' : 'none';
+      document.getElementById('thinkTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
+      buildModeFilters();
+      applyFilter();
+      renderStats();
+      updateDisplay();
+    };
+    container.appendChild(chip);
+  });
 }
 
 playBtn.onclick = () => {
@@ -851,6 +958,7 @@ playBtn.onclick = () => {
   playBtn.textContent = isPlaying ? '⏸' : '▶';
   if (isPlaying) {
     repeatCount = 0;
+    if (appMode === 'quiz') updateDisplay();
     speakCurrent();
   } else {
     stopSpeaking();
@@ -865,6 +973,7 @@ repeatSelect.onchange = () => { repeatTotal = parseInt(repeatSelect.value); };
 function initApp() {
   buildFilters();
   buildStatusFilters();
+  buildModeFilters();
   buildExcludeSpeakableToggle();
   renderStats();
   renderList();
