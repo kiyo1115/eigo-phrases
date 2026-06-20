@@ -415,8 +415,8 @@
       <div>
         <label>速度</label>
         <select id="rateSelect">
-          <option value="0.8">遅め (0.8x)</option>
-          <option value="1" selected>標準 (1.0x)</option>
+          <option value="0.8" selected>遅め (0.8x)</option>
+          <option value="1">標準 (1.0x)</option>
           <option value="1.2">やや速い (1.2x)</option>
         </select>
       </div>
@@ -424,15 +424,15 @@
         <label>リピート回数</label>
         <select id="repeatSelect">
           <option value="1">1回</option>
-          <option value="2" selected>2回</option>
-          <option value="3">3回</option>
+          <option value="2">2回</option>
+          <option value="3" selected>3回</option>
         </select>
       </div>
       <div>
         <label>日本語も読む</label>
         <select id="jpToggle">
-          <option value="no" selected>英語のみ</option>
-          <option value="yes">英→日</option>
+          <option value="no">英語のみ</option>
+          <option value="yes" selected>英→日</option>
         </select>
       </div>
     </div>
@@ -542,7 +542,7 @@ let filtered = [...DATA];
 let curIndex = 0;
 let isPlaying = false;
 let repeatCount = 1;
-let repeatTotal = 2;
+let repeatTotal = 3;
 let synth = window.speechSynthesis;
 let englishVoice = null;
 let japaneseVoice = null;
