@@ -27,6 +27,22 @@
   }
   .wrap { max-width: 640px; margin: 0 auto; }
 
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 6px 14px;
+    margin-bottom: 16px;
+    transition: 0.15s;
+  }
+  .back-link:hover { border-color: var(--amber-dim); color: var(--amber); }
+
   .eyebrow {
     font-size: 11px;
     letter-spacing: 0.2em;
@@ -377,6 +393,7 @@
 <div class="sync-badge" id="syncBadge" style="display:none;"></div>
 
 <div class="wrap">
+  <a class="back-link" href="index.html">← トップに戻る</a>
   <div class="eyebrow">瞬間英作文 中級 / GTA選別版</div>
   <h1>中級<span>フレーズ</span></h1>
 
