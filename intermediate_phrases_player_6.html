@@ -767,6 +767,7 @@ let englishVoice = null;
 let japaneseVoice = null;
 let activeStatusFilter = 'all';
 let excludeSpeakable = false;
+let excludeKnown = false;
 let appMode = 'listen'; // 'listen' or 'quiz'
 let quizTimer = null;
 
@@ -970,6 +971,7 @@ function applyFilter() {
     if (!activeCats.has(d.cat)) return false;
     if (activeStatusFilter !== 'all' && getStatus(d) !== activeStatusFilter) return false;
     if (excludeSpeakable && getStatus(d) === 'speakable') return false;
+    if (excludeKnown && getStatus(d) === 'known') return false;
     return true;
   });
   curIndex = 0;
@@ -980,15 +982,26 @@ function applyFilter() {
 function buildExcludeSpeakableToggle() {
   const container = document.getElementById('excludeSpeakableRow');
   container.innerHTML = '';
-  const chip = document.createElement('div');
-  chip.className = 'status-chip' + (excludeSpeakable ? ' active' : '');
-  chip.textContent = excludeSpeakable ? '★話せるは流さない (ON)' : '★話せるも流す (OFF)';
-  chip.onclick = () => {
+
+  const chip1 = document.createElement('div');
+  chip1.className = 'status-chip' + (excludeSpeakable ? ' active' : '');
+  chip1.textContent = excludeSpeakable ? '★話せるは流さない (ON)' : '★話せるも流す (OFF)';
+  chip1.onclick = () => {
     excludeSpeakable = !excludeSpeakable;
     buildExcludeSpeakableToggle();
     applyFilter();
   };
-  container.appendChild(chip);
+  container.appendChild(chip1);
+
+  const chip2 = document.createElement('div');
+  chip2.className = 'status-chip' + (excludeKnown ? ' active' : '');
+  chip2.textContent = excludeKnown ? '◯覚えたは流さない (ON)' : '◯覚えたも流す (OFF)';
+  chip2.onclick = () => {
+    excludeKnown = !excludeKnown;
+    buildExcludeSpeakableToggle();
+    applyFilter();
+  };
+  container.appendChild(chip2);
 }
 
 function renderList() {
