@@ -1,45 +1,115 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>英語学習フレーズ</title>
 <style>
+  :root {
+    --bg: #14110f;
+    --panel: #1c1815;
+    --amber: #ff8c2e;
+    --amber-dim: #c4691a;
+    --text: #ede5d8;
+    --text-dim: #968d7f;
+    --line: #2e2822;
+  }
+  * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: #14110f;
-    color: #ede5d8;
+    background: var(--bg);
+    color: var(--text);
     font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
     min-height: 100vh;
     padding: 40px 20px;
   }
   .wrap { max-width: 480px; margin: 0 auto; }
-  h1 { font-size: 24px; margin-bottom: 24px; }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber-dim);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 0 0 8px;
+  }
+  h1 span { color: var(--amber); }
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
   a.card {
     display: block;
-    background: #1c1815;
-    border: 1px solid #2e2822;
-    border-radius: 10px;
-    padding: 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 20px;
     margin-bottom: 14px;
-    color: #ede5d8;
+    color: var(--text);
     text-decoration: none;
+    transition: 0.15s;
   }
-  a.card:hover { border-color: #ff8c2e; }
-  a.card .title { font-size: 18px; font-weight: 700; color: #ff8c2e; margin-bottom: 6px; }
-  a.card .desc { font-size: 13px; color: #968d7f; }
+  a.card:hover { border-color: var(--amber-dim); }
+  a.card:active { border-color: var(--amber); }
+  .card-tag {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    border-radius: 99px;
+    padding: 2px 8px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .card-meta {
+    font-size: 11px;
+    color: var(--amber-dim);
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>英語学習フレーズ</h1>
+  <div class="eyebrow">English Learning</div>
+  <h1>英語<span>フレーズ</span></h1>
+  <div class="subtitle">合言葉でPCとiPhoneのデータが同期されます</div>
+
+  <a class="card" href="practical_phrases_player.html">
+    <div class="card-tag">おすすめ</div>
+    <div class="card-title">実用フレーズ</div>
+    <div class="card-desc">実際の会話でよく使う表現を厳選。過去形・状況描写・ツッコミ・間埋め・ネタ系など。</div>
+    <div class="card-meta">190フレーズ · 10カテゴリ</div>
+  </a>
+
   <a class="card" href="gta_phrases_player_5.html">
-    <div class="title">GTA実況フレーズ</div>
-    <div class="desc">67フレーズ・GTA実況用</div>
+    <div class="card-tag">GTA特化</div>
+    <div class="card-title">GTAフレーズ</div>
+    <div class="card-desc">GTA実況で使うフレーズに特化。状況描写・銃撃戦・運転・カオス系リアクションなど。</div>
+    <div class="card-meta">67フレーズ · 8カテゴリ</div>
   </a>
+
   <a class="card" href="intermediate_phrases_player_6.html">
-    <div class="title">中級フレーズ</div>
-    <div class="desc">278フレーズ・瞬間英作文中級</div>
+    <div class="card-tag">文法強化</div>
+    <div class="card-title">中級フレーズ</div>
+    <div class="card-desc">瞬間英作文中級から抽出。助動詞・進行形・比較・現在完了など文型の幅を広げたい時に。</div>
+    <div class="card-meta">278フレーズ · 8カテゴリ</div>
   </a>
+
 </div>
 </body>
 </html>
