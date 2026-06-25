@@ -454,6 +454,17 @@
           <option value="20000">20秒</option>
         </select>
       </div>
+      <div id="reviewTimeWrap" style="display:none;">
+        <label>答え確認時間</label>
+        <select id="reviewTimeSelect">
+          <option value="3000">3秒</option>
+          <option value="5000">5秒</option>
+          <option value="8000" selected>8秒</option>
+          <option value="10000">10秒</option>
+          <option value="15000">15秒</option>
+          <option value="20000">20秒</option>
+        </select>
+      </div>
     </div>
 
     <div class="hint" id="voiceHint"></div>
@@ -1050,15 +1061,25 @@ function speakEnglishThenAdvance(item, rate, wantJp) {
       return;
     }
     repeatCount = 0;
-    if (wantJp && japaneseVoice) {
-      const uttJp = new SpeechSynthesisUtterance(item.jp);
-      uttJp.lang = 'ja-JP';
-      uttJp.voice = japaneseVoice;
-      uttJp.rate = 1;
-      uttJp.onend = () => { if (isPlaying) goNext(true); };
-      synth.speak(uttJp);
+    const reviewMs = (appMode === 'quiz') ? parseInt(document.getElementById('reviewTimeSelect').value) : 0;
+    const proceed = () => {
+      if (!isPlaying) return;
+      if (wantJp && japaneseVoice) {
+        const uttJp = new SpeechSynthesisUtterance(item.jp);
+        uttJp.lang = 'ja-JP';
+        uttJp.voice = japaneseVoice;
+        uttJp.rate = 1;
+        uttJp.onend = () => { if (isPlaying) goNext(true); };
+        synth.speak(uttJp);
+      } else {
+        goNext(true);
+      }
+    };
+    if (reviewMs > 0) {
+      clearTimeout(quizTimer);
+      quizTimer = setTimeout(proceed, reviewMs);
     } else {
-      if (isPlaying) goNext(true);
+      proceed();
     }
   };
 
@@ -1103,6 +1124,7 @@ function buildModeFilters() {
       appMode = m.key;
       document.getElementById('jpToggleWrap').style.display = (appMode === 'listen') ? 'block' : 'none';
       document.getElementById('thinkTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
+      document.getElementById('reviewTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
       buildModeFilters();
       applyFilter();
       renderStats();
