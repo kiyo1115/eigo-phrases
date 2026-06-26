@@ -1043,6 +1043,7 @@ function renderList() {
       curIndex = i;
       updateDisplay();
       if (isPlaying) speakCurrent();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     row.appendChild(mainDiv);
     row.appendChild(buildStatusButtonsEl(item, false));
