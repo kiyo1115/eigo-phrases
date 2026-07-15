@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>実用フレーズ 聞き流しプレイヤー1</title>
+<title>実用フレーズ 聞き流しプレイヤー</title>
 <style>
   :root {
     --bg: #14110f;
@@ -402,6 +402,7 @@
   </div>
 
   <div class="panel now-playing">
+    <div id="emptyMsg" style="display:none; font-size:13px; color:var(--text-dim); line-height:1.7; padding:8px 4px 16px;"></div>
     <div class="cat-tag" id="catTag">状況描写</div>
     <div class="phrase-jp" id="phraseJpQuiz" style="display:none; font-size:26px; font-weight:700; color:var(--text); margin-bottom:18px;"></div>
     <div class="phrase-en" id="phraseEn">Loading...</div>
@@ -455,8 +456,8 @@
         <label>考える時間</label>
         <select id="thinkTimeSelect">
           <option value="3000">3秒</option>
-          <option value="5000" selected>5秒</option>
-          <option value="8000">8秒</option>
+          <option value="5000">5秒</option>
+          <option value="8000" selected>8秒</option>
           <option value="15000">15秒</option>
           <option value="20000">20秒</option>
         </select>
@@ -705,15 +706,42 @@ let japaneseVoice = null;
 let activeStatusFilter = 'all';
 let excludeSpeakable = false;
 let excludeKnown = false;
-let appMode = 'listen'; // 'listen' or 'quiz'
+let appMode = 'listen'; // 'listen' | 'quiz' | 'quiz5' | 'quiz3'
 let quizTimer = null;
+
+// 各クイズモードの考える時間(ms)。quizだけユーザーが選択可能
+const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000 };
+// 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
+const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5' };
+
+function isQuizMode() { return appMode !== 'listen'; }
+
+function isCleared(status) { return status === 'known' || status === 'speakable'; }
+
+// そのフレーズが現在のモードの対象かどうか
+function isUnlocked(item) {
+  const src = MODE_SOURCE[appMode];
+  if (!src) return true; // listen / quiz は全フレーズ対象
+  return isCleared(statusMap[src][item.en]);
+}
+
+function unlockedCount(mode) {
+  const src = MODE_SOURCE[mode];
+  if (!src) return DATA.length;
+  return DATA.filter(d => isCleared(statusMap[src][d.en])).length;
+}
+
+function getThinkMs() {
+  if (MODE_THINK_MS[appMode]) return MODE_THINK_MS[appMode];
+  return parseInt(document.getElementById('thinkTimeSelect').value);
+}
 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
 const APP_KEY = 'practical'; // distinguishes this app's data from the gta player
 const LOCAL_USER_KEY = 'phraseAppUser_v1';
 
 let currentUser = null;
-let statusMap = { listen: {}, quiz: {} };
+let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {} };
 let saveTimer = null;
 
 function loadStatusMap() {
@@ -726,14 +754,31 @@ function scheduleSave() {
   saveTimer = setTimeout(saveStatusMap, 600);
 }
 
-function saveStatusMap() {
+function saveStatusMap(retry) {
   if (!currentUser) return;
-  const payload = JSON.stringify(statusMap);
-  const url = GAS_URL + '?action=save&user=' + encodeURIComponent(APP_KEY + ':' + currentUser) + '&data=' + encodeURIComponent(payload);
-  fetch(url)
+  // POSTで送る(GETだとデータ量が増えたときURL長の上限を超えて保存が失敗するため)
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      action: 'save',
+      user: APP_KEY + ':' + currentUser,
+      data: JSON.stringify(statusMap)
+    })
+  })
     .then(r => r.json())
-    .then(() => setSyncBadge('保存済み'))
-    .catch(() => setSyncBadge('保存失敗(通信を確認)'));
+    .then(res => {
+      if (res && res.error) throw new Error(res.error);
+      setSyncBadge('保存済み');
+    })
+    .catch(() => {
+      if (!retry) {
+        setSyncBadge('保存リトライ中...');
+        setTimeout(() => saveStatusMap(true), 1500);
+      } else {
+        setSyncBadge('⚠保存失敗 タップで再試行');
+      }
+    });
 }
 
 function loadFromServer(user) {
@@ -743,14 +788,19 @@ function loadFromServer(user) {
     .then(res => {
       try {
         const parsed = JSON.parse(res.data || '{}');
-        // migrate old flat-format data (pre mode-split) into "listen" bucket
+        // 旧フォーマット(モード分け前)は listen バケットへ移行
         if (parsed && (parsed.listen || parsed.quiz)) {
-          statusMap = { listen: parsed.listen || {}, quiz: parsed.quiz || {} };
+          statusMap = {
+            listen: parsed.listen || {},
+            quiz: parsed.quiz || {},
+            quiz5: parsed.quiz5 || {},
+            quiz3: parsed.quiz3 || {}
+          };
         } else {
-          statusMap = { listen: parsed || {}, quiz: {} };
+          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {} };
         }
       } catch (e) {
-        statusMap = { listen: {}, quiz: {} };
+        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {} };
       }
     });
 }
@@ -786,6 +836,7 @@ function setStatus(item, status) {
   renderList();
   renderNowPlayingStatus();
   renderStats();
+  buildModeFilters();
 }
 
 function buildStatusButtonsEl(item, large) {
@@ -815,7 +866,8 @@ function renderNowPlayingStatus() {
 
 function renderStats() {
   const counts = { none: 0, learning: 0, known: 0, speakable: 0 };
-  DATA.forEach(d => {
+  // そのモードの対象フレーズだけを数える(5秒/3秒モードは解放済みのみ)
+  DATA.filter(isUnlocked).forEach(d => {
     const s = getStatus(d);
     counts[s] = (counts[s] || 0) + 1;
   });
@@ -905,6 +957,7 @@ function buildFilters() {
 
 function applyFilter() {
   filtered = DATA.filter(d => {
+    if (!isUnlocked(d)) return false;
     if (!activeCats.has(d.cat)) return false;
     if (activeStatusFilter !== 'all' && getStatus(d) !== activeStatusFilter) return false;
     if (excludeSpeakable && getStatus(d) === 'speakable') return false;
@@ -967,7 +1020,23 @@ function renderList() {
 }
 
 function updateDisplay() {
-  if (filtered.length === 0) return;
+  const emptyBox = document.getElementById('emptyMsg');
+  if (filtered.length === 0) {
+    emptyBox.style.display = 'block';
+    emptyBox.textContent = MODE_SOURCE[appMode]
+      ? '対象フレーズがありません。前のモードで「◯覚えた」にチェックしたフレーズがここに追加されます。'
+      : '対象フレーズがありません。フィルター条件を確認してください。';
+    document.getElementById('phraseJpQuiz').style.display = 'none';
+    phraseEn.textContent = '—';
+    phraseEn.style.opacity = '1';
+    phraseJp.textContent = '';
+    document.getElementById('kwBox').style.display = 'none';
+    document.getElementById('nowPlayingStatus').innerHTML = '';
+    curIdxEl.textContent = '0 / 0';
+    progressBar.style.width = '0%';
+    return;
+  }
+  emptyBox.style.display = 'none';
   const item = filtered[curIndex];
   catTag.textContent = item.cat;
   curIdxEl.textContent = (curIndex + 1) + ' / ' + filtered.length;
@@ -1068,7 +1137,7 @@ function speakEnglishThenAdvance(item, rate, wantJp) {
       return;
     }
     repeatCount = 0;
-    const reviewMs = (appMode === 'quiz') ? parseInt(document.getElementById('reviewTimeSelect').value) : 0;
+    const reviewMs = isQuizMode() ? parseInt(document.getElementById('reviewTimeSelect').value) : 0;
     const proceed = () => {
       if (!isPlaying) return;
       if (wantJp && japaneseVoice) {
@@ -1117,13 +1186,17 @@ function buildModeFilters() {
   const container = document.getElementById('modeFilters');
   container.innerHTML = '';
   const modes = [
-    { key: 'listen', label: '聞き流しモード' },
-    { key: 'quiz', label: 'クイズモード(日本語→考える→答え)' },
+    { key: 'listen', label: '聞き流し' },
+    { key: 'quiz', label: 'クイズ(時間可変)' },
+    { key: 'quiz5', label: '5秒モード' },
+    { key: 'quiz3', label: '3秒モード' },
   ];
   modes.forEach(m => {
     const chip = document.createElement('div');
     chip.className = 'status-chip' + (appMode === m.key ? ' active' : '');
-    chip.textContent = m.label;
+    const n = unlockedCount(m.key);
+    chip.textContent = MODE_SOURCE[m.key] ? `${m.label} (${n})` : m.label;
+    if (MODE_SOURCE[m.key] && n === 0) chip.style.opacity = '0.4';
     chip.onclick = () => {
       stopSpeaking();
       isPlaying = false;
@@ -1131,7 +1204,7 @@ function buildModeFilters() {
       appMode = m.key;
       document.getElementById('jpToggleWrap').style.display = (appMode === 'listen') ? 'block' : 'none';
       document.getElementById('thinkTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
-      document.getElementById('reviewTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
+      document.getElementById('reviewTimeWrap').style.display = isQuizMode() ? 'block' : 'none';
       buildModeFilters();
       applyFilter();
       renderStats();
@@ -1146,7 +1219,7 @@ playBtn.onclick = () => {
   playBtn.textContent = isPlaying ? '⏸' : '▶';
   if (isPlaying) {
     repeatCount = 0;
-    if (appMode === 'quiz') updateDisplay(); // reset to hidden state
+    if (isQuizMode()) updateDisplay(); // 答えを隠した状態に戻す
     speakCurrent();
   } else {
     stopSpeaking();
@@ -1194,6 +1267,10 @@ document.getElementById('passInput').onkeydown = (e) => {
 };
 
 document.getElementById('syncBadge').onclick = () => {
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗') !== -1) {
+    saveStatusMap();
+    return;
+  }
   if (currentUser) loadFromServer(currentUser).then(() => {
     setSyncBadge(currentUser + ' で同期中(更新済み)');
     initApp();
