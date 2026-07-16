@@ -1045,8 +1045,8 @@ function updateDisplay() {
 
   const phraseJpQuiz = document.getElementById('phraseJpQuiz');
 
-  if (appMode === 'quiz') {
-    // show Japanese first, hide English, then reveal after thinking time
+  if (isQuizMode()) {
+    // 日本語を先に出し、考える時間のあと英語を表示する
     phraseJpQuiz.style.display = 'block';
     phraseJpQuiz.textContent = item.jp;
     phraseEn.textContent = '？？？';
@@ -1091,9 +1091,9 @@ function speakCurrent() {
   const rate = parseFloat(rateSelect.value);
   const wantJp = jpToggle.value === 'yes';
 
-  if (appMode === 'quiz') {
-    // speak Japanese first, then wait remaining thinking time, then reveal + speak English
-    const thinkMs = parseInt(document.getElementById('thinkTimeSelect').value);
+  if (isQuizMode()) {
+    // 日本語音声 → 考える時間 → 英語表示+音声
+    const thinkMs = getThinkMs();
     clearTimeout(quizTimer);
 
     if (japaneseVoice) {
