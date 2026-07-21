@@ -621,6 +621,7 @@ let quizTimer = null;
 const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800 };
 // 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
 const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2' };
+const RANDOM_MODES = new Set(['quiz2', 'quizInstant']); // 出題順をランダムにするモード
 // モードごとの固定リピート回数(指定がなければユーザー選択値を使う)
 // モードごとのリピート回数の上限とデフォルト。指定のないモードは max10/default5
 const MODE_REPEAT_CFG = {
@@ -899,6 +900,13 @@ function applyFilter() {
     if (excludeKnown && getStatus(d) === 'known') return false;
     return true;
   });
+  // 2秒・即射モードは順番暗記を防ぐため出題順をシャッフル
+  if (RANDOM_MODES.has(appMode)) {
+    for (let i = filtered.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+    }
+  }
   curIndex = 0;
   renderList();
   updateDisplay();
