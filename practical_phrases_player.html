@@ -706,13 +706,19 @@ let japaneseVoice = null;
 let activeStatusFilter = 'all';
 let excludeSpeakable = false;
 let excludeKnown = false;
-let appMode = 'listen'; // 'listen' | 'quiz' | 'quiz5' | 'quiz3'
+let appMode = 'listen'; // listen | quiz | quiz5 | quiz3 | quiz2 | quizInstant
 let quizTimer = null;
 
 // 各クイズモードの考える時間(ms)。quizだけユーザーが選択可能
-const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000 };
+const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800 };
 // 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
-const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5' };
+const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2' };
+// モードごとの固定リピート回数(指定がなければユーザー選択値を使う)
+const MODE_REPEAT = { quiz3: 2, quiz2: 1, quizInstant: 1 };
+function getRepeatTotal() {
+  if (MODE_REPEAT[appMode]) return MODE_REPEAT[appMode];
+  return repeatTotal;
+}
 
 function isQuizMode() { return appMode !== 'listen'; }
 
@@ -741,7 +747,7 @@ const APP_KEY = 'practical'; // distinguishes this app's data from the gta playe
 const LOCAL_USER_KEY = 'phraseAppUser_v1';
 
 let currentUser = null;
-let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {} };
+let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
 let saveTimer = null;
 
 function loadStatusMap() {
@@ -794,13 +800,15 @@ function loadFromServer(user) {
             listen: parsed.listen || {},
             quiz: parsed.quiz || {},
             quiz5: parsed.quiz5 || {},
-            quiz3: parsed.quiz3 || {}
+            quiz3: parsed.quiz3 || {},
+            quiz2: parsed.quiz2 || {},
+            quizInstant: parsed.quizInstant || {}
           };
         } else {
-          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {} };
+          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
         }
       } catch (e) {
-        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {} };
+        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
       }
     });
 }
@@ -1132,7 +1140,7 @@ function speakEnglishThenAdvance(item, rate, wantJp) {
 
   uttEn.onend = () => {
     repeatCount++;
-    if (repeatCount < repeatTotal) {
+    if (repeatCount < getRepeatTotal()) {
       if (isPlaying) speakEnglishThenAdvance(item, rate, wantJp);
       return;
     }
@@ -1189,7 +1197,9 @@ function buildModeFilters() {
     { key: 'listen', label: '聞き流し' },
     { key: 'quiz', label: 'クイズ(時間可変)' },
     { key: 'quiz5', label: '5秒モード' },
-    { key: 'quiz3', label: '3秒モード' },
+    { key: 'quiz3', label: '3秒(2回)' },
+    { key: 'quiz2', label: '2秒(1回)' },
+    { key: 'quizInstant', label: '即射(1回)' },
   ];
   modes.forEach(m => {
     const chip = document.createElement('div');
