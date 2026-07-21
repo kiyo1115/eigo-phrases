@@ -622,10 +622,29 @@ const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800 
 // 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
 const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2' };
 // モードごとの固定リピート回数(指定がなければユーザー選択値を使う)
-const MODE_REPEAT = { quiz3: 2, quiz2: 1, quizInstant: 1 };
+// モードごとのリピート回数の上限とデフォルト。指定のないモードは max10/default5
+const MODE_REPEAT_CFG = {
+  quiz5:       { max: 4, def: 3 },
+  quiz3:       { max: 3, def: 2 },
+  quiz2:       { max: 2, def: 1 },
+  quizInstant: { max: 2, def: 1 },
+};
+function repeatCfg() {
+  return MODE_REPEAT_CFG[appMode] || { max: 10, def: 5 };
+}
 function getRepeatTotal() {
-  if (MODE_REPEAT[appMode]) return MODE_REPEAT[appMode];
   return repeatTotal;
+}
+// モードに応じてリピート選択肢を作り直し、デフォルトを適用する
+function rebuildRepeatOptions() {
+  const cfg = repeatCfg();
+  if (repeatTotal > cfg.max) repeatTotal = cfg.def;
+  let html = '';
+  for (let i = 1; i <= cfg.max; i++) {
+    html += `<option value="${i}"${i === repeatTotal ? ' selected' : ''}>${i}回</option>`;
+  }
+  repeatSelect.innerHTML = html;
+  repeatSelect.value = String(repeatTotal);
 }
 
 function isQuizMode() { return appMode !== 'listen'; }
@@ -1120,6 +1139,8 @@ function buildModeFilters() {
       isPlaying = false;
       playBtn.textContent = '▶';
       appMode = m.key;
+      repeatTotal = repeatCfg().def; // モードのデフォルトに合わせる
+      rebuildRepeatOptions();
       document.getElementById('jpToggleWrap').style.display = (appMode === 'listen') ? 'block' : 'none';
       document.getElementById('thinkTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
       document.getElementById('reviewTimeWrap').style.display = isQuizMode() ? 'block' : 'none';
@@ -1148,6 +1169,7 @@ nextBtn.onclick = () => { stopSpeaking(); goNext(); };
 prevBtn.onclick = goPrev;
 
 repeatSelect.onchange = () => { repeatTotal = parseInt(repeatSelect.value); };
+rebuildRepeatOptions();
 
 function initApp() {
   buildFilters();
