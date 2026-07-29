@@ -499,96 +499,96 @@
 
 <script>
 const DATA = [
-  {cat:"状況描写", en:"I'm stuck", jp:"自分は引っかかって進めない(物理的に動けない)", kw:"stuck", ex:"stuck=動けない・詰まった状態"},
-  {cat:"状況描写", en:"I'm trapped", jp:"自分は閉じ込められた(逃げ場がない)", kw:"trapped", ex:"trap=罠にかける、be trapped=閉じ込められる"},
-  {cat:"状況描写", en:"I'm cornered", jp:"自分は追い詰められた", kw:"cornered", ex:"corner=角、be cornered=角に追い詰められる"},
-  {cat:"状況描写", en:"I'm exposed", jp:"自分は丸見えだ(隠れられてない)", kw:"exposed", ex:"expose=さらす、be exposed=さらされている"},
-  {cat:"状況描写", en:"I'm vulnerable right now", jp:"今自分は無防備だ", kw:"vulnerable", ex:"vulnerable=攻撃されやすい・無防備な"},
-  {cat:"状況描写", en:"Something's not right", jp:"何かがおかしい", kw:"not right", ex:"not right=正常じゃない・おかしい"},
-  {cat:"状況描写", en:"This place is huge", jp:"ここはめちゃくちゃ広い", kw:"huge", ex:"huge=巨大な(bigよりかなり大きい)"},
-  {cat:"状況描写", en:"This place is empty", jp:"ここは誰もいない", kw:"empty", ex:"empty=空っぽの・誰もいない"},
-  {cat:"状況描写", en:"It's too quiet", jp:"静かすぎる(不穏な静けさ)", kw:"too quiet", ex:"too quiet=静かすぎる(不気味さを含む)"},
-  {cat:"状況描写", en:"Something's coming", jp:"何かが近づいてくる", kw:"coming", ex:"come=来る、somethingが主語"},
-  {cat:"戦闘・アクション", en:"I'm pinned down", jp:"自分は撃たれて動けない(銃撃で釘付け)", kw:"pinned down", ex:"pin down=押さえつける・釘付けにする"},
-  {cat:"戦闘・アクション", en:"I'm flanking", jp:"自分は側面から回り込んでる", kw:"flanking", ex:"flank=側面、flanking=側面攻撃をしている"},
-  {cat:"戦闘・アクション", en:"I'm low on health", jp:"自分は体力が少ない", kw:"low on health", ex:"low on=〜が少ない"},
-  {cat:"戦闘・アクション", en:"I need backup", jp:"自分は応援が必要だ", kw:"backup", ex:"backup=援護・応援"},
-  {cat:"戦闘・アクション", en:"I got the drop on him", jp:"自分は先手を取れた", kw:"drop on him", ex:"get the drop on=先手を取る・有利な状況で仕掛ける"},
-  {cat:"戦闘・アクション", en:"He's onto me", jp:"あいつは自分に気づいてる", kw:"onto me", ex:"be onto=〜に気づいている・察知している"},
-  {cat:"戦闘・アクション", en:"I blew my cover", jp:"自分は正体がバレた", kw:"blew my cover", ex:"blow one's cover=正体・隠れていたことがバレる"},
-  {cat:"戦闘・アクション", en:"I'm in the clear", jp:"自分は安全圏にいる", kw:"in the clear", ex:"in the clear=危険を脱した・安全な状態"},
-  {cat:"戦闘・アクション", en:"That was a close call", jp:"今のは危機一髪だった(危険を回避)", kw:"close call", ex:"close call=危機一髪・ギリギリの状況"},
-  {cat:"戦闘・アクション", en:"I barely made it", jp:"自分はかろうじて間に合った(時間・到達)", kw:"barely", ex:"barely=かろうじて・ギリギリで"},
-  {cat:"判断・決断", en:"Let's just go for it", jp:"よし、思い切って突っ込もう(覚悟を決める)", kw:"go for it", ex:"go for it=思い切ってやる"},
-  {cat:"判断・決断", en:"I'll take the risk", jp:"自分はリスクを承知でやる", kw:"take the risk", ex:"take the risk=リスクを冒す"},
-  {cat:"判断・決断", en:"Better safe than sorry", jp:"後悔するより用心が先(ことわざ)", kw:"safe than sorry", ex:"Better safe than sorry=用心するに越したことはない(ことわざ)"},
-  {cat:"判断・決断", en:"There's no turning back now", jp:"もう後戻りできない", kw:"no turning back", ex:"no turning back=後戻りできない"},
-  {cat:"判断・決断", en:"Let's not risk it", jp:"ここは危ない橋は渡らないでおこう", kw:"risk it", ex:"risk it=賭けに出る、not risk it=賭けない"},
-  {cat:"判断・決断", en:"I'll wing it", jp:"自分はぶっつけ本番でいく(準備なし)", kw:"wing it", ex:"wing it=準備なしでその場の判断でやる"},
-  {cat:"判断・決断", en:"Trust the process", jp:"結果を焦らず流れを信じよう(過程を信じる)", kw:"trust the process", ex:"trust the process=過程を信じる(結果を急がない時)"},
-  {cat:"判断・決断", en:"I'm just going with my gut", jp:"自分は直感に従ってる", kw:"going with my gut", ex:"go with one's gut=直感に従う"},
-  {cat:"判断・決断", en:"Let's wait it out", jp:"ここは待つことにしよう", kw:"wait it out", ex:"wait out=やり過ごすまで待つ"},
-  {cat:"驚き・ショック", en:"I did not expect that", jp:"それは予想してなかった(起きた出来事そのものへ)", kw:"did not expect", ex:"expect=予想する、didn't expect=予想していなかった"},
-  {cat:"驚き・ショック", en:"That came out of nowhere", jp:"それは突然だった", kw:"out of nowhere", ex:"out of nowhere=どこからともなく・突然"},
-  {cat:"驚き・ショック", en:"I'm speechless", jp:"自分は言葉が出ない", kw:"speechless", ex:"speechless=言葉を失った"},
-  {cat:"驚き・ショック", en:"My jaw dropped", jp:"自分はあごが外れるほど驚いた", kw:"jaw dropped", ex:"jaw drop=あごが落ちる(驚きの慣用表現)"},
-  {cat:"驚き・ショック", en:"I wasn't prepared for that", jp:"自分は身構える余裕がなかった(心の準備)", kw:"wasn't prepared", ex:"be prepared for=〜の準備ができている"},
-  {cat:"驚き・ショック", en:"That caught me off guard", jp:"それは自分の不意をついた", kw:"off guard", ex:"catch off guard=不意打ちする・油断させる"},
-  {cat:"驚き・ショック", en:"I'm shaking", jp:"自分は震えている", kw:"shaking", ex:"shake=震える(shakingは進行形)"},
-  {cat:"驚き・ショック", en:"My heart is racing", jp:"自分の心臓がバクバクしてる", kw:"heart is racing", ex:"heart race=心臓がドキドキする"},
-  {cat:"驚き・ショック", en:"I jumped out of my seat", jp:"自分は思わず椅子から飛び上がった", kw:"jumped out", ex:"jump out of one's seat=驚いて飛び上がる"},
-  {cat:"驚き・ショック", en:"That gave me chills", jp:"それは鳥肌が立った", kw:"gave me chills", ex:"give chills=鳥肌を立たせる"},
-  {cat:"能力・状態", en:"I'm out of my depth", jp:"自分の実力の範囲を超えてる(能力不足)", kw:"out of my depth", ex:"out of one's depth=自分の能力を超えている"},
-  {cat:"能力・状態", en:"I'm running on empty", jp:"自分はガス欠状態だ(気力・体力が尽きた)", kw:"running on empty", ex:"run on empty=ガス欠状態で動く・限界状態"},
-  {cat:"能力・状態", en:"I'm not cut out for this", jp:"自分はこれに向いてない", kw:"not cut out for", ex:"be cut out for=〜に向いている(built forと同義)"},
-  {cat:"能力・状態", en:"I'm on a roll", jp:"自分は調子がいい(連続でうまくいってる)", kw:"on a roll", ex:"on a roll=絶好調・連勝中"},
-  {cat:"能力・状態", en:"I'm in the zone", jp:"自分は集中モードに入ってる", kw:"in the zone", ex:"in the zone=超集中状態"},
-  {cat:"能力・状態", en:"I've got this", jp:"自分はこれをやれる(自信がある)", kw:"got this", ex:"got this=対応できる・任せて"},
-  {cat:"能力・状態", en:"I'm rusty at this", jp:"自分はこれの腕が鈍ってる", kw:"rusty", ex:"rusty=錆びついた・腕が鈍った"},
-  {cat:"失敗・後悔", en:"I jumped the gun", jp:"自分はフライングした(早まった)", kw:"jumped the gun", ex:"jump the gun=早まった行動をする"},
-  {cat:"失敗・後悔", en:"I bit off more than I could chew", jp:"自分は手に余ることをやった", kw:"bit off more", ex:"bite off more than one can chew=身の丈に合わないことに手を出す"},
-  {cat:"失敗・後悔", en:"I jinxed it", jp:"自分が変なフラグを立てた", kw:"jinxed it", ex:"jinx=縁起の悪いことを言う・フラグを立てる"},
-  {cat:"失敗・後悔", en:"I should know better", jp:"自分はいい加減学習すべきだ(同じ失敗の繰り返し)", kw:"know better", ex:"know better=もっと賢明な判断をすべきだと分かっている"},
-  {cat:"失敗・後悔", en:"That backfired", jp:"それは裏目に出た", kw:"backfired", ex:"backfire=逆効果になる・裏目に出る"},
-  {cat:"失敗・後悔", en:"I dug myself into a hole", jp:"自分は自分で墓穴を掘った", kw:"dug a hole", ex:"dig oneself into a hole=自分で苦境を作る"},
-  {cat:"失敗・後悔", en:"I'm paying for it now", jp:"自分は今その代償を払ってる", kw:"paying for it", ex:"pay for it=その報いを受ける"},
-  {cat:"失敗・後悔", en:"I walked right into that", jp:"自分はまんまと引っかかった", kw:"walked into that", ex:"walk into=（罠などに）まんまとはまる"},
-  {cat:"実況盛り上げ", en:"Here it comes", jp:"来たぞ", kw:"here it comes", ex:"Here it comes=さあ来た(何かが起きる直前)"},
-  {cat:"実況盛り上げ", en:"This is it", jp:"いよいよだ・これが正念場だ", kw:"this is it", ex:"This is it=いよいよだ・正念場だ"},
-  {cat:"実況盛り上げ", en:"Let's make this count", jp:"これを無駄にしないようにしよう", kw:"make this count", ex:"make it count=無駄にしない・意味あるものにする"},
-  {cat:"実況盛り上げ", en:"This is the moment", jp:"今がまさにその決定的な瞬間だ", kw:"the moment", ex:"the moment=その瞬間・決定的な時"},
-  {cat:"実況盛り上げ", en:"Everything's on the line", jp:"全てがかかってる", kw:"on the line", ex:"on the line=危険にさらされている・賭かっている"},
-  {cat:"実況盛り上げ", en:"It's now or never", jp:"今しかない", kw:"now or never", ex:"now or never=今しかない・二度とないチャンス"},
-  {cat:"実況盛り上げ", en:"Let's see if this works", jp:"うまくいくか試してみよう", kw:"if this works", ex:"if this works=これがうまくいくかどうか"},
-  {cat:"実況盛り上げ", en:"Here goes nothing", jp:"うまくいく気はしないけどやってみる(ダメ元)", kw:"here goes nothing", ex:"Here goes nothing=ダメ元で・とりあえずやってみる"},
-  {cat:"実況盛り上げ", en:"Let's finish this", jp:"これを終わらせよう", kw:"finish this", ex:"finish this=これを終わらせる"},
-  {cat:"視聴者呼びかけ", en:"You see that?", jp:"視聴者へ：今の見た？", kw:"you see that", ex:"Did you see that?の口語的な短縮形"},
-  {cat:"視聴者呼びかけ", en:"Watch this", jp:"視聴者へ：これ見てて", kw:"watch this", ex:"watch this=これを見て(注目を促す)"},
-  {cat:"視聴者呼びかけ", en:"I told you so", jp:"だから言ったでしょ", kw:"told you so", ex:"I told you so=ほら言った通りだ"},
-  {cat:"視聴者呼びかけ", en:"Stick around for this", jp:"視聴者へ：これは見逃さないで", kw:"stick around", ex:"stick around=その場に留まる・見続ける"},
-  {cat:"視聴者呼びかけ", en:"Let me show you something", jp:"視聴者へ：ちょっと見せたいものがある", kw:"show you", ex:"show you=あなたに見せる"},
-  {cat:"視聴者呼びかけ", en:"Bear with me here", jp:"視聴者へ：ここは少し我慢して見てて", kw:"bear with me here", ex:"視聴者向けの呼びかけ版。実用フレーズ1のJust bear with meは独り言、これは配信視聴者への呼びかけ"},
-  {cat:"視聴者呼びかけ", en:"Just so you know", jp:"視聴者へ：一応言っておくと", kw:"just so you know", ex:"just so you know=参考までに・一応伝えておくと"},
-  {cat:"視聴者呼びかけ", en:"Trust me on this", jp:"視聴者へ：これだけは信じてほしい", kw:"trust me", ex:"trust me=自分を信じて"},
-  {cat:"視聴者呼びかけ", en:"You'll see why in a second", jp:"視聴者へ：すぐに理由が分かるよ", kw:"in a second", ex:"in a second=すぐに・一瞬で"},
-  {cat:"状況の変化", en:"Things just changed", jp:"状況がたった今変わった", kw:"just changed", ex:"just changed=ちょうど変わった"},
-  {cat:"状況の変化", en:"The tables have turned", jp:"形勢が逆転した", kw:"tables have turned", ex:"the tables turn=形勢が逆転する(イディオム)"},
-  {cat:"状況の変化", en:"This changes everything", jp:"これで前提が全部ひっくり返る", kw:"changes everything", ex:"change everything=全てを変える"},
-  {cat:"状況の変化", en:"We're back in business", jp:"よし、態勢を立て直して再開だ", kw:"back in business", ex:"back in business=活動再開・また動き出せる"},
-  {cat:"状況の変化", en:"The plan just fell apart", jp:"計画が崩れた", kw:"fell apart", ex:"fall apart=崩壊する(fellはfallの過去形)"},
-  {cat:"状況の変化", en:"New plan", jp:"作戦変更(短く言い切る)", kw:"new plan", ex:"new plan=新しい計画(短い実況フレーズ)"},
-  {cat:"状況の変化", en:"Plan B it is", jp:"じゃあプランBでいくか(代案に切り替え)", kw:"plan B it is", ex:"it is=それに決定(口語的な決定の表現)"},
-  {cat:"状況の変化", en:"I wasn't expecting this turn", jp:"こんな展開になるとは思わなかった(話の流れへ)", kw:"this turn", ex:"turn=展開・転換(ここでは名詞)"},
-  {cat:"ミス・誤解深掘り", en:"I might be reading this wrong", jp:"自分はこれを読み違えてるかも", kw:"reading wrong", ex:"read wrong=誤って読む・解釈を間違える"},
-  {cat:"ミス・誤解深掘り", en:"Lost in translation", jp:"訳したら意味が抜け落ちた(翻訳の問題)", kw:"lost in translation", ex:"lost in translation=翻訳で意味が失われる(慣用句)"},
-  {cat:"ミス・誤解深掘り", en:"I'm just winging the translation", jp:"自分は翻訳を適当にやりながら進めてる", kw:"winging the translation", ex:"wing it=その場しのぎでやる、ここでは翻訳に適用"},
-  {cat:"ミス・誤解深掘り", en:"Correct me if I'm wrong", jp:"間違ってたら教えて", kw:"correct me", ex:"correct me if I'm wrong=もし違ったら訂正して"},
-  {cat:"ミス・誤解深掘り", en:"I'm flying blind here", jp:"自分は手探り状態でやってる(情報が何もない)", kw:"flying blind", ex:"fly blind=何も見えない状態で進む(イディオム)"},
-  {cat:"ミス・誤解深掘り", en:"Your guess is as good as mine", jp:"自分も同じく分からない(聞かれても困る)", kw:"good as mine", ex:"your guess is as good as mine=私もあなたと同じくらい分からない"},
-  {cat:"ミス・誤解深掘り", en:"I'm just going off vibes here", jp:"自分は雰囲気だけで判断してる(根拠なし)", kw:"off vibes", ex:"go off vibes=雰囲気だけで判断する(スラング)"},
-  {cat:"ミス・誤解深掘り", en:"This is way over my head", jp:"これは難しすぎて自分には理解できない", kw:"over my head", ex:"over one's head=理解を超えている"},
-  {cat:"ミス・誤解深掘り", en:"I'm completely lost", jp:"自分は完全に置いていかれた(話についていけない)", kw:"completely lost", ex:"lost=道に迷った・理解できていない"},
-  {cat:"ミス・誤解深掘り", en:"Don't quote me on that", jp:"それを真に受けないで(自信ない発言)", kw:"quote me", ex:"don't quote me on that=それを確定情報として扱わないで"},
+  {cat:"状況描写", en:"I'm stuck", jp:"自分は引っかかって進めない(物理的に動けない)", kw:"stuck", ex:"stuck=動けない・詰まった状態", sc:"壁や地形に引っかかって、キャラが動かせなくなった時"},
+  {cat:"状況描写", en:"I'm trapped", jp:"自分は閉じ込められた(逃げ場がない)", kw:"trapped", ex:"trap=罠にかける、be trapped=閉じ込められる", sc:"四方を敵や壁に囲まれて、逃げ道がなくなった時"},
+  {cat:"状況描写", en:"I'm cornered", jp:"自分は追い詰められた", kw:"cornered", ex:"corner=角、be cornered=角に追い詰められる", sc:"追い詰められて、部屋の角まで逃げ場を失った時"},
+  {cat:"状況描写", en:"I'm exposed", jp:"自分は丸見えだ(隠れられてない)", kw:"exposed", ex:"expose=さらす、be exposed=さらされている", sc:"遮蔽物がなく、敵から丸見えの場所に出てしまった時"},
+  {cat:"状況描写", en:"I'm vulnerable right now", jp:"今自分は無防備だ", kw:"vulnerable", ex:"vulnerable=攻撃されやすい・無防備な", sc:"リロード中や回復中で、今攻撃されたら終わりな時"},
+  {cat:"状況描写", en:"Something's not right", jp:"何かがおかしい", kw:"not right", ex:"not right=正常じゃない・おかしい", sc:"静かすぎたり違和感があって、罠の気配を感じた時"},
+  {cat:"状況描写", en:"This place is huge", jp:"ここはめちゃくちゃ広い", kw:"huge", ex:"huge=巨大な(bigよりかなり大きい)", sc:"足を踏み入れたエリアが想像以上に広大だった時"},
+  {cat:"状況描写", en:"This place is empty", jp:"ここは誰もいない", kw:"empty", ex:"empty=空っぽの・誰もいない", sc:"人がいるはずの場所に誰もいなくて不気味な時"},
+  {cat:"状況描写", en:"It's too quiet", jp:"静かすぎる(不穏な静けさ)", kw:"too quiet", ex:"too quiet=静かすぎる(不気味さを含む)", sc:"敵が来るはずなのに無音で、逆に不安になる時"},
+  {cat:"状況描写", en:"Something's coming", jp:"何かが近づいてくる", kw:"coming", ex:"come=来る、somethingが主語", sc:"足音や気配で、何かが接近しているのを感じた時"},
+  {cat:"戦闘・アクション", en:"I'm pinned down", jp:"自分は撃たれて動けない(銃撃で釘付け)", kw:"pinned down", ex:"pin down=押さえつける・釘付けにする", sc:"銃撃が激しくて遮蔽物から一歩も動けない時"},
+  {cat:"戦闘・アクション", en:"I'm flanking", jp:"自分は側面から回り込んでる", kw:"flanking", ex:"flank=側面、flanking=側面攻撃をしている", sc:"正面を避けて、敵の横から回り込んでいる時"},
+  {cat:"戦闘・アクション", en:"I'm low on health", jp:"自分は体力が少ない", kw:"low on health", ex:"low on=〜が少ない", sc:"体力ゲージが残りわずかになった時"},
+  {cat:"戦闘・アクション", en:"I need backup", jp:"自分は応援が必要だ", kw:"backup", ex:"backup=援護・応援", sc:"一人では敵が多すぎて、援護がほしい時"},
+  {cat:"戦闘・アクション", en:"I got the drop on him", jp:"自分は先手を取れた", kw:"drop on him", ex:"get the drop on=先手を取る・有利な状況で仕掛ける", sc:"気づかれずに敵の背後を取れた時"},
+  {cat:"戦闘・アクション", en:"He's onto me", jp:"あいつは自分に気づいてる", kw:"onto me", ex:"be onto=〜に気づいている・察知している", sc:"隠れていたのに、敵にこちらの存在を気づかれた時"},
+  {cat:"戦闘・アクション", en:"I blew my cover", jp:"自分は正体がバレた", kw:"blew my cover", ex:"blow one's cover=正体・隠れていたことがバレる", sc:"潜入中にミスをして、正体がバレてしまった時"},
+  {cat:"戦闘・アクション", en:"I'm in the clear", jp:"自分は安全圏にいる", kw:"in the clear", ex:"in the clear=危険を脱した・安全な状態", sc:"追手を撒いて、ようやく安全になった時"},
+  {cat:"戦闘・アクション", en:"That was a close call", jp:"今のは危機一髪だった(危険を回避)", kw:"close call", ex:"close call=危機一髪・ギリギリの状況", sc:"あと一発で死ぬところを、ギリギリ切り抜けた時"},
+  {cat:"戦闘・アクション", en:"I barely made it", jp:"自分はかろうじて間に合った(時間・到達)", kw:"barely", ex:"barely=かろうじて・ギリギリで", sc:"時間や距離がギリギリで、なんとか間に合った時"},
+  {cat:"判断・決断", en:"Let's just go for it", jp:"よし、思い切って突っ込もう(覚悟を決める)", kw:"go for it", ex:"go for it=思い切ってやる", sc:"迷いを捨てて、思い切って突っ込むと決めた時"},
+  {cat:"判断・決断", en:"I'll take the risk", jp:"自分はリスクを承知でやる", kw:"take the risk", ex:"take the risk=リスクを冒す", sc:"危険を承知の上で、あえて挑戦を選ぶ時"},
+  {cat:"判断・決断", en:"Better safe than sorry", jp:"後悔するより用心が先(ことわざ)", kw:"safe than sorry", ex:"Better safe than sorry=用心するに越したことはない(ことわざ)", sc:"無理せず、安全な選択をしておこうと判断する時"},
+  {cat:"判断・決断", en:"There's no turning back now", jp:"もう後戻りできない", kw:"no turning back", ex:"no turning back=後戻りできない", sc:"もう引き返せない地点まで来てしまった時"},
+  {cat:"判断・決断", en:"Let's not risk it", jp:"ここは危ない橋は渡らないでおこう", kw:"risk it", ex:"risk it=賭けに出る、not risk it=賭けない", sc:"危ない橋は避けて、慎重にいこうと決める時"},
+  {cat:"判断・決断", en:"I'll wing it", jp:"自分はぶっつけ本番でいく(準備なし)", kw:"wing it", ex:"wing it=準備なしでその場の判断でやる", sc:"準備も計画もないまま、その場のノリでやる時"},
+  {cat:"判断・決断", en:"Trust the process", jp:"結果を焦らず流れを信じよう(過程を信じる)", kw:"trust the process", ex:"trust the process=過程を信じる(結果を急がない時)", sc:"うまくいってないけど、焦らず今のやり方を続ける時"},
+  {cat:"判断・決断", en:"I'm just going with my gut", jp:"自分は直感に従ってる", kw:"going with my gut", ex:"go with one's gut=直感に従う", sc:"根拠はないけど、直感を信じて動く時"},
+  {cat:"判断・決断", en:"Let's wait it out", jp:"ここは待つことにしよう", kw:"wait it out", ex:"wait out=やり過ごすまで待つ", sc:"今は動かず、状況が落ち着くのを待つと決めた時"},
+  {cat:"驚き・ショック", en:"I did not expect that", jp:"それは予想してなかった(起きた出来事そのものへ)", kw:"did not expect", ex:"expect=予想する、didn't expect=予想していなかった", sc:"全く予想していなかったことが実際に起きた時"},
+  {cat:"驚き・ショック", en:"That came out of nowhere", jp:"それは突然だった", kw:"out of nowhere", ex:"out of nowhere=どこからともなく・突然", sc:"前触れもなく、突然何かが飛び出してきた時"},
+  {cat:"驚き・ショック", en:"I'm speechless", jp:"自分は言葉が出ない", kw:"speechless", ex:"speechless=言葉を失った", sc:"衝撃的な光景に、言葉が出てこない時"},
+  {cat:"驚き・ショック", en:"My jaw dropped", jp:"自分はあごが外れるほど驚いた", kw:"jaw dropped", ex:"jaw drop=あごが落ちる(驚きの慣用表現)", sc:"あまりの出来事に、口が開いたまま固まった時"},
+  {cat:"驚き・ショック", en:"I wasn't prepared for that", jp:"自分は身構える余裕がなかった(心の準備)", kw:"wasn't prepared", ex:"be prepared for=〜の準備ができている", sc:"心の準備ができていないまま不意打ちを受けた時"},
+  {cat:"驚き・ショック", en:"That caught me off guard", jp:"それは自分の不意をついた", kw:"off guard", ex:"catch off guard=不意打ちする・油断させる", sc:"油断していたところを突然突かれた時"},
+  {cat:"驚き・ショック", en:"I'm shaking", jp:"自分は震えている", kw:"shaking", ex:"shake=震える(shakingは進行形)", sc:"恐怖や興奮で、実際に手が震えている時"},
+  {cat:"驚き・ショック", en:"My heart is racing", jp:"自分の心臓がバクバクしてる", kw:"heart is racing", ex:"heart race=心臓がドキドキする", sc:"緊張やスリルで、心臓が激しく鼓動している時"},
+  {cat:"驚き・ショック", en:"I jumped out of my seat", jp:"自分は思わず椅子から飛び上がった", kw:"jumped out", ex:"jump out of one's seat=驚いて飛び上がる", sc:"驚きのあまり、思わず体が跳ね上がった時"},
+  {cat:"驚き・ショック", en:"That gave me chills", jp:"それは鳥肌が立った", kw:"gave me chills", ex:"give chills=鳥肌を立たせる", sc:"ゾッとする演出に、鳥肌が立った時"},
+  {cat:"能力・状態", en:"I'm out of my depth", jp:"自分の実力の範囲を超えてる(能力不足)", kw:"out of my depth", ex:"out of one's depth=自分の能力を超えている", sc:"自分の実力では到底歯が立たないと感じた時"},
+  {cat:"能力・状態", en:"I'm running on empty", jp:"自分はガス欠状態だ(気力・体力が尽きた)", kw:"running on empty", ex:"run on empty=ガス欠状態で動く・限界状態", sc:"気力も体力も限界で、もう出し切った時"},
+  {cat:"能力・状態", en:"I'm not cut out for this", jp:"自分はこれに向いてない", kw:"not cut out for", ex:"be cut out for=〜に向いている(built forと同義)", sc:"何度やっても向いていないと痛感した時"},
+  {cat:"能力・状態", en:"I'm on a roll", jp:"自分は調子がいい(連続でうまくいってる)", kw:"on a roll", ex:"on a roll=絶好調・連勝中", sc:"連続で成功して、勢いに乗っている時"},
+  {cat:"能力・状態", en:"I'm in the zone", jp:"自分は集中モードに入ってる", kw:"in the zone", ex:"in the zone=超集中状態", sc:"完全に集中して、動きが冴えている時"},
+  {cat:"能力・状態", en:"I've got this", jp:"自分はこれをやれる(自信がある)", kw:"got this", ex:"got this=対応できる・任せて", sc:"自信を持って、これはいけると確信した時"},
+  {cat:"能力・状態", en:"I'm rusty at this", jp:"自分はこれの腕が鈍ってる", kw:"rusty", ex:"rusty=錆びついた・腕が鈍った", sc:"久しぶりで、昔より腕が落ちたと感じる時"},
+  {cat:"失敗・後悔", en:"I jumped the gun", jp:"自分はフライングした(早まった)", kw:"jumped the gun", ex:"jump the gun=早まった行動をする", sc:"早とちりして、タイミングより先に動いてしまった時"},
+  {cat:"失敗・後悔", en:"I bit off more than I could chew", jp:"自分は手に余ることをやった", kw:"bit off more", ex:"bite off more than one can chew=身の丈に合わないことに手を出す", sc:"自分の手に負えない難題に手を出してしまった時"},
+  {cat:"失敗・後悔", en:"I jinxed it", jp:"自分が変なフラグを立てた", kw:"jinxed it", ex:"jinx=縁起の悪いことを言う・フラグを立てる", sc:"余計なことを言った直後に、その通り悪いことが起きた時"},
+  {cat:"失敗・後悔", en:"I should know better", jp:"自分はいい加減学習すべきだ(同じ失敗の繰り返し)", kw:"know better", ex:"know better=もっと賢明な判断をすべきだと分かっている", sc:"何度も同じ失敗をして、いい加減学べと自分に呆れる時"},
+  {cat:"失敗・後悔", en:"That backfired", jp:"それは裏目に出た", kw:"backfired", ex:"backfire=逆効果になる・裏目に出る", sc:"良かれと思ってやったことが、逆効果になった時"},
+  {cat:"失敗・後悔", en:"I dug myself into a hole", jp:"自分は自分で墓穴を掘った", kw:"dug a hole", ex:"dig oneself into a hole=自分で苦境を作る", sc:"自分の選択で、どんどん状況を悪くしてしまった時"},
+  {cat:"失敗・後悔", en:"I'm paying for it now", jp:"自分は今その代償を払ってる", kw:"paying for it", ex:"pay for it=その報いを受ける", sc:"過去の油断や手抜きのツケを、今払わされている時"},
+  {cat:"失敗・後悔", en:"I walked right into that", jp:"自分はまんまと引っかかった", kw:"walked into that", ex:"walk into=（罠などに）まんまとはまる", sc:"見え見えの罠に、まんまと引っかかった時"},
+  {cat:"実況盛り上げ", en:"Here it comes", jp:"来たぞ", kw:"here it comes", ex:"Here it comes=さあ来た(何かが起きる直前)", sc:"何かが起きる直前の、その瞬間を待ち構える時"},
+  {cat:"実況盛り上げ", en:"This is it", jp:"いよいよだ・これが正念場だ", kw:"this is it", ex:"This is it=いよいよだ・正念場だ", sc:"いよいよ本番、正念場を迎えた時"},
+  {cat:"実況盛り上げ", en:"Let's make this count", jp:"これを無駄にしないようにしよう", kw:"make this count", ex:"make it count=無駄にしない・意味あるものにする", sc:"一度きりのチャンスを、無駄にしたくない時"},
+  {cat:"実況盛り上げ", en:"This is the moment", jp:"今がまさにその決定的な瞬間だ", kw:"the moment", ex:"the moment=その瞬間・決定的な時", sc:"すべてが決まる決定的な瞬間が来た時"},
+  {cat:"実況盛り上げ", en:"Everything's on the line", jp:"全てがかかってる", kw:"on the line", ex:"on the line=危険にさらされている・賭かっている", sc:"これまでの成果が全部かかっている場面"},
+  {cat:"実況盛り上げ", en:"It's now or never", jp:"今しかない", kw:"now or never", ex:"now or never=今しかない・二度とないチャンス", sc:"今を逃したら二度とチャンスがないと感じた時"},
+  {cat:"実況盛り上げ", en:"Let's see if this works", jp:"うまくいくか試してみよう", kw:"if this works", ex:"if this works=これがうまくいくかどうか", sc:"うまくいくか分からない作戦を試す時"},
+  {cat:"実況盛り上げ", en:"Here goes nothing", jp:"うまくいく気はしないけどやってみる(ダメ元)", kw:"here goes nothing", ex:"Here goes nothing=ダメ元で・とりあえずやってみる", sc:"成功する自信はないけど、覚悟を決めて挑む時"},
+  {cat:"実況盛り上げ", en:"Let's finish this", jp:"これを終わらせよう", kw:"finish this", ex:"finish this=これを終わらせる", sc:"長かった戦いや作業に、決着をつける時"},
+  {cat:"視聴者呼びかけ", en:"You see that?", jp:"視聴者へ：今の見た？", kw:"you see that", ex:"Did you see that?の口語的な短縮形", sc:"見事なプレイをして、視聴者に見たか?と問いかける時"},
+  {cat:"視聴者呼びかけ", en:"Watch this", jp:"視聴者へ：これ見てて", kw:"watch this", ex:"watch this=これを見て(注目を促す)", sc:"これから見せ場をやるぞ、と視聴者に予告する時"},
+  {cat:"視聴者呼びかけ", en:"I told you so", jp:"だから言ったでしょ", kw:"told you so", ex:"I told you so=ほら言った通りだ", sc:"自分の予想が当たって、だから言ったと言う時"},
+  {cat:"視聴者呼びかけ", en:"Stick around for this", jp:"視聴者へ：これは見逃さないで", kw:"stick around", ex:"stick around=その場に留まる・見続ける", sc:"この後に面白いことが起きるから見てて、と促す時"},
+  {cat:"視聴者呼びかけ", en:"Let me show you something", jp:"視聴者へ：ちょっと見せたいものがある", kw:"show you", ex:"show you=あなたに見せる", sc:"視聴者に何か特別なものを見せようとする時"},
+  {cat:"視聴者呼びかけ", en:"Bear with me here", jp:"視聴者へ：ここは少し我慢して見てて", kw:"bear with me here", ex:"視聴者向けの呼びかけ版。実用フレーズ1のJust bear with meは独り言、これは配信視聴者への呼びかけ", sc:"手間取っているので、視聴者に少し待ってと頼む時"},
+  {cat:"視聴者呼びかけ", en:"Just so you know", jp:"視聴者へ：一応言っておくと", kw:"just so you know", ex:"just so you know=参考までに・一応伝えておくと", sc:"念のため、視聴者に前提を伝えておく時"},
+  {cat:"視聴者呼びかけ", en:"Trust me on this", jp:"視聴者へ：これだけは信じてほしい", kw:"trust me", ex:"trust me=自分を信じて", sc:"疑われそうなことを、視聴者に信じてくれと言う時"},
+  {cat:"視聴者呼びかけ", en:"You'll see why in a second", jp:"視聴者へ：すぐに理由が分かるよ", kw:"in a second", ex:"in a second=すぐに・一瞬で", sc:"今やっている意味が、すぐ分かるからと言う時"},
+  {cat:"状況の変化", en:"Things just changed", jp:"状況がたった今変わった", kw:"just changed", ex:"just changed=ちょうど変わった", sc:"状況がたった今、大きく変わった時"},
+  {cat:"状況の変化", en:"The tables have turned", jp:"形勢が逆転した", kw:"tables have turned", ex:"the tables turn=形勢が逆転する(イディオム)", sc:"不利だった状況が、一気に逆転した時"},
+  {cat:"状況の変化", en:"This changes everything", jp:"これで前提が全部ひっくり返る", kw:"changes everything", ex:"change everything=全てを変える", sc:"一つの出来事で、前提が全部覆った時"},
+  {cat:"状況の変化", en:"We're back in business", jp:"よし、態勢を立て直して再開だ", kw:"back in business", ex:"back in business=活動再開・また動き出せる", sc:"中断していたことを、また動かせるようになった時"},
+  {cat:"状況の変化", en:"The plan just fell apart", jp:"計画が崩れた", kw:"fell apart", ex:"fall apart=崩壊する(fellはfallの過去形)", sc:"立てていた作戦が、その場で崩れ去った時"},
+  {cat:"状況の変化", en:"New plan", jp:"作戦変更(短く言い切る)", kw:"new plan", ex:"new plan=新しい計画(短い実況フレーズ)", sc:"元の計画を捨てて、別の方針に切り替える時"},
+  {cat:"状況の変化", en:"Plan B it is", jp:"じゃあプランBでいくか(代案に切り替え)", kw:"plan B it is", ex:"it is=それに決定(口語的な決定の表現)", sc:"本命がダメで、代替案でいくと決めた時"},
+  {cat:"状況の変化", en:"I wasn't expecting this turn", jp:"こんな展開になるとは思わなかった(話の流れへ)", kw:"this turn", ex:"turn=展開・転換(ここでは名詞)", sc:"話や状況が思わぬ方向に展開した時"},
+  {cat:"ミス・誤解深掘り", en:"I might be reading this wrong", jp:"自分はこれを読み違えてるかも", kw:"reading wrong", ex:"read wrong=誤って読む・解釈を間違える", sc:"英語の指示を、自分が誤解しているかもと疑う時"},
+  {cat:"ミス・誤解深掘り", en:"Lost in translation", jp:"訳したら意味が抜け落ちた(翻訳の問題)", kw:"lost in translation", ex:"lost in translation=翻訳で意味が失われる(慣用句)", sc:"翻訳しようとして、ニュアンスが掴めず困った時"},
+  {cat:"ミス・誤解深掘り", en:"I'm just winging the translation", jp:"自分は翻訳を適当にやりながら進めてる", kw:"winging the translation", ex:"wing it=その場しのぎでやる、ここでは翻訳に適用", sc:"英語をきちんと訳せず、適当に意味を取って進める時"},
+  {cat:"ミス・誤解深掘り", en:"Correct me if I'm wrong", jp:"間違ってたら教えて", kw:"correct me", ex:"correct me if I'm wrong=もし違ったら訂正して", sc:"自信のない解釈を口にして、違ったら指摘してと言う時"},
+  {cat:"ミス・誤解深掘り", en:"I'm flying blind here", jp:"自分は手探り状態でやってる(情報が何もない)", kw:"flying blind", ex:"fly blind=何も見えない状態で進む(イディオム)", sc:"情報が何もない状態で、手探りで進んでいる時"},
+  {cat:"ミス・誤解深掘り", en:"Your guess is as good as mine", jp:"自分も同じく分からない(聞かれても困る)", kw:"good as mine", ex:"your guess is as good as mine=私もあなたと同じくらい分からない", sc:"何が起きてるか、自分にも全く分からない時"},
+  {cat:"ミス・誤解深掘り", en:"I'm just going off vibes here", jp:"自分は雰囲気だけで判断してる(根拠なし)", kw:"off vibes", ex:"go off vibes=雰囲気だけで判断する(スラング)", sc:"根拠なく、雰囲気だけで判断している時"},
+  {cat:"ミス・誤解深掘り", en:"This is way over my head", jp:"これは難しすぎて自分には理解できない", kw:"over my head", ex:"over one's head=理解を超えている", sc:"難しすぎて、自分の理解を完全に超えている時"},
+  {cat:"ミス・誤解深掘り", en:"I'm completely lost", jp:"自分は完全に置いていかれた(話についていけない)", kw:"completely lost", ex:"lost=道に迷った・理解できていない", sc:"話や状況に全くついていけず、迷子状態の時"},
+  {cat:"ミス・誤解深掘り", en:"Don't quote me on that", jp:"それを真に受けないで(自信ない発言)", kw:"quote me", ex:"don't quote me on that=それを確定情報として扱わないで", sc:"自信のない発言をして、真に受けないでと予防線を張る時"},
 ];
 
 // Total: 100 phrases
@@ -613,10 +613,11 @@ let appMode = 'listen'; // listen | quiz | quiz5 | quiz3 | quiz2 | quizInstant
 let quizTimer = null;
 
 // 各クイズモードの考える時間(ms)。quizだけユーザーが選択可能
-const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800 };
+const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800, quizScene: 6000 };
 // 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
-const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2' };
-const RANDOM_MODES = new Set(['quiz2', 'quizInstant']); // 出題順をランダムにするモード
+const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2', quizScene: 'quizInstant' };
+const RANDOM_MODES = new Set(['quiz2', 'quizInstant', 'quizScene']); // 出題順をランダムにするモード
+function isSceneMode() { return appMode === 'quizScene'; }
 // モードごとの固定リピート回数(指定がなければユーザー選択値を使う)
 // モードごとのリピート回数の上限とデフォルト。指定のないモードは max10/default5
 const MODE_REPEAT_CFG = {
@@ -624,6 +625,7 @@ const MODE_REPEAT_CFG = {
   quiz3:       { max: 3, def: 2 },
   quiz2:       { max: 2, def: 1 },
   quizInstant: { max: 2, def: 1 },
+  quizScene:   { max: 2, def: 1 },
 };
 function repeatCfg() {
   return MODE_REPEAT_CFG[appMode] || { max: 10, def: 5 };
@@ -670,7 +672,7 @@ const APP_KEY = 'practical2'; // distinguishes this app's data from the gta play
 const LOCAL_USER_KEY = 'phraseAppUser_v1';
 
 let currentUser = null;
-let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
+let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
 let saveTimer = null;
 
 function loadStatusMap() {
@@ -725,13 +727,14 @@ function loadFromServer(user) {
             quiz5: parsed.quiz5 || {},
             quiz3: parsed.quiz3 || {},
             quiz2: parsed.quiz2 || {},
-            quizInstant: parsed.quizInstant || {}
+            quizInstant: parsed.quizInstant || {},
+            quizScene: parsed.quizScene || {}
           };
         } else {
-          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
+          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
         }
       } catch (e) {
-        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
+        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
       }
     });
 }
@@ -984,9 +987,9 @@ function updateDisplay() {
   const phraseJpQuiz = document.getElementById('phraseJpQuiz');
 
   if (isQuizMode()) {
-    // 日本語を先に出し、考える時間のあと英語を表示する
+    // 日本語(情景モードは情景文)を先に出し、考える時間のあと英語を表示する
     phraseJpQuiz.style.display = 'block';
-    phraseJpQuiz.textContent = item.jp;
+    phraseJpQuiz.textContent = isSceneMode() ? ('【状況】' + (item.sc || item.jp)) : item.jp;
     phraseEn.textContent = '？？？';
     phraseEn.style.opacity = '0.3';
     phraseJp.textContent = '';
@@ -1015,6 +1018,9 @@ function revealAnswer() {
   const item = filtered[curIndex];
   phraseEn.textContent = item.en;
   phraseEn.style.opacity = '1';
+  if (isSceneMode()) {
+    document.getElementById('phraseJpQuiz').textContent = '【状況】' + (item.sc || item.jp) + '  →  ' + item.jp;
+  }
   // show keyword box
   if (item.kw) {
     document.getElementById('kwWord').textContent = item.kw;
@@ -1035,7 +1041,7 @@ function speakCurrent() {
     clearTimeout(quizTimer);
 
     if (japaneseVoice) {
-      const uttJpFirst = new SpeechSynthesisUtterance(item.jp);
+      const uttJpFirst = new SpeechSynthesisUtterance(isSceneMode() ? (item.sc || item.jp) : item.jp);
       uttJpFirst.lang = 'ja-JP';
       uttJpFirst.voice = japaneseVoice;
       uttJpFirst.rate = 1;
@@ -1130,6 +1136,7 @@ function buildModeFilters() {
     { key: 'quiz3', label: '3秒(2回)' },
     { key: 'quiz2', label: '2秒(1回)' },
     { key: 'quizInstant', label: '即射(1回)' },
+    { key: 'quizScene', label: '情景モード' },
   ];
   modes.forEach(m => {
     const chip = document.createElement('div');
