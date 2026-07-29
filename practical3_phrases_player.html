@@ -499,100 +499,100 @@
 
 <script>
 const DATA = [
-  {cat:"相づち・返し", en:"That makes sense", jp:"なるほど筋が通ってる", kw:"makes sense", ex:"make sense=筋が通る・理にかなう"},
-  {cat:"相づち・返し", en:"Fair enough", jp:"まあそれもそうだな(納得)", kw:"fair enough", ex:"fair enough=一理ある・納得(相手の言い分を認める)"},
-  {cat:"相づち・返し", en:"You can say that again", jp:"まったくその通りだ", kw:"say that again", ex:"You can say that again=激しく同意・全くだ"},
-  {cat:"相づち・返し", en:"I'll take your word for it", jp:"その言葉を信じるよ", kw:"take your word", ex:"take one's word for it=言葉を鵜呑みにする・信用する"},
-  {cat:"相づち・返し", en:"That's a good point", jp:"それはいい指摘だ", kw:"good point", ex:"good point=良い指摘・もっともな意見"},
-  {cat:"相づち・返し", en:"I see what you mean", jp:"言いたいことは分かる", kw:"see what you mean", ex:"see what you mean=言わんとすることが分かる"},
-  {cat:"相づち・返し", en:"Couldn't agree more", jp:"これ以上ないほど同感だ", kw:"couldn't agree more", ex:"couldn't agree more=完全に同意(直訳「もっと同意できない」)"},
-  {cat:"相づち・返し", en:"Tell me about it", jp:"ほんとそれな(自分も経験ある)", kw:"tell me about it", ex:"Tell me about it=わかる・まったくだ(共感の慣用句)"},
-  {cat:"相づち・返し", en:"That's fair", jp:"それはもっともだ", kw:"that's fair", ex:"that's fair=それは妥当・筋が通ってる"},
-  {cat:"呼びかけ・注意", en:"Watch out", jp:"危ない、気をつけろ", kw:"watch out", ex:"watch out=気をつけろ・危険を知らせる"},
-  {cat:"呼びかけ・注意", en:"Look out", jp:"危ない(とっさの警告)", kw:"look out", ex:"look out=危ない(watch outとほぼ同義のとっさの叫び)"},
-  {cat:"呼びかけ・注意", en:"Heads up", jp:"ちょっと注意して(前もって知らせる)", kw:"heads up", ex:"heads up=事前の注意喚起・気をつけて"},
-  {cat:"呼びかけ・注意", en:"Watch where you're going", jp:"前を見て進めよ", kw:"watch where", ex:"watch where you're going=どこ見て歩いてるんだ(ぶつかった時)"},
-  {cat:"呼びかけ・注意", en:"Get out of the way", jp:"そこをどけ", kw:"out of the way", ex:"get out of the way=道をあける・どく"},
-  {cat:"呼びかけ・注意", en:"Keep it down", jp:"静かにしろ", kw:"keep it down", ex:"keep it down=声・音量を抑える"},
-  {cat:"呼びかけ・注意", en:"Hold your horses", jp:"焦るな、落ち着け", kw:"hold your horses", ex:"hold your horses=慌てるな(直訳「馬を抑えろ」)"},
-  {cat:"呼びかけ・注意", en:"Easy there", jp:"落ち着けって", kw:"easy there", ex:"easy there=まあ落ち着け・慌てるな"},
-  {cat:"呼びかけ・注意", en:"Back off", jp:"引き下がれ・近寄るな", kw:"back off", ex:"back off=引き下がる・手を引く"},
-  {cat:"呼びかけ・注意", en:"Knock it off", jp:"いい加減にやめろ", kw:"knock it off", ex:"knock it off=うるさい・やめろ(迷惑行為への制止)"},
-  {cat:"感情表現", en:"This is unreal", jp:"現実とは思えない", kw:"unreal", ex:"unreal=非現実的・信じられないほどすごい"},
-  {cat:"感情表現", en:"I can't even", jp:"もう言葉にならない", kw:"can't even", ex:"I can't even=感情が処理しきれない(若者言葉のスラング)"},
-  {cat:"感情表現", en:"That's insane", jp:"正気じゃない(すごい/ひどい)", kw:"insane", ex:"insane=正気じゃない・とんでもない"},
-  {cat:"感情表現", en:"What are the odds", jp:"こんな偶然あるかよ", kw:"what are the odds", ex:"what are the odds=そんな確率ある？(まさかの偶然に)"},
-  {cat:"感情表現", en:"I'm losing it", jp:"笑いが止まらない/正気を失いそう", kw:"losing it", ex:"lose it=笑い崩れる or 冷静さを失う(文脈次第)"},
-  {cat:"感情表現", en:"This is nuts", jp:"イカれてる(すごい状況)", kw:"nuts", ex:"nuts=気が狂った・とんでもない(insaneの砕けた版)"},
-  {cat:"感情表現", en:"That blew my mind", jp:"度肝を抜かれた", kw:"blew my mind", ex:"blow one's mind=驚愕させる・感動させる"},
-  {cat:"会話つなぎ", en:"Long story short", jp:"手短に言うと", kw:"long story short", ex:"long story short=長い話を短くすると・要するに"},
-  {cat:"会話つなぎ", en:"The thing is", jp:"実はね(問題はね)", kw:"the thing is", ex:"the thing is=実のところ・問題は(本題に入る前置き)"},
-  {cat:"会話つなぎ", en:"To be honest", jp:"正直言うと", kw:"to be honest", ex:"to be honest=正直に言うと"},
-  {cat:"会話つなぎ", en:"Now that I think about it", jp:"そういえば考えてみると", kw:"now that I think", ex:"now that=今や〜なので、考えてみれば"},
-  {cat:"会話つなぎ", en:"Speaking of which", jp:"そういえばその話で", kw:"speaking of which", ex:"speaking of which=その話といえば(関連する話題へ)"},
-  {cat:"会話つなぎ", en:"Come to think of it", jp:"そういえば(思い返せば)", kw:"come to think of it", ex:"come to think of it=そういえば・考えてみれば"},
-  {cat:"会話つなぎ", en:"Here's the deal", jp:"こういうことだ", kw:"here's the deal", ex:"here's the deal=要するにこうだ(説明・提案の前置き)"},
-  {cat:"会話つなぎ", en:"Let me put it this way", jp:"こう言い換えよう", kw:"put it this way", ex:"put it this way=こういう言い方をしよう"},
-  {cat:"会話つなぎ", en:"That being said", jp:"とはいえ", kw:"that being said", ex:"that being said=そうは言っても・とはいえ"},
-  {cat:"会話つなぎ", en:"For what it's worth", jp:"参考になるか分からないけど", kw:"what it's worth", ex:"for what it's worth=価値があるかは別として・一応言うと"},
-  {cat:"同意・判断", en:"I'm not so sure about that", jp:"それはどうかな", kw:"not so sure", ex:"not so sure about=それについては確信が持てない"},
-  {cat:"同意・判断", en:"That's not the point", jp:"そこじゃないんだよ", kw:"not the point", ex:"that's not the point=論点はそこじゃない"},
-  {cat:"同意・判断", en:"It doesn't matter", jp:"そんなの関係ない", kw:"doesn't matter", ex:"it doesn't matter=どうでもいい・重要じゃない"},
-  {cat:"同意・判断", en:"Whatever you say", jp:"はいはい、分かったよ", kw:"whatever you say", ex:"whatever you say=好きにしろ・分かったよ(渋々同意)"},
-  {cat:"同意・判断", en:"That's up to you", jp:"それは君次第だ", kw:"up to you", ex:"up to you=あなた次第・お任せする"},
-  {cat:"同意・判断", en:"I wouldn't say that", jp:"そうとは言えないな", kw:"wouldn't say that", ex:"I wouldn't say that=そこまでは言わない・そうは思わない"},
-  {cat:"同意・判断", en:"It is what it is", jp:"しょうがない(そういうもんだ)", kw:"it is what it is", ex:"it is what it is=現実は変えられない・仕方ない"},
-  {cat:"同意・判断", en:"That works for me", jp:"それで問題ないよ", kw:"works for me", ex:"that works for me=それで大丈夫・都合がいい"},
-  {cat:"同意・判断", en:"I guess so", jp:"まあそうだね(消極的同意)", kw:"guess so", ex:"I guess so=たぶんそうだね(あまり乗り気でない同意)"},
-  {cat:"同意・判断", en:"Makes no difference to me", jp:"自分はどっちでもいい", kw:"no difference", ex:"make no difference=違いがない・どうでもいい"},
-  {cat:"挑発・威嚇", en:"You want a piece of me", jp:"やんのかコラ", kw:"piece of me", ex:"want a piece of me=かかってこいよ(喧嘩を売る)"},
-  {cat:"挑発・威嚇", en:"Bring it on", jp:"上等だ、かかってこい", kw:"bring it on", ex:"bring it on=やってやろうじゃないか(挑発を受けて立つ)"},
-  {cat:"挑発・威嚇", en:"You're asking for it", jp:"痛い目見たいのか", kw:"asking for it", ex:"asking for it=自業自得・痛い目に遭いたいのか"},
-  {cat:"挑発・威嚇", en:"Don't push your luck", jp:"調子に乗るなよ", kw:"push your luck", ex:"push one's luck=調子に乗る・運を過信する"},
-  {cat:"挑発・威嚇", en:"You'll regret this", jp:"後悔することになるぞ", kw:"regret this", ex:"you'll regret this=これを後悔するぞ(脅し)"},
-  {cat:"挑発・威嚇", en:"Watch yourself", jp:"身の程をわきまえろ", kw:"watch yourself", ex:"watch yourself=気をつけろ・調子に乗るな(警告)"},
-  {cat:"挑発・威嚇", en:"Say that again", jp:"もう一回言ってみろ", kw:"say that again", ex:"Say that again=（喧嘩腰で）もう一度言ってみろ"},
-  {cat:"挑発・威嚇", en:"You started it", jp:"先に手を出したのはお前だ", kw:"started it", ex:"you started it=お前が始めたことだ"},
-  {cat:"挑発・威嚇", en:"Mind your own business", jp:"余計なお世話だ", kw:"own business", ex:"mind your own business=自分のことに集中しろ・干渉するな"},
-  {cat:"挑発・威嚇", en:"That's none of your business", jp:"お前には関係ないだろ", kw:"none of your business", ex:"none of your business=あなたには関係ない"},
-  {cat:"自然な口語", en:"I'm not gonna lie", jp:"正直に言うとさ", kw:"not gonna lie", ex:"not gonna lie=嘘はつかない・正直に言うと(前置き)"},
-  {cat:"自然な口語", en:"That's what I'm talking about", jp:"そうこなくちゃ", kw:"what I'm talking about", ex:"that's what I'm talking about=それだよ・待ってました"},
-  {cat:"自然な口語", en:"Here we go", jp:"さあ始まるぞ", kw:"here we go", ex:"here we go=さあいくぞ・始まった"},
-  {cat:"自然な口語", en:"You know what", jp:"あのさ、いいこと思いついた", kw:"you know what", ex:"you know what=あのね・ちょっと聞いて(話を切り出す)"},
-  {cat:"自然な口語", en:"I mean, come on", jp:"いやいや、勘弁してよ", kw:"I mean come on", ex:"I mean, come on=いやマジで・そりゃないよ"},
-  {cat:"自然な口語", en:"What is even happening", jp:"何が起きてるんだこれ", kw:"even happening", ex:"what is even happening=一体全体何が起きてるんだ"},
-  {cat:"自然な口語", en:"This is going great", jp:"順調そのものだね(皮肉も可)", kw:"going great", ex:"going great=すごく順調(皮肉で逆の意味にもなる)"},
-  {cat:"自然な口語", en:"I have a bad feeling about this", jp:"嫌な予感がする", kw:"bad feeling", ex:"have a bad feeling about=〜に嫌な予感がする"},
-  {cat:"自然な口語", en:"Let's not do that again", jp:"二度とやめとこう", kw:"not do that again", ex:"let's not do that again=あれはもう繰り返さないでおこう"},
-  {cat:"自然な口語", en:"Well, that happened", jp:"まあ、色々あったな", kw:"that happened", ex:"well that happened=(予想外のことの後)なんか起きたね"},
-  {cat:"状況反応", en:"That's more like it", jp:"そうそう、その調子", kw:"more like it", ex:"that's more like it=それでこそ・そうこなくちゃ"},
-  {cat:"状況反応", en:"That could've gone better", jp:"もっとうまくやれたな", kw:"gone better", ex:"could have gone better=もっとうまくいけたはず"},
-  {cat:"状況反応", en:"Well, this is awkward", jp:"うわ、気まずい", kw:"this is awkward", ex:"awkward=気まずい・ぎこちない"},
-  {cat:"状況反応", en:"This can't be good", jp:"これはまずいだろ", kw:"can't be good", ex:"this can't be good=これは良くない兆候だ"},
-  {cat:"状況反応", en:"Here comes trouble", jp:"厄介事の到来だ", kw:"here comes trouble", ex:"here comes trouble=面倒が来たぞ"},
-  {cat:"状況反応", en:"That escalated quickly", jp:"一気に話が大きくなったな", kw:"escalated quickly", ex:"escalate=急激に悪化・拡大する"},
-  {cat:"状況反応", en:"Well, that's new", jp:"へえ、初めてのパターンだ", kw:"that's new", ex:"that's new=それは新しい・初めて見た"},
-  {cat:"状況反応", en:"This keeps getting better", jp:"どんどん良くなる(皮肉も)", kw:"keeps getting better", ex:"keep getting better=どんどん良くなる(皮肉で悪化にも)"},
-  {cat:"お願い・提案", en:"Do me a favor", jp:"ちょっと頼みがある", kw:"do me a favor", ex:"do me a favor=頼み事を聞いてくれ"},
-  {cat:"お願い・提案", en:"Give me a hand", jp:"ちょっと手を貸して", kw:"give me a hand", ex:"give a hand=手伝う・手を貸す"},
-  {cat:"お願い・提案", en:"Hear me out", jp:"最後まで話を聞いて", kw:"hear me out", ex:"hear me out=最後まで聞いてくれ"},
-  {cat:"お願い・提案", en:"Let's call it a day", jp:"今日はここまでにしよう", kw:"call it a day", ex:"call it a day=(その日の作業を)切り上げる"},
-  {cat:"お願い・提案", en:"Suit yourself", jp:"好きにしなよ", kw:"suit yourself", ex:"suit yourself=好きにしろ・お好きにどうぞ"},
-  {cat:"お願い・提案", en:"Take it easy", jp:"無理すんなよ", kw:"take it easy", ex:"take it easy=気楽にいけ・無理するな"},
-  {cat:"お願い・提案", en:"Give it a shot", jp:"ちょっとやってみなよ", kw:"give it a shot", ex:"give it a shot=試しにやってみる"},
-  {cat:"お願い・提案", en:"Cut me some slack", jp:"少し大目に見てよ", kw:"cut me some slack", ex:"cut someone slack=大目に見る・手加減する"},
-  {cat:"お願い・提案", en:"Work with me here", jp:"ちょっと協力してくれ", kw:"work with me", ex:"work with me=話を合わせて・協力して(この場で)"},
-  {cat:"お願い・提案", en:"Just hear me out for a second", jp:"ちょっとだけ聞いてほしい", kw:"for a second", ex:"hear me out for a second=少しだけ話を聞いて"},
-  {cat:"締め・結論", en:"That's the plan", jp:"そういう作戦だ", kw:"that's the plan", ex:"that's the plan=それが狙い・計画通り"},
-  {cat:"締め・結論", en:"And there it is", jp:"はい来た(予想通りのオチ)", kw:"there it is", ex:"and there it is=ほら来た・案の定だ"},
-  {cat:"締め・結論", en:"That'll do", jp:"それでよしとしよう", kw:"that'll do", ex:"that'll do=それで十分・そこまででいい"},
-  {cat:"締め・結論", en:"Story of my life", jp:"いつもこうなんだよな", kw:"story of my life", ex:"story of my life=よくあることだ・自分の人生こんなもん"},
-  {cat:"締め・結論", en:"Better late than never", jp:"遅くてもやらないよりマシ", kw:"late than never", ex:"better late than never=遅れてもやらないよりはいい(ことわざ)"},
-  {cat:"締め・結論", en:"That's a wrap", jp:"はい終了", kw:"that's a wrap", ex:"that's a wrap=これで終了・完了(撮影用語由来)"},
-  {cat:"締め・結論", en:"We'll cross that bridge when we get there", jp:"その時になったら考えよう", kw:"cross that bridge", ex:"cross that bridge when you get there=先のことは後で考える"},
-  {cat:"締め・結論", en:"Easier said than done", jp:"言うは易し行うは難し", kw:"easier said than done", ex:"easier said than done=言うのは簡単だが実行は難しい"},
-  {cat:"締め・結論", en:"You win some, you lose some", jp:"勝つ時もあれば負ける時もある", kw:"win some lose some", ex:"you win some you lose some=勝ったり負けたり・そんなもんだ"},
-  {cat:"締め・結論", en:"That settles it", jp:"これで決まりだ", kw:"settles it", ex:"that settles it=これで決着・決定だ"},
+  {cat:"相づち・返し", en:"That makes sense", jp:"なるほど筋が通ってる", kw:"makes sense", ex:"make sense=筋が通る・理にかなう", sc:"相手の説明を聞いて、なるほどと納得した時"},
+  {cat:"相づち・返し", en:"Fair enough", jp:"まあそれもそうだな(納得)", kw:"fair enough", ex:"fair enough=一理ある・納得(相手の言い分を認める)", sc:"反論しようと思ったが、相手の言い分にも一理あると認める時"},
+  {cat:"相づち・返し", en:"You can say that again", jp:"まったくその通りだ", kw:"say that again", ex:"You can say that again=激しく同意・全くだ", sc:"相手の意見に、まったくその通りだと強く同意する時"},
+  {cat:"相づち・返し", en:"I'll take your word for it", jp:"その言葉を信じるよ", kw:"take your word", ex:"take one's word for it=言葉を鵜呑みにする・信用する", sc:"確かめようがないが、相手を信じることにする時"},
+  {cat:"相づち・返し", en:"That's a good point", jp:"それはいい指摘だ", kw:"good point", ex:"good point=良い指摘・もっともな意見", sc:"相手の指摘が的を射ていると感心した時"},
+  {cat:"相づち・返し", en:"I see what you mean", jp:"言いたいことは分かる", kw:"see what you mean", ex:"see what you mean=言わんとすることが分かる", sc:"相手の言いたいことが理解できた時"},
+  {cat:"相づち・返し", en:"Couldn't agree more", jp:"これ以上ないほど同感だ", kw:"couldn't agree more", ex:"couldn't agree more=完全に同意(直訳「もっと同意できない」)", sc:"相手の意見に、完全に同感だと伝える時"},
+  {cat:"相づち・返し", en:"Tell me about it", jp:"ほんとそれな(自分も経験ある)", kw:"tell me about it", ex:"Tell me about it=わかる・まったくだ(共感の慣用句)", sc:"相手の愚痴に、自分も同じ経験があると共感する時"},
+  {cat:"相づち・返し", en:"That's fair", jp:"それはもっともだ", kw:"that's fair", ex:"that's fair=それは妥当・筋が通ってる", sc:"相手の主張が妥当だと認める時"},
+  {cat:"呼びかけ・注意", en:"Watch out", jp:"危ない、気をつけろ", kw:"watch out", ex:"watch out=気をつけろ・危険を知らせる", sc:"相手に危険が迫っているのを見て、とっさに警告する時"},
+  {cat:"呼びかけ・注意", en:"Look out", jp:"危ない(とっさの警告)", kw:"look out", ex:"look out=危ない(watch outとほぼ同義のとっさの叫び)", sc:"目の前に危険があって、反射的に叫ぶ時"},
+  {cat:"呼びかけ・注意", en:"Heads up", jp:"ちょっと注意して(前もって知らせる)", kw:"heads up", ex:"heads up=事前の注意喚起・気をつけて", sc:"この後起こることを、前もって相手に知らせる時"},
+  {cat:"呼びかけ・注意", en:"Watch where you're going", jp:"前を見て進めよ", kw:"watch where", ex:"watch where you're going=どこ見て歩いてるんだ(ぶつかった時)", sc:"ぶつかってきた相手に、前を見ろと言う時"},
+  {cat:"呼びかけ・注意", en:"Get out of the way", jp:"そこをどけ", kw:"out of the way", ex:"get out of the way=道をあける・どく", sc:"邪魔な相手に、そこをどけと言う時"},
+  {cat:"呼びかけ・注意", en:"Keep it down", jp:"静かにしろ", kw:"keep it down", ex:"keep it down=声・音量を抑える", sc:"うるさい相手に、静かにしろと言う時"},
+  {cat:"呼びかけ・注意", en:"Hold your horses", jp:"焦るな、落ち着け", kw:"hold your horses", ex:"hold your horses=慌てるな(直訳「馬を抑えろ」)", sc:"焦って先走ろうとする相手を、落ち着かせる時"},
+  {cat:"呼びかけ・注意", en:"Easy there", jp:"落ち着けって", kw:"easy there", ex:"easy there=まあ落ち着け・慌てるな", sc:"興奮している相手を、まあ落ち着けとなだめる時"},
+  {cat:"呼びかけ・注意", en:"Back off", jp:"引き下がれ・近寄るな", kw:"back off", ex:"back off=引き下がる・手を引く", sc:"近づいてくる相手に、それ以上来るなと威嚇する時"},
+  {cat:"呼びかけ・注意", en:"Knock it off", jp:"いい加減にやめろ", kw:"knock it off", ex:"knock it off=うるさい・やめろ(迷惑行為への制止)", sc:"しつこい迷惑行為に、いい加減にやめろと言う時"},
+  {cat:"感情表現", en:"This is unreal", jp:"現実とは思えない", kw:"unreal", ex:"unreal=非現実的・信じられないほどすごい", sc:"現実とは思えないほどの光景に驚いた時"},
+  {cat:"感情表現", en:"I can't even", jp:"もう言葉にならない", kw:"can't even", ex:"I can't even=感情が処理しきれない(若者言葉のスラング)", sc:"衝撃が大きすぎて、うまく言葉にできない時"},
+  {cat:"感情表現", en:"That's insane", jp:"正気じゃない(すごい/ひどい)", kw:"insane", ex:"insane=正気じゃない・とんでもない", sc:"常識では考えられないことが起きた時"},
+  {cat:"感情表現", en:"What are the odds", jp:"こんな偶然あるかよ", kw:"what are the odds", ex:"what are the odds=そんな確率ある？(まさかの偶然に)", sc:"ありえないような偶然が起きて驚いた時"},
+  {cat:"感情表現", en:"I'm losing it", jp:"笑いが止まらない/正気を失いそう", kw:"losing it", ex:"lose it=笑い崩れる or 冷静さを失う(文脈次第)", sc:"おかしすぎて笑いが止まらなくなった時"},
+  {cat:"感情表現", en:"This is nuts", jp:"イカれてる(すごい状況)", kw:"nuts", ex:"nuts=気が狂った・とんでもない(insaneの砕けた版)", sc:"めちゃくちゃな状況に、イカれてると言いたくなる時"},
+  {cat:"感情表現", en:"That blew my mind", jp:"度肝を抜かれた", kw:"blew my mind", ex:"blow one's mind=驚愕させる・感動させる", sc:"想像を超える出来事に、度肝を抜かれた時"},
+  {cat:"会話つなぎ", en:"Long story short", jp:"手短に言うと", kw:"long story short", ex:"long story short=長い話を短くすると・要するに", sc:"経緯を全部省いて、結論だけ話す時"},
+  {cat:"会話つなぎ", en:"The thing is", jp:"実はね(問題はね)", kw:"the thing is", ex:"the thing is=実のところ・問題は(本題に入る前置き)", sc:"本題や問題点を切り出す時"},
+  {cat:"会話つなぎ", en:"To be honest", jp:"正直言うと", kw:"to be honest", ex:"to be honest=正直に言うと", sc:"本音を打ち明けようとする時"},
+  {cat:"会話つなぎ", en:"Now that I think about it", jp:"そういえば考えてみると", kw:"now that I think", ex:"now that=今や〜なので、考えてみれば", sc:"話しながら、ふとあることに思い当たった時"},
+  {cat:"会話つなぎ", en:"Speaking of which", jp:"そういえばその話で", kw:"speaking of which", ex:"speaking of which=その話といえば(関連する話題へ)", sc:"今の話題から、関連する別の話に移る時"},
+  {cat:"会話つなぎ", en:"Come to think of it", jp:"そういえば(思い返せば)", kw:"come to think of it", ex:"come to think of it=そういえば・考えてみれば", sc:"言われて、そういえばと思い出した時"},
+  {cat:"会話つなぎ", en:"Here's the deal", jp:"こういうことだ", kw:"here's the deal", ex:"here's the deal=要するにこうだ(説明・提案の前置き)", sc:"これから状況や条件を説明しようとする時"},
+  {cat:"会話つなぎ", en:"Let me put it this way", jp:"こう言い換えよう", kw:"put it this way", ex:"put it this way=こういう言い方をしよう", sc:"うまく伝わらないので、別の言い方をする時"},
+  {cat:"会話つなぎ", en:"That being said", jp:"とはいえ", kw:"that being said", ex:"that being said=そうは言っても・とはいえ", sc:"前言を認めつつ、でもと反対のことを言う時"},
+  {cat:"会話つなぎ", en:"For what it's worth", jp:"参考になるか分からないけど", kw:"what it's worth", ex:"for what it's worth=価値があるかは別として・一応言うと", sc:"役立つか分からないが、一応意見を言う時"},
+  {cat:"同意・判断", en:"I'm not so sure about that", jp:"それはどうかな", kw:"not so sure", ex:"not so sure about=それについては確信が持てない", sc:"相手の意見に、それはどうかなと疑問を示す時"},
+  {cat:"同意・判断", en:"That's not the point", jp:"そこじゃないんだよ", kw:"not the point", ex:"that's not the point=論点はそこじゃない", sc:"話がズレていて、論点はそこじゃないと正す時"},
+  {cat:"同意・判断", en:"It doesn't matter", jp:"そんなの関係ない", kw:"doesn't matter", ex:"it doesn't matter=どうでもいい・重要じゃない", sc:"細かいことは重要じゃないと切り捨てる時"},
+  {cat:"同意・判断", en:"Whatever you say", jp:"はいはい、分かったよ", kw:"whatever you say", ex:"whatever you say=好きにしろ・分かったよ(渋々同意)", sc:"反論する気も失せて、渋々従う時"},
+  {cat:"同意・判断", en:"That's up to you", jp:"それは君次第だ", kw:"up to you", ex:"up to you=あなた次第・お任せする", sc:"決定を相手に委ねる時"},
+  {cat:"同意・判断", en:"I wouldn't say that", jp:"そうとは言えないな", kw:"wouldn't say that", ex:"I wouldn't say that=そこまでは言わない・そうは思わない", sc:"相手の言い方に、そこまでは言わないと軽く否定する時"},
+  {cat:"同意・判断", en:"It is what it is", jp:"しょうがない(そういうもんだ)", kw:"it is what it is", ex:"it is what it is=現実は変えられない・仕方ない", sc:"変えられない現実を、受け入れるしかないと諦める時"},
+  {cat:"同意・判断", en:"That works for me", jp:"それで問題ないよ", kw:"works for me", ex:"that works for me=それで大丈夫・都合がいい", sc:"提案に対して、それで問題ないと同意する時"},
+  {cat:"同意・判断", en:"I guess so", jp:"まあそうだね(消極的同意)", kw:"guess so", ex:"I guess so=たぶんそうだね(あまり乗り気でない同意)", sc:"あまり乗り気じゃないが、消極的に同意する時"},
+  {cat:"同意・判断", en:"Makes no difference to me", jp:"自分はどっちでもいい", kw:"no difference", ex:"make no difference=違いがない・どうでもいい", sc:"どちらでも構わないと表明する時"},
+  {cat:"挑発・威嚇", en:"You want a piece of me", jp:"やんのかコラ", kw:"piece of me", ex:"want a piece of me=かかってこいよ(喧嘩を売る)", sc:"喧嘩を売ってきた相手に、やんのかと威嚇する時"},
+  {cat:"挑発・威嚇", en:"Bring it on", jp:"上等だ、かかってこい", kw:"bring it on", ex:"bring it on=やってやろうじゃないか(挑発を受けて立つ)", sc:"挑発を受けて、上等だとやり返す時"},
+  {cat:"挑発・威嚇", en:"You're asking for it", jp:"痛い目見たいのか", kw:"asking for it", ex:"asking for it=自業自得・痛い目に遭いたいのか", sc:"無茶をする相手に、痛い目見るぞと警告する時"},
+  {cat:"挑発・威嚇", en:"Don't push your luck", jp:"調子に乗るなよ", kw:"push your luck", ex:"push one's luck=調子に乗る・運を過信する", sc:"調子に乗る相手に、それ以上やるなと釘を刺す時"},
+  {cat:"挑発・威嚇", en:"You'll regret this", jp:"後悔することになるぞ", kw:"regret this", ex:"you'll regret this=これを後悔するぞ(脅し)", sc:"相手の行動に、後悔するぞと脅す時"},
+  {cat:"挑発・威嚇", en:"Watch yourself", jp:"身の程をわきまえろ", kw:"watch yourself", ex:"watch yourself=気をつけろ・調子に乗るな(警告)", sc:"生意気な相手に、身の程をわきまえろと警告する時"},
+  {cat:"挑発・威嚇", en:"Say that again", jp:"もう一回言ってみろ", kw:"say that again", ex:"Say that again=（喧嘩腰で）もう一度言ってみろ", sc:"侮辱されて、もう一回言ってみろと凄む時"},
+  {cat:"挑発・威嚇", en:"You started it", jp:"先に手を出したのはお前だ", kw:"started it", ex:"you started it=お前が始めたことだ", sc:"揉め事の責任は、先に手を出した相手にあると言う時"},
+  {cat:"挑発・威嚇", en:"Mind your own business", jp:"余計なお世話だ", kw:"own business", ex:"mind your own business=自分のことに集中しろ・干渉するな", sc:"干渉してくる相手に、放っておいてくれと言う時"},
+  {cat:"挑発・威嚇", en:"That's none of your business", jp:"お前には関係ないだろ", kw:"none of your business", ex:"none of your business=あなたには関係ない", sc:"詮索してくる相手に、関係ないだろと突き放す時"},
+  {cat:"自然な口語", en:"I'm not gonna lie", jp:"正直に言うとさ", kw:"not gonna lie", ex:"not gonna lie=嘘はつかない・正直に言うと(前置き)", sc:"正直な感想や本音を切り出す時"},
+  {cat:"自然な口語", en:"That's what I'm talking about", jp:"そうこなくちゃ", kw:"what I'm talking about", ex:"that's what I'm talking about=それだよ・待ってました", sc:"期待通りの展開になって、そうこなくちゃと喜ぶ時"},
+  {cat:"自然な口語", en:"Here we go", jp:"さあ始まるぞ", kw:"here we go", ex:"here we go=さあいくぞ・始まった", sc:"いよいよ何かが始まる、その瞬間"},
+  {cat:"自然な口語", en:"You know what", jp:"あのさ、いいこと思いついた", kw:"you know what", ex:"you know what=あのね・ちょっと聞いて(話を切り出す)", sc:"ふと思いついたことを、相手に切り出す時"},
+  {cat:"自然な口語", en:"I mean, come on", jp:"いやいや、勘弁してよ", kw:"I mean come on", ex:"I mean, come on=いやマジで・そりゃないよ", sc:"理不尽なことに、勘弁してよと呆れる時"},
+  {cat:"自然な口語", en:"What is even happening", jp:"何が起きてるんだこれ", kw:"even happening", ex:"what is even happening=一体全体何が起きてるんだ", sc:"状況が混乱しすぎて、何が起きてるんだと戸惑う時"},
+  {cat:"自然な口語", en:"This is going great", jp:"順調そのものだね(皮肉も可)", kw:"going great", ex:"going great=すごく順調(皮肉で逆の意味にもなる)", sc:"順調な時、または皮肉で全然ダメな時"},
+  {cat:"自然な口語", en:"I have a bad feeling about this", jp:"嫌な予感がする", kw:"bad feeling", ex:"have a bad feeling about=〜に嫌な予感がする", sc:"この先よくないことが起きそうだと直感した時"},
+  {cat:"自然な口語", en:"Let's not do that again", jp:"二度とやめとこう", kw:"not do that again", ex:"let's not do that again=あれはもう繰り返さないでおこう", sc:"ひどい目に遭って、もう二度とやめようと思う時"},
+  {cat:"自然な口語", en:"Well, that happened", jp:"まあ、色々あったな", kw:"that happened", ex:"well that happened=(予想外のことの後)なんか起きたね", sc:"予想外のことが一通り起きた後、しみじみ振り返る時"},
+  {cat:"状況反応", en:"That's more like it", jp:"そうそう、その調子", kw:"more like it", ex:"that's more like it=それでこそ・そうこなくちゃ", sc:"ようやく望んだ展開になって、その調子と喜ぶ時"},
+  {cat:"状況反応", en:"That could've gone better", jp:"もっとうまくやれたな", kw:"gone better", ex:"could have gone better=もっとうまくいけたはず", sc:"結果がイマイチで、もっとうまくやれたと反省する時"},
+  {cat:"状況反応", en:"Well, this is awkward", jp:"うわ、気まずい", kw:"this is awkward", ex:"awkward=気まずい・ぎこちない", sc:"なんとも気まずい状況になってしまった時"},
+  {cat:"状況反応", en:"This can't be good", jp:"これはまずいだろ", kw:"can't be good", ex:"this can't be good=これは良くない兆候だ", sc:"明らかに悪い兆候を感じて、まずいと思う時"},
+  {cat:"状況反応", en:"Here comes trouble", jp:"厄介事の到来だ", kw:"here comes trouble", ex:"here comes trouble=面倒が来たぞ", sc:"面倒事が近づいてくるのが見えた時"},
+  {cat:"状況反応", en:"That escalated quickly", jp:"一気に話が大きくなったな", kw:"escalated quickly", ex:"escalate=急激に悪化・拡大する", sc:"ちょっとしたことが、一気に大事になった時"},
+  {cat:"状況反応", en:"Well, that's new", jp:"へえ、初めてのパターンだ", kw:"that's new", ex:"that's new=それは新しい・初めて見た", sc:"今まで見たことのない事態が起きた時"},
+  {cat:"状況反応", en:"This keeps getting better", jp:"どんどん良くなる(皮肉も)", kw:"keeps getting better", ex:"keep getting better=どんどん良くなる(皮肉で悪化にも)", sc:"次々といいこと(または皮肉で悪いこと)が起きる時"},
+  {cat:"お願い・提案", en:"Do me a favor", jp:"ちょっと頼みがある", kw:"do me a favor", ex:"do me a favor=頼み事を聞いてくれ", sc:"相手に、ちょっとした頼み事をする時"},
+  {cat:"お願い・提案", en:"Give me a hand", jp:"ちょっと手を貸して", kw:"give me a hand", ex:"give a hand=手伝う・手を貸す", sc:"作業を手伝ってほしいと頼む時"},
+  {cat:"お願い・提案", en:"Hear me out", jp:"最後まで話を聞いて", kw:"hear me out", ex:"hear me out=最後まで聞いてくれ", sc:"遮られそうな話を、最後まで聞いてくれと頼む時"},
+  {cat:"お願い・提案", en:"Let's call it a day", jp:"今日はここまでにしよう", kw:"call it a day", ex:"call it a day=(その日の作業を)切り上げる", sc:"疲れたり区切りがついて、今日は終わりにする時"},
+  {cat:"お願い・提案", en:"Suit yourself", jp:"好きにしなよ", kw:"suit yourself", ex:"suit yourself=好きにしろ・お好きにどうぞ", sc:"こちらの提案を断る相手に、好きにしろと言う時"},
+  {cat:"お願い・提案", en:"Take it easy", jp:"無理すんなよ", kw:"take it easy", ex:"take it easy=気楽にいけ・無理するな", sc:"無理している相手に、気楽にいけよと声をかける時"},
+  {cat:"お願い・提案", en:"Give it a shot", jp:"ちょっとやってみなよ", kw:"give it a shot", ex:"give it a shot=試しにやってみる", sc:"迷っている相手に、試しにやってみなよと勧める時"},
+  {cat:"お願い・提案", en:"Cut me some slack", jp:"少し大目に見てよ", kw:"cut me some slack", ex:"cut someone slack=大目に見る・手加減する", sc:"厳しくされて、少し大目に見てくれと頼む時"},
+  {cat:"お願い・提案", en:"Work with me here", jp:"ちょっと協力してくれ", kw:"work with me", ex:"work with me=話を合わせて・協力して(この場で)", sc:"話を合わせて協力してほしいと相手に頼む時"},
+  {cat:"お願い・提案", en:"Just hear me out for a second", jp:"ちょっとだけ聞いてほしい", kw:"for a second", ex:"hear me out for a second=少しだけ話を聞いて", sc:"少しだけでいいから話を聞いてと食い下がる時"},
+  {cat:"締め・結論", en:"That's the plan", jp:"そういう作戦だ", kw:"that's the plan", ex:"that's the plan=それが狙い・計画通り", sc:"うまくいった時、それが狙い通りだと言う時"},
+  {cat:"締め・結論", en:"And there it is", jp:"はい来た(予想通りのオチ)", kw:"there it is", ex:"and there it is=ほら来た・案の定だ", sc:"予想通りのオチが来て、ほら来たと言う時"},
+  {cat:"締め・結論", en:"That'll do", jp:"それでよしとしよう", kw:"that'll do", ex:"that'll do=それで十分・そこまででいい", sc:"完璧じゃないが、それで十分だと切り上げる時"},
+  {cat:"締め・結論", en:"Story of my life", jp:"いつもこうなんだよな", kw:"story of my life", ex:"story of my life=よくあることだ・自分の人生こんなもん", sc:"いつもの不運が起きて、自分の人生こんなもんだと嘆く時"},
+  {cat:"締め・結論", en:"Better late than never", jp:"遅くてもやらないよりマシ", kw:"late than never", ex:"better late than never=遅れてもやらないよりはいい(ことわざ)", sc:"遅れたけど、やらないよりマシだと前向きに捉える時"},
+  {cat:"締め・結論", en:"That's a wrap", jp:"はい終了", kw:"that's a wrap", ex:"that's a wrap=これで終了・完了(撮影用語由来)", sc:"作業や配信を、これで終了と締めくくる時"},
+  {cat:"締め・結論", en:"We'll cross that bridge when we get there", jp:"その時になったら考えよう", kw:"cross that bridge", ex:"cross that bridge when you get there=先のことは後で考える", sc:"先の問題は、その時になったら考えようと言う時"},
+  {cat:"締め・結論", en:"Easier said than done", jp:"言うは易し行うは難し", kw:"easier said than done", ex:"easier said than done=言うのは簡単だが実行は難しい", sc:"言うのは簡単だが、実際は難しいと感じた時"},
+  {cat:"締め・結論", en:"You win some, you lose some", jp:"勝つ時もあれば負ける時もある", kw:"win some lose some", ex:"you win some you lose some=勝ったり負けたり・そんなもんだ", sc:"勝ったり負けたり、そんなもんだと受け流す時"},
+  {cat:"締め・結論", en:"That settles it", jp:"これで決まりだ", kw:"settles it", ex:"that settles it=これで決着・決定だ", sc:"議論や迷いに、これで決着だと結論を出す時"},
 ];
 
 // Total: 100 phrases
@@ -617,10 +617,11 @@ let appMode = 'listen'; // listen | quiz | quiz5 | quiz3 | quiz2 | quizInstant
 let quizTimer = null;
 
 // 各クイズモードの考える時間(ms)。quizだけユーザーが選択可能
-const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800 };
+const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800, quizScene: 6000 };
 // 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
-const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2' };
-const RANDOM_MODES = new Set(['quiz2', 'quizInstant']); // 出題順をランダムにするモード
+const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2', quizScene: 'quizInstant' };
+const RANDOM_MODES = new Set(['quiz2', 'quizInstant', 'quizScene']); // 出題順をランダムにするモード
+function isSceneMode() { return appMode === 'quizScene'; }
 // モードごとの固定リピート回数(指定がなければユーザー選択値を使う)
 // モードごとのリピート回数の上限とデフォルト。指定のないモードは max10/default5
 const MODE_REPEAT_CFG = {
@@ -628,6 +629,7 @@ const MODE_REPEAT_CFG = {
   quiz3:       { max: 3, def: 2 },
   quiz2:       { max: 2, def: 1 },
   quizInstant: { max: 2, def: 1 },
+  quizScene:   { max: 2, def: 1 },
 };
 function repeatCfg() {
   return MODE_REPEAT_CFG[appMode] || { max: 10, def: 5 };
@@ -674,7 +676,7 @@ const APP_KEY = 'practical3'; // distinguishes this app's data from the gta play
 const LOCAL_USER_KEY = 'phraseAppUser_v1';
 
 let currentUser = null;
-let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
+let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
 let saveTimer = null;
 
 function loadStatusMap() {
@@ -729,13 +731,14 @@ function loadFromServer(user) {
             quiz5: parsed.quiz5 || {},
             quiz3: parsed.quiz3 || {},
             quiz2: parsed.quiz2 || {},
-            quizInstant: parsed.quizInstant || {}
+            quizInstant: parsed.quizInstant || {},
+            quizScene: parsed.quizScene || {}
           };
         } else {
-          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
+          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
         }
       } catch (e) {
-        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {} };
+        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
       }
     });
 }
@@ -988,9 +991,9 @@ function updateDisplay() {
   const phraseJpQuiz = document.getElementById('phraseJpQuiz');
 
   if (isQuizMode()) {
-    // 日本語を先に出し、考える時間のあと英語を表示する
+    // 日本語(情景モードは情景文)を先に出し、考える時間のあと英語を表示する
     phraseJpQuiz.style.display = 'block';
-    phraseJpQuiz.textContent = item.jp;
+    phraseJpQuiz.textContent = isSceneMode() ? ('【状況】' + (item.sc || item.jp)) : item.jp;
     phraseEn.textContent = '？？？';
     phraseEn.style.opacity = '0.3';
     phraseJp.textContent = '';
@@ -1019,6 +1022,9 @@ function revealAnswer() {
   const item = filtered[curIndex];
   phraseEn.textContent = item.en;
   phraseEn.style.opacity = '1';
+  if (isSceneMode()) {
+    document.getElementById('phraseJpQuiz').textContent = '【状況】' + (item.sc || item.jp) + '  →  ' + item.jp;
+  }
   // show keyword box
   if (item.kw) {
     document.getElementById('kwWord').textContent = item.kw;
@@ -1039,7 +1045,7 @@ function speakCurrent() {
     clearTimeout(quizTimer);
 
     if (japaneseVoice) {
-      const uttJpFirst = new SpeechSynthesisUtterance(item.jp);
+      const uttJpFirst = new SpeechSynthesisUtterance(isSceneMode() ? (item.sc || item.jp) : item.jp);
       uttJpFirst.lang = 'ja-JP';
       uttJpFirst.voice = japaneseVoice;
       uttJpFirst.rate = 1;
@@ -1134,6 +1140,7 @@ function buildModeFilters() {
     { key: 'quiz3', label: '3秒(2回)' },
     { key: 'quiz2', label: '2秒(1回)' },
     { key: 'quizInstant', label: '即射(1回)' },
+    { key: 'quizScene', label: '情景モード' },
   ];
   modes.forEach(m => {
     const chip = document.createElement('div');
