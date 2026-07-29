@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -500,7 +501,6 @@
 const DATA = [
   {cat:"相づち・返し", en:"That makes sense", jp:"なるほど筋が通ってる", kw:"makes sense", ex:"make sense=筋が通る・理にかなう"},
   {cat:"相づち・返し", en:"Fair enough", jp:"まあそれもそうだな(納得)", kw:"fair enough", ex:"fair enough=一理ある・納得(相手の言い分を認める)"},
-  {cat:"相づち・返し", en:"No kidding", jp:"マジで(冗談抜きで)", kw:"no kidding", ex:"no kidding=冗談じゃなく本当に・へえそうなんだ"},
   {cat:"相づち・返し", en:"You can say that again", jp:"まったくその通りだ", kw:"say that again", ex:"You can say that again=激しく同意・全くだ"},
   {cat:"相づち・返し", en:"I'll take your word for it", jp:"その言葉を信じるよ", kw:"take your word", ex:"take one's word for it=言葉を鵜呑みにする・信用する"},
   {cat:"相づち・返し", en:"That's a good point", jp:"それはいい指摘だ", kw:"good point", ex:"good point=良い指摘・もっともな意見"},
@@ -518,15 +518,12 @@ const DATA = [
   {cat:"呼びかけ・注意", en:"Easy there", jp:"落ち着けって", kw:"easy there", ex:"easy there=まあ落ち着け・慌てるな"},
   {cat:"呼びかけ・注意", en:"Back off", jp:"引き下がれ・近寄るな", kw:"back off", ex:"back off=引き下がる・手を引く"},
   {cat:"呼びかけ・注意", en:"Knock it off", jp:"いい加減にやめろ", kw:"knock it off", ex:"knock it off=うるさい・やめろ(迷惑行為への制止)"},
-  {cat:"感情表現", en:"You've got to be joking", jp:"冗談だろ(信じられない)", kw:"got to be joking", ex:"you've got to be joking=冗談でしょ(kiddingの別バージョン)"},
   {cat:"感情表現", en:"This is unreal", jp:"現実とは思えない", kw:"unreal", ex:"unreal=非現実的・信じられないほどすごい"},
   {cat:"感情表現", en:"I can't even", jp:"もう言葉にならない", kw:"can't even", ex:"I can't even=感情が処理しきれない(若者言葉のスラング)"},
   {cat:"感情表現", en:"That's insane", jp:"正気じゃない(すごい/ひどい)", kw:"insane", ex:"insane=正気じゃない・とんでもない"},
   {cat:"感情表現", en:"What are the odds", jp:"こんな偶然あるかよ", kw:"what are the odds", ex:"what are the odds=そんな確率ある？(まさかの偶然に)"},
   {cat:"感情表現", en:"I'm losing it", jp:"笑いが止まらない/正気を失いそう", kw:"losing it", ex:"lose it=笑い崩れる or 冷静さを失う(文脈次第)"},
-  {cat:"感情表現", en:"You're kidding me", jp:"うそだろ", kw:"kidding me", ex:"you're kidding me=冗談でしょ(即座の驚き)"},
   {cat:"感情表現", en:"This is nuts", jp:"イカれてる(すごい状況)", kw:"nuts", ex:"nuts=気が狂った・とんでもない(insaneの砕けた版)"},
-  {cat:"感情表現", en:"No way that just happened", jp:"今のはありえないだろ", kw:"no way", ex:"no way that just happened=今起きたことが信じられない"},
   {cat:"感情表現", en:"That blew my mind", jp:"度肝を抜かれた", kw:"blew my mind", ex:"blow one's mind=驚愕させる・感動させる"},
   {cat:"会話つなぎ", en:"Long story short", jp:"手短に言うと", kw:"long story short", ex:"long story short=長い話を短くすると・要するに"},
   {cat:"会話つなぎ", en:"The thing is", jp:"実はね(問題はね)", kw:"the thing is", ex:"the thing is=実のところ・問題は(本題に入る前置き)"},
@@ -569,13 +566,11 @@ const DATA = [
   {cat:"自然な口語", en:"Let's not do that again", jp:"二度とやめとこう", kw:"not do that again", ex:"let's not do that again=あれはもう繰り返さないでおこう"},
   {cat:"自然な口語", en:"Well, that happened", jp:"まあ、色々あったな", kw:"that happened", ex:"well that happened=(予想外のことの後)なんか起きたね"},
   {cat:"状況反応", en:"That's more like it", jp:"そうそう、その調子", kw:"more like it", ex:"that's more like it=それでこそ・そうこなくちゃ"},
-  {cat:"状況反応", en:"So far so good", jp:"今のところ順調", kw:"so far so good", ex:"so far so good=ここまでは順調"},
   {cat:"状況反応", en:"That could've gone better", jp:"もっとうまくやれたな", kw:"gone better", ex:"could have gone better=もっとうまくいけたはず"},
   {cat:"状況反応", en:"Well, this is awkward", jp:"うわ、気まずい", kw:"this is awkward", ex:"awkward=気まずい・ぎこちない"},
   {cat:"状況反応", en:"This can't be good", jp:"これはまずいだろ", kw:"can't be good", ex:"this can't be good=これは良くない兆候だ"},
   {cat:"状況反応", en:"Here comes trouble", jp:"厄介事の到来だ", kw:"here comes trouble", ex:"here comes trouble=面倒が来たぞ"},
   {cat:"状況反応", en:"That escalated quickly", jp:"一気に話が大きくなったな", kw:"escalated quickly", ex:"escalate=急激に悪化・拡大する"},
-  {cat:"状況反応", en:"I saw that coming", jp:"予想通りだ", kw:"saw that coming", ex:"see it coming=予測する(予想が的中した時)"},
   {cat:"状況反応", en:"Well, that's new", jp:"へえ、初めてのパターンだ", kw:"that's new", ex:"that's new=それは新しい・初めて見た"},
   {cat:"状況反応", en:"This keeps getting better", jp:"どんどん良くなる(皮肉も)", kw:"keeps getting better", ex:"keep getting better=どんどん良くなる(皮肉で悪化にも)"},
   {cat:"お願い・提案", en:"Do me a favor", jp:"ちょっと頼みがある", kw:"do me a favor", ex:"do me a favor=頼み事を聞いてくれ"},
