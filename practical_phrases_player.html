@@ -412,6 +412,11 @@
       <div id="kwEx" style="font-size:13px; color:var(--text-dim); line-height:1.6;"></div>
     </div>
 
+    <div id="srsGradeRow" style="display:none; margin-top:16px; gap:10px; justify-content:center;">
+      <button id="srsFail" style="flex:1; max-width:180px; padding:14px; border:none; border-radius:10px; background:#5a3030; color:#ffb3b3; font-size:15px; font-weight:700; cursor:pointer;">△ 詰まった<br><span style="font-size:11px; opacity:0.7; font-weight:400;">最初からやり直し</span></button>
+      <button id="srsPass" style="flex:1; max-width:180px; padding:14px; border:none; border-radius:10px; background:#2f4a30; color:#b3ffb8; font-size:15px; font-weight:700; cursor:pointer;">○ 言えた<br><span style="font-size:11px; opacity:0.7; font-weight:400;">間隔を伸ばす</span></button>
+    </div>
+
     <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
     <div class="progress-label"><span id="curIdx">0</span><span id="totalIdx">0</span></div>
 
@@ -710,11 +715,50 @@ let appMode = 'listen'; // listen | quiz | quiz5 | quiz3 | quiz2 | quizInstant
 let quizTimer = null;
 
 // 各クイズモードの考える時間(ms)。quizだけユーザーが選択可能
-const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800, quizScene: 6000 };
+const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800, quizScene: 6000, srs: 6000 };
 // 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
 const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2', quizScene: 'quizInstant' };
-const RANDOM_MODES = new Set(['quiz2', 'quizInstant', 'quizScene']); // 出題順をランダムにするモード
-function isSceneMode() { return appMode === 'quizScene'; }
+const RANDOM_MODES = new Set(['quiz2', 'quizInstant', 'quizScene', 'srs']); // 出題順をランダムにするモード
+function isSceneMode() { return appMode === 'quizScene' || appMode === 'srs'; }
+function isSrsMode() { return appMode === 'srs'; }
+
+// ===== 間隔反復(SRS) =====
+// 話せるフラグのフレーズだけを対象に、忘却曲線に沿って復習日を管理する。
+// srsData[en] = { due: 次回復習日(YYYY-MM-DD), step: 現在の間隔段階 }
+// 間隔段階(日): [1, 3, 7, 14, 30, 60]。言えたら次段階へ、詰まったら最初へ戻す。
+const SRS_INTERVALS = [1, 3, 7, 14, 30, 60];
+let srsData = {};
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function addDays(dateStr, days) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+// 話せるフラグが付いているか
+function isSpeakable(item) {
+  // 間隔反復の対象は「情景モードで★話せるにした語」だけ
+  return statusMap.quizScene && statusMap.quizScene[item.en] === 'speakable';
+}
+// SRS対象(話せる)のうち、今日以前が復習期限のもの
+function isSrsDue(item) {
+  if (!isSpeakable(item)) return false;
+  const rec = srsData[item.en];
+  if (!rec) return true; // まだ一度も復習していない話せる語は即対象
+  return rec.due <= todayStr();
+}
+function srsDueCount() { return DATA.filter(isSrsDue).length; }
+// 話せる語の総数(期限に関係なく)
+function srsTotalCount() { return DATA.filter(isSpeakable).length; }
+// 「言えた」→次の間隔へ / 「詰まった」→最初へ
+function srsGrade(item, ok) {
+  const rec = srsData[item.en] || { step: -1 };
+  let step = ok ? Math.min(rec.step + 1, SRS_INTERVALS.length - 1) : 0;
+  srsData[item.en] = { step: step, due: addDays(todayStr(), SRS_INTERVALS[step]) };
+  scheduleSave();
+}
 // モードごとの固定リピート回数(指定がなければユーザー選択値を使う)
 // モードごとのリピート回数の上限とデフォルト。指定のないモードは max10/default5
 const MODE_REPEAT_CFG = {
@@ -723,6 +767,7 @@ const MODE_REPEAT_CFG = {
   quiz2:       { max: 2, def: 1 },
   quizInstant: { max: 2, def: 1 },
   quizScene:   { max: 2, def: 1 },
+  srs:         { max: 2, def: 1 },
 };
 function repeatCfg() {
   return MODE_REPEAT_CFG[appMode] || { max: 10, def: 5 };
@@ -791,7 +836,7 @@ function saveStatusMap(retry) {
     body: JSON.stringify({
       action: 'save',
       user: APP_KEY + ':' + currentUser,
-      data: JSON.stringify(statusMap)
+      data: JSON.stringify({ _statusMap: statusMap, _srs: srsData })
     })
   })
     .then(r => r.json())
@@ -815,7 +860,12 @@ function loadFromServer(user) {
     .then(r => r.json())
     .then(res => {
       try {
-        const parsed = JSON.parse(res.data || '{}');
+        let parsed = JSON.parse(res.data || '{}');
+        // 新形式: { _statusMap, _srs } を分離
+        if (parsed && parsed._statusMap) {
+          srsData = parsed._srs || {};
+          parsed = parsed._statusMap;
+        }
         // 旧フォーマット(モード分け前)は listen バケットへ移行
         if (parsed && (parsed.listen || parsed.quiz)) {
           statusMap = {
@@ -988,6 +1038,7 @@ function buildFilters() {
 
 function applyFilter() {
   filtered = DATA.filter(d => {
+    if (appMode === 'srs') return isSrsDue(d); // 間隔反復は今日期限の話せる語のみ(カテゴリ絞りは無視)
     if (!isUnlocked(d)) return false;
     if (!activeCats.has(d.cat)) return false;
     if (activeStatusFilter !== 'all' && getStatus(d) !== activeStatusFilter) return false;
@@ -1061,9 +1112,16 @@ function updateDisplay() {
   const emptyBox = document.getElementById('emptyMsg');
   if (filtered.length === 0) {
     emptyBox.style.display = 'block';
-    emptyBox.textContent = MODE_SOURCE[appMode]
-      ? '対象フレーズがありません。前のモードで「◯覚えた」にチェックしたフレーズがここに追加されます。'
-      : '対象フレーズがありません。フィルター条件を確認してください。';
+    if (appMode === 'srs') {
+      const total = srsTotalCount();
+      emptyBox.textContent = total === 0
+        ? '「★話せる」にした語がまだありません。情景モードなどで話せるようになった語がここに集まります。'
+        : '今日の復習は完了です！お疲れさまでした。次の復習日にまた出題されます。';
+    } else {
+      emptyBox.textContent = MODE_SOURCE[appMode]
+        ? '対象フレーズがありません。前のモードで「◯覚えた」にチェックしたフレーズがここに追加されます。'
+        : '対象フレーズがありません。フィルター条件を確認してください。';
+    }
     document.getElementById('phraseJpQuiz').style.display = 'none';
     phraseEn.textContent = '—';
     phraseEn.style.opacity = '1';
@@ -1075,6 +1133,7 @@ function updateDisplay() {
     return;
   }
   emptyBox.style.display = 'none';
+  document.getElementById('srsGradeRow').style.display = 'none';
   const item = filtered[curIndex];
   catTag.textContent = item.cat;
   curIdxEl.textContent = (curIndex + 1) + ' / ' + filtered.length;
@@ -1117,6 +1176,9 @@ function revealAnswer() {
   phraseEn.style.opacity = '1';
   if (isSceneMode()) {
     document.getElementById('phraseJpQuiz').textContent = '【状況】' + (item.sc || item.jp) + '  →  ' + item.jp;
+  }
+  if (isSrsMode()) {
+    document.getElementById('srsGradeRow').style.display = 'flex';
   }
   // show keyword box
   if (item.kw) {
@@ -1178,6 +1240,13 @@ function speakEnglishThenAdvance(item, rate, wantJp) {
       return;
     }
     repeatCount = 0;
+    if (isSrsMode()) {
+      // 間隔反復は自己申告ボタンで進むため、ここで停止してボタンを待つ
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      document.getElementById('srsGradeRow').style.display = 'flex';
+      return;
+    }
     const reviewMs = isQuizMode() ? parseInt(document.getElementById('reviewTimeSelect').value) : 0;
     const proceed = () => {
       if (!isPlaying) return;
@@ -1234,17 +1303,22 @@ function buildModeFilters() {
     { key: 'quiz2', label: '2秒(1回)' },
     { key: 'quizInstant', label: '即射(1回)' },
     { key: 'quizScene', label: '情景モード' },
+    { key: 'srs', label: '仕上げ(間隔反復)' },
   ];
   modes.forEach(m => {
     const chip = document.createElement('div');
     chip.className = 'status-chip' + (appMode === m.key ? ' active' : '');
-    const n = unlockedCount(m.key);
-    chip.textContent = MODE_SOURCE[m.key] ? `${m.label} (${n})` : m.label;
-    if (MODE_SOURCE[m.key] && n === 0) chip.style.opacity = '0.4';
+    let n;
+    if (m.key === 'srs') { n = srsDueCount(); }
+    else { n = unlockedCount(m.key); }
+    const showCount = MODE_SOURCE[m.key] || m.key === 'srs';
+    chip.textContent = showCount ? `${m.label} (${n})` : m.label;
+    if (showCount && n === 0) chip.style.opacity = '0.4';
     chip.onclick = () => {
       stopSpeaking();
       isPlaying = false;
       playBtn.textContent = '▶';
+      document.getElementById('srsGradeRow').style.display = 'none';
       appMode = m.key;
       repeatTotal = repeatCfg().def; // モードのデフォルトに合わせる
       rebuildRepeatOptions();
@@ -1277,6 +1351,28 @@ prevBtn.onclick = goPrev;
 
 repeatSelect.onchange = () => { repeatTotal = parseInt(repeatSelect.value); };
 rebuildRepeatOptions();
+
+// 間隔反復の「言えた/詰まった」ボタン
+document.getElementById('srsPass').onclick = () => srsAdvance(true);
+document.getElementById('srsFail').onclick = () => srsAdvance(false);
+function srsAdvance(ok) {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  srsGrade(item, ok);           // 復習日を更新
+  document.getElementById('srsGradeRow').style.display = 'none';
+  // この問題をリストから外して次へ(今日のノルマを消化していく)
+  filtered.splice(curIndex, 1);
+  buildModeFilters();           // チップの残り数を更新
+  if (filtered.length === 0) {
+    updateDisplay();            // 空表示(今日の分は完了)
+    return;
+  }
+  if (curIndex >= filtered.length) curIndex = 0;
+  updateDisplay();
+  isPlaying = true;
+  playBtn.textContent = '⏸';
+  speakCurrent();
+}
 
 function initApp() {
   buildFilters();
