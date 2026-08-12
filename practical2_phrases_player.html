@@ -717,7 +717,7 @@ const APP_KEY = 'practical2'; // distinguishes this app's data from the gta play
 const LOCAL_USER_KEY = 'phraseAppUser_v1';
 
 let currentUser = null;
-let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
+let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
 let saveTimer = null;
 
 function loadStatusMap() {
@@ -778,13 +778,14 @@ function loadFromServer(user) {
             quiz3: parsed.quiz3 || {},
             quiz2: parsed.quiz2 || {},
             quizInstant: parsed.quizInstant || {},
-            quizScene: parsed.quizScene || {}
+            quizScene: parsed.quizScene || {},
+            srs: parsed.srs || {}
           };
         } else {
-          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
+          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
         }
       } catch (e) {
-        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {} };
+        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
       }
     });
 }
