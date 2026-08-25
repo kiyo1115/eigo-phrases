@@ -1,0 +1,1450 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>実用フレーズ4 聞き流しプレイヤー</title>
+<style>
+  :root {
+    --bg: #14110f;
+    --panel: #1c1815;
+    --amber: #ff8c2e;
+    --amber-dim: #c4691a;
+    --text: #ede5d8;
+    --text-dim: #968d7f;
+    --line: #2e2822;
+    --red: #d4453a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 6px 14px;
+    margin-bottom: 16px;
+    transition: 0.15s;
+  }
+  .back-link:hover { border-color: var(--amber-dim); color: var(--amber); }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber-dim);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 4px 0 24px;
+    letter-spacing: -0.01em;
+  }
+  h1 span { color: var(--amber); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .now-playing {
+    text-align: center;
+    padding: 28px 16px;
+  }
+  .cat-tag {
+    display: inline-block;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    border-radius: 99px;
+    padding: 3px 10px;
+    margin-bottom: 16px;
+  }
+  .phrase-en {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .phrase-jp {
+    font-size: 18px;
+    color: var(--text-dim);
+  }
+
+  .progress {
+    height: 3px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 20px 0 4px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--amber);
+    width: 0%;
+    transition: width 0.2s linear;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .btn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .btn:hover { border-color: var(--amber-dim); }
+  .btn-skip { width: 44px; height: 44px; font-size: 16px; }
+  .btn-play {
+    width: 64px; height: 64px;
+    font-size: 22px;
+    background: var(--amber);
+    border: none;
+    color: #1a1208;
+  }
+  .btn-play:hover { background: #ffa14f; }
+
+  .settings-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .settings-row > div { flex: 1; }
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+  select, input[type=range] {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .cat-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .cat-chip {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+  }
+  .cat-chip.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(255,140,46,0.08);
+  }
+
+  .list-title {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .phrase-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .phrase-row:hover { background: var(--bg); }
+  .phrase-row.current { background: rgba(255,140,46,0.1); }
+  .phrase-row .en { font-weight: 600; }
+  .phrase-row .jp { color: var(--text-dim); font-size: 14px; }
+  .phrase-row .idx {
+    color: var(--amber-dim);
+    font-size: 11px;
+    width: 24px;
+    flex-shrink: 0;
+  }
+  .row-main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .row-main .en, .row-main .jp { white-space: normal; }
+  .row-main .idx { align-self: flex-start; }
+
+  .status-buttons {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .status-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: 0.15s;
+  }
+  .status-btn:hover { border-color: var(--amber-dim); }
+  .status-btn.active-learning {
+    background: rgba(196,105,26,0.25);
+    border-color: var(--amber-dim);
+    color: var(--amber);
+  }
+  .status-btn.active-known {
+    background: rgba(255,140,46,0.3);
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+  .status-btn.active-speakable {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #1a1208;
+  }
+
+  .now-playing .status-buttons {
+    justify-content: center;
+    margin: 14px 0 0;
+  }
+  .now-playing .status-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+  .status-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 11px;
+  }
+  .stat-pill {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+  .stat-pill .num { font-size: 16px; font-weight: 700; color: var(--amber); display: block; }
+  .stat-pill .label { color: var(--text-dim); }
+
+  .status-filter-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .status-chip {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .status-chip.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(255,140,46,0.08);
+  }
+
+  .hint {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .login-box {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px 24px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-box h2 { font-size: 18px; margin: 0 0 6px; }
+  .login-box p { font-size: 12px; color: var(--text-dim); margin: 0 0 20px; }
+  .login-box input {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .login-box button {
+    width: 100%;
+    background: var(--amber);
+    border: none;
+    color: #1a1208;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .login-status {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 10px;
+    min-height: 14px;
+  }
+  .sync-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    color: var(--text-dim);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 4px 10px;
+    z-index: 10;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">実用フレーズ4 / 生の口語版</div>
+  <h1>実用<span>フレーズ4</span></h1>
+
+  <div class="panel" style="padding:14px 20px;">
+    <div class="status-filter-row" id="modeFilters" style="margin-top:0;"></div>
+  </div>
+
+  <div class="panel now-playing">
+    <div id="emptyMsg" style="display:none; font-size:13px; color:var(--text-dim); line-height:1.7; padding:8px 4px 16px;"></div>
+    <div class="cat-tag" id="catTag">状況描写</div>
+    <div class="phrase-jp" id="phraseJpQuiz" style="display:none; font-size:26px; font-weight:700; color:var(--text); margin-bottom:18px;"></div>
+    <div class="phrase-en" id="phraseEn">Loading...</div>
+    <div class="phrase-jp" id="phraseJp"></div>
+    <div id="kwBox" style="display:none; margin-top:14px; background:rgba(255,140,46,0.08); border:1px solid var(--amber-dim); border-radius:8px; padding:12px 14px; text-align:left;">
+      <div id="kwWord" style="font-size:15px; font-weight:700; color:var(--amber); margin-bottom:4px;"></div>
+      <div id="kwEx" style="font-size:13px; color:var(--text-dim); line-height:1.6;"></div>
+    </div>
+
+    <div id="srsGradeRow" style="display:none; margin-top:16px; gap:10px; justify-content:center;">
+      <button id="srsFail" style="flex:1; max-width:180px; padding:14px; border:none; border-radius:10px; background:#5a3030; color:#ffb3b3; font-size:15px; font-weight:700; cursor:pointer;">△ 詰まった<br><span style="font-size:11px; opacity:0.7; font-weight:400;">最初からやり直し</span></button>
+      <button id="srsPass" style="flex:1; max-width:180px; padding:14px; border:none; border-radius:10px; background:#2f4a30; color:#b3ffb8; font-size:15px; font-weight:700; cursor:pointer;">○ 言えた<br><span style="font-size:11px; opacity:0.7; font-weight:400;">間隔を伸ばす</span></button>
+    </div>
+
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-label"><span id="curIdx">0</span><span id="totalIdx">0</span></div>
+
+    <div class="controls">
+      <button class="btn btn-skip" id="prevBtn">⏮</button>
+      <button class="btn btn-play" id="playBtn">▶</button>
+      <button class="btn btn-skip" id="nextBtn">⏭</button>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <label>速度</label>
+        <select id="rateSelect">
+          <option value="0.8" selected>遅め (0.8x)</option>
+          <option value="1">標準 (1.0x)</option>
+          <option value="1.2">やや速い (1.2x)</option>
+        </select>
+      </div>
+      <div>
+        <label>リピート回数</label>
+        <select id="repeatSelect">
+          <option value="1">1回</option>
+          <option value="2">2回</option>
+          <option value="3">3回</option>
+          <option value="4">4回</option>
+          <option value="5" selected>5回</option>
+          <option value="6">6回</option>
+          <option value="7">7回</option>
+          <option value="8">8回</option>
+          <option value="9">9回</option>
+          <option value="10">10回</option>
+        </select>
+      </div>
+      <div id="jpToggleWrap">
+        <label>日本語も読む</label>
+        <select id="jpToggle">
+          <option value="no">英語のみ</option>
+          <option value="yes" selected>英→日</option>
+        </select>
+      </div>
+      <div id="thinkTimeWrap" style="display:none;">
+        <label>考える時間</label>
+        <select id="thinkTimeSelect">
+          <option value="3000">3秒</option>
+          <option value="5000">5秒</option>
+          <option value="8000" selected>8秒</option>
+          <option value="15000">15秒</option>
+          <option value="20000">20秒</option>
+        </select>
+      </div>
+      <div id="reviewTimeWrap" style="display:none;">
+        <label>答え確認時間</label>
+        <select id="reviewTimeSelect">
+          <option value="3000">3秒</option>
+          <option value="5000">5秒</option>
+          <option value="8000" selected>8秒</option>
+          <option value="10000">10秒</option>
+          <option value="15000">15秒</option>
+          <option value="20000">20秒</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hint" id="voiceHint"></div>
+
+    <div class="status-buttons" id="nowPlayingStatus"></div>
+    <div class="status-label">タップして習熟度を記録(端末に保存されます)</div>
+  </div>
+
+  <div class="panel">
+    <div class="stats-row" id="statsRow"></div>
+    <div class="status-filter-row" id="statusFilters"></div>
+    <div class="status-filter-row" id="excludeSpeakableRow" style="margin-top:8px;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="cat-filters" id="catFilters"></div>
+  </div>
+
+  <div class="panel">
+    <div class="list-title">フレーズ一覧（タップで再生）</div>
+    <div id="listContainer"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  // ===== 直訳が裏切る返事・定型 (40) — 単語は全部中学レベル、なのに意味が化ける =====
+  {cat:"直訳が裏切る定型", en:"Sleep on it", jp:"一晩考えてみなよ", kw:"sleep on", ex:"直訳『その上で寝ろ』→『即決せず一晩考えて』", sc:"大きな決断を急がせない時"},
+  {cat:"直訳が裏切る定型", en:"I'm good", jp:"いえ、結構です(遠慮)", kw:"I'm good", ex:"直訳『私は良い』→『いらない』の断り。Want more?への返しで頻出", sc:"おかわりや勧誘をやんわり断る時"},
+  {cat:"直訳が裏切る定型", en:"I'll pass", jp:"今回はやめとくよ", kw:"pass", ex:"pass=パスする→不参加の意思表示", sc:"誘いを軽く断る時"},
+  {cat:"直訳が裏切る定型", en:"You bet", jp:"もちろん！／どういたしまして", kw:"you bet", ex:"直訳『君は賭ける』→『確実だ=もちろん』。Thanksへの返しにも", sc:"快諾やお礼への返しで聞く"},
+  {cat:"直訳が裏切る定型", en:"Not really", jp:"うーん、そうでもないかな", kw:"not really", ex:"直訳『本当じゃない』→『それほどでもない』のやわらか否定", sc:"質問にやんわりNoと答える時"},
+  {cat:"直訳が裏切る定型", en:"I'm down", jp:"いいね、乗った！", kw:"I'm down", ex:"直訳『落ちてる』→『参加する』。I'm inも同じ意味", sc:"誘いにノリよく乗る時"},
+  {cat:"直訳が裏切る定型", en:"Deal", jp:"それで決まりだ", kw:"deal", ex:"deal=取引→『交渉成立』の一言。It's a dealも同じ", sc:"条件がまとまった瞬間"},
+  {cat:"直訳が裏切る定型", en:"No big deal", jp:"大したことないよ", kw:"big deal", ex:"big deal=大ごと。No big deal=気にしないで", sc:"お礼や謝罪を軽く流す時"},
+  {cat:"直訳が裏切る定型", en:"Can't complain", jp:"まあまあ元気にやってるよ", kw:"can't complain", ex:"直訳『文句は言えない』→『悪くないよ』。How are you?への返し", sc:"あいさつの返事で聞く"},
+  {cat:"直訳が裏切る定型", en:"Not much", jp:"特に何も(ないよ)", kw:"not much", ex:"What's up?への定番の返し。直訳『多くない』→『別に』", sc:"あいさつへの返事"},
+  {cat:"直訳が裏切る定型", en:"Could be better", jp:"いまいちかなあ", kw:"could be better", ex:"直訳『もっと良くなりうる』→『あんまり良くない』", sc:"調子を聞かれて微妙な時の返事"},
+  {cat:"直訳が裏切る定型", en:"Beats me", jp:"さっぱりわからん", kw:"beats me", ex:"直訳『私を殴る』→『見当もつかない』", sc:"答えられない質問への返し"},
+  {cat:"直訳が裏切る定型", en:"You tell me", jp:"こっちが聞きたいよ", kw:"you tell me", ex:"直訳『君が私に言え』→『それはこっちのセリフ』", sc:"答えを知ってるはずの相手に聞かれた時"},
+  {cat:"直訳が裏切る定型", en:"Says who?", jp:"誰が決めたんだよ？", kw:"says who", ex:"直訳『誰が言う?』→『そんなルール認めない』の反発", sc:"納得いかない指図への反論"},
+  {cat:"直訳が裏切る定型", en:"Don't mention it", jp:"どういたしまして", kw:"don't mention", ex:"直訳『それに言及するな』→『礼はいらないよ』", sc:"Thank youへの返し"},
+  {cat:"直訳が裏切る定型", en:"I owe you one", jp:"恩に着るよ、借りができた", kw:"owe you one", ex:"owe=借りがある。one=ひとつの恩", sc:"助けてもらった後のお礼"},
+  {cat:"直訳が裏切る定型", en:"We're even", jp:"これでおあいこだね", kw:"even", ex:"even=対等・五分五分→貸し借りなし", sc:"借りを返した時"},
+  {cat:"直訳が裏切る定型", en:"You got this", jp:"君ならいける！", kw:"you got this", ex:"直訳『君はこれを持ってる』→『大丈夫、できるよ』の応援", sc:"挑戦する人への励まし"},
+  {cat:"直訳が裏切る定型", en:"Hang in there", jp:"踏ん張れ、あと少しだ", kw:"hang in", ex:"直訳『そこにぶら下がってろ』→『諦めるな』", sc:"苦しんでる人への応援"},
+  {cat:"直訳が裏切る定型", en:"Way to go!", jp:"よくやった！", kw:"way to go", ex:"直訳『行く道』→『でかした!』の称賛", sc:"成功を褒める時"},
+  {cat:"直訳が裏切る定型", en:"Now we're talking", jp:"そうこなくちゃ！", kw:"now we're talking", ex:"直訳『今私たちは話している』→『それを待ってた!』", sc:"望んでた提案がやっと出た時"},
+  {cat:"直訳が裏切る定型", en:"Point taken", jp:"ごもっとも、一本取られた", kw:"point taken", ex:"直訳『点は取られた』→『君の言い分を受け入れる』", sc:"痛いところを突かれて認める時"},
+  {cat:"直訳が裏切る定型", en:"I'll give you that", jp:"それは認めるよ", kw:"give you that", ex:"直訳『それをあげる』→『その点は君が正しい』", sc:"部分的に相手を認める時"},
+  {cat:"直訳が裏切る定型", en:"Tell you what", jp:"じゃあ、こうしよう", kw:"tell you what", ex:"直訳『君に何を言う』→提案の前振り", sc:"折衷案を切り出す時"},
+  {cat:"直訳が裏切る定型", en:"Come again?", jp:"え、もう一回言って？", kw:"come again", ex:"直訳『また来て』→『聞き取れなかった、もう一度』", sc:"聞き返す時(Sorry?と同じ)"},
+  {cat:"直訳が裏切る定型", en:"You name it", jp:"なんでもあるよ・なんでも言って", kw:"you name it", ex:"直訳『君が名付けろ』→『挙げればキリがない』", sc:"品揃えや経験の豊富さを誇る時"},
+  {cat:"直訳が裏切る定型", en:"That makes two of us", jp:"私もだよ", kw:"two of us", ex:"直訳『それで私たちは2人になる』→『同感』", sc:"相手と同じ気持ちだと伝える時"},
+  {cat:"直訳が裏切る定型", en:"Been there", jp:"あー、それ経験あるわ", kw:"been there", ex:"Been there, done thatの略。『そこに行ったことある』→『わかるよその状況』", sc:"相手の失敗談に共感する時"},
+  {cat:"直訳が裏切る定型", en:"It's about time", jp:"やっとかよ！", kw:"about time", ex:"直訳『そろそろ時間』→『遅すぎ、待ちくたびれた』", sc:"待たされたものがやっと来た時"},
+  {cat:"直訳が裏切る定型", en:"I mean it", jp:"本気で言ってるんだよ", kw:"mean it", ex:"mean=意図する→『冗談じゃない、本気だ』", sc:"真剣さを念押しする時"},
+  {cat:"直訳が裏切る定型", en:"I can't help it", jp:"どうしようもない・やめられない", kw:"can't help", ex:"help=避ける(この用法)。『助けられない』ではない", sc:"癖や衝動を弁解する時"},
+  {cat:"直訳が裏切る定型", en:"I can't stand it", jp:"我慢ならない", kw:"can't stand", ex:"stand=耐える(この用法)。『立てない』ではない", sc:"嫌いなものへの拒否反応"},
+  {cat:"直訳が裏切る定型", en:"I can't make it tonight", jp:"今夜は行けそうにない", kw:"make it", ex:"make it=都合がつく・間に合う。『作る』ではない", sc:"予定を断る連絡"},
+  {cat:"直訳が裏切る定型", en:"Does Tuesday work for you?", jp:"火曜日で都合つく？", kw:"work", ex:"work=(予定が)都合が合う。『働く』ではない", sc:"日程調整の定番"},
+  {cat:"直訳が裏切る定型", en:"It slipped my mind", jp:"うっかり忘れてた", kw:"slipped my mind", ex:"直訳『心から滑り落ちた』→『失念してた』", sc:"忘れてたことを白状する時"},
+  {cat:"直訳が裏切る定型", en:"I'm broke", jp:"金欠なんだ", kw:"broke", ex:"broke=無一文(brokenの『壊れた』ではない)", sc:"お金がないと断る時"},
+  {cat:"直訳が裏切る定型", en:"I'm beat", jp:"くたくたに疲れた", kw:"beat", ex:"beat=疲れ果てた(『殴られた』ではない)", sc:"一日の終わりの定番"},
+  {cat:"直訳が裏切る定型", en:"What brings you here?", jp:"どうしてここに？", kw:"brings you", ex:"直訳『何が君を運んだ』→来た目的を聞く丁寧な言い方", sc:"意外な場所で会った時・受付で"},
+  {cat:"直訳が裏切る定型", en:"How's it coming along?", jp:"進捗どう？", kw:"coming along", ex:"come along=進行する。『一緒に来る』ではない", sc:"作業の進み具合を聞かれる時"},
+  {cat:"直訳が裏切る定型", en:"What's the catch?", jp:"裏があるんでしょ？", kw:"catch", ex:"catch=引っかけ・落とし穴(この用法)。うますぎる話への警戒", sc:"タダより高いものはない、と疑う時"},
+
+  // ===== 句動詞・動詞の多義 (40) — 知ってる動詞なのに意味が出ない王道パターン =====
+  {cat:"句動詞・多義", en:"It turned out fine", jp:"結局うまくいったよ", kw:"turn out", ex:"turn out=結果的に〜になる。『外に曲がる』ではない", sc:"結果報告で頻出"},
+  {cat:"句動詞・多義", en:"It'll work out somehow", jp:"なんとかなるよ", kw:"work out", ex:"work out=うまくいく(ジムで鍛える意味も。文脈で判断)", sc:"心配してる人をなだめる時"},
+  {cat:"句動詞・多義", en:"Something came up", jp:"急用ができちゃって", kw:"come up", ex:"come up=(予定・問題が)発生する。『上がってくる』ではない", sc:"キャンセル連絡の定番"},
+  {cat:"句動詞・多義", en:"I came up with an idea", jp:"いいこと思いついた", kw:"come up with", ex:"come up with=思いつく。withが付くと意味が変わる", sc:"アイデアを披露する前振り"},
+  {cat:"句動詞・多義", en:"He didn't show up", jp:"彼、来なかったんだよ", kw:"show up", ex:"show up=現れる。『上を見せる』ではない", sc:"すっぽかされた話"},
+  {cat:"句動詞・多義", en:"Stop putting it off", jp:"先延ばしにするなって", kw:"put off", ex:"put off=延期する。『外に置く』ではない", sc:"後回し癖を指摘される時"},
+  {cat:"句動詞・多義", en:"You'll get over it", jp:"そのうち立ち直れるよ", kw:"get over", ex:"get over=乗り越える。『上を越える』の比喩", sc:"失恋や失敗への慰め"},
+  {cat:"句動詞・多義", en:"We'll get through this", jp:"一緒に乗り切ろう", kw:"get through", ex:"get through=切り抜ける。電話が『つながる』の意味も", sc:"困難な状況での励まし"},
+  {cat:"句動詞・多義", en:"I don't wanna go through that again", jp:"あれは二度と経験したくない", kw:"go through", ex:"go through=(つらいことを)経験する。『通り抜ける』の比喩", sc:"過去のつらい話"},
+  {cat:"句動詞・多義", en:"I ran into an old friend", jp:"昔の友達にばったり会った", kw:"run into", ex:"run into=偶然出くわす。『走って突っ込む』ではない", sc:"偶然の再会の報告"},
+  {cat:"句動詞・多義", en:"I'll look into it", jp:"調べておきますね", kw:"look into", ex:"look into=調査する。『中を覗く』の比喩", sc:"問い合わせへの返答"},
+  {cat:"句動詞・多義", en:"I'll deal with it later", jp:"あとで対処するよ", kw:"deal with", ex:"deal with=対処する。『取引する』ではない", sc:"優先順位を伝える時"},
+  {cat:"句動詞・多義", en:"You can count on me", jp:"任せて", kw:"count on", ex:"count on=当てにする。『上で数える』ではない", sc:"頼みを引き受ける時"},
+  {cat:"句動詞・多義", en:"I came across a nice cafe", jp:"いい感じのカフェを偶然見つけた", kw:"come across", ex:"come across=偶然出会う。『横切って来る』ではない", sc:"発見の報告"},
+  {cat:"句動詞・多義", en:"The car broke down", jp:"車が故障した", kw:"break down", ex:"break down=壊れる。人なら『泣き崩れる』", sc:"移動トラブル"},
+  {cat:"句動詞・多義", en:"I can't put up with this", jp:"もう我慢できない", kw:"put up with", ex:"put up with=我慢する。3語で1つの意味", sc:"限界宣言"},
+  {cat:"句動詞・多義", en:"Let's wrap it up", jp:"そろそろ切り上げよう", kw:"wrap up", ex:"wrap up=終わらせる。店では『包む』", sc:"会議・作業の終盤"},
+  {cat:"句動詞・多義", en:"An ad popped up", jp:"広告が急に出てきた", kw:"pop up", ex:"pop up=突然現れる", sc:"画面や話題に何かが急に出た時"},
+  {cat:"句動詞・多義", en:"Look it up online", jp:"ネットで調べてみな", kw:"look up", ex:"look up=(情報を)調べる。『見上げる』ではない", sc:"わからない事への返し"},
+  {cat:"句動詞・多義", en:"I'm looking forward to it", jp:"楽しみにしてるよ", kw:"look forward to", ex:"look forward to=楽しみに待つ。『前を見る』の比喩", sc:"次の約束への期待"},
+  {cat:"句動詞・多義", en:"We ended up taking a taxi", jp:"結局タクシーになった", kw:"end up", ex:"end up=最終的に〜になる。『上で終わる』ではない", sc:"予定変更のオチ"},
+  {cat:"句動詞・多義", en:"You'll find out soon", jp:"すぐわかるよ", kw:"find out", ex:"find out=(事実を)知る。findだけの『見つける』と微妙に違う", sc:"もったいぶった予告"},
+  {cat:"句動詞・多義", en:"You're making that up", jp:"それ作り話でしょ", kw:"make up", ex:"make up=でっち上げる。『上に作る』ではない。化粧・仲直りの意味も", sc:"話を疑う時"},
+  {cat:"句動詞・多義", en:"I'll make up for it", jp:"埋め合わせするから", kw:"make up for", ex:"make up for=埋め合わせる。forが付くと謝罪の文脈", sc:"迷惑をかけた後のフォロー"},
+  {cat:"句動詞・多義", en:"We made it!", jp:"間に合った！／やり遂げた！", kw:"make it", ex:"make it=間に合う・成功する・都合がつく。超多義", sc:"ギリギリ間に合った瞬間"},
+  {cat:"句動詞・多義", en:"I'll pick you up at seven", jp:"7時に車で迎えに行くよ", kw:"pick up", ex:"pick up=迎えに行く・拾う・(電話に)出る・(言語を)覚える。超多義", sc:"送迎の約束"},
+  {cat:"句動詞・多義", en:"I'll drop you off at the station", jp:"駅で降ろしてあげるよ", kw:"drop off", ex:"drop off=(車から)降ろす。『落とす』ではない", sc:"送りの申し出"},
+  {cat:"句動詞・多義", en:"Please fill out this form", jp:"この用紙に記入してください", kw:"fill out", ex:"fill out=記入する。『外に満たす』ではない", sc:"受付・手続きの定番"},
+  {cat:"句動詞・多義", en:"Can I try this on?", jp:"試着してもいいですか？", kw:"try on", ex:"try on=試着する。tryだけだと『試す』全般", sc:"買い物での定番"},
+  {cat:"句動詞・多義", en:"What time can we check in?", jp:"何時にチェックインできますか？", kw:"check in", ex:"check in=宿泊・搭乗手続き。check out=退室/見てみる、と対", sc:"ホテル・空港"},
+  {cat:"句動詞・多義", en:"You should check it out", jp:"それ見てみる価値あるよ", kw:"check out", ex:"check out=見てみる・調べる。ホテルでは退室。レジ精算の意味も", sc:"おすすめされる時"},
+  {cat:"句動詞・多義", en:"Get on the next bus", jp:"次のバスに乗って", kw:"get on", ex:"get on=(バス・電車に)乗る。車はget in", sc:"乗り換え案内"},
+  {cat:"句動詞・多義", en:"Get off at the third stop", jp:"3つ目で降りてね", kw:"get off", ex:"get off=降りる。『離れろ!』の意味にもなる", sc:"降車の案内"},
+  {cat:"句動詞・多義", en:"The plane takes off at nine", jp:"飛行機は9時に離陸します", kw:"take off", ex:"take off=離陸する・(服を)脱ぐ・急成長する。多義", sc:"空港・搭乗案内"},
+  {cat:"句動詞・多義", en:"Let's get takeout", jp:"テイクアウトにしようよ", kw:"takeout", ex:"take out=持ち帰る(名詞takeout)。『外に取る』から連想可", sc:"食事の相談"},
+  {cat:"句動詞・多義", en:"I'll go with the pasta", jp:"パスタにします", kw:"go with", ex:"go with=〜を選ぶ。『一緒に行く』ではない。注文の定番", sc:"レストランで注文を決める時"},
+  {cat:"句動詞・多義", en:"I'll go for the bigger one", jp:"大きい方を選ぶよ", kw:"go for", ex:"go for=〜を狙う・選ぶ", sc:"選択の場面"},
+  {cat:"句動詞・多義", en:"They called it off", jp:"中止になったって", kw:"call off", ex:"call off=中止する。『呼んで離す』ではない", sc:"イベント中止の知らせ"},
+  {cat:"句動詞・多義", en:"I can get by with this much", jp:"これだけあればなんとかやっていける", kw:"get by", ex:"get by=なんとかやっていく", sc:"最低限で足りると伝える時"},
+  {cat:"句動詞・多義", en:"We get along well", jp:"私たち、気が合うんだ", kw:"get along", ex:"get along=仲良くやる。『一緒に進む』の比喩", sc:"人間関係の話"},
+
+  // ===== 文中の小さい罠 (25) — 短いのに文全体の意味を変える =====
+  {cat:"文中の小さい罠", en:"It's expensive, though", jp:"高いけどね", kw:"though(文末)", ex:"文末のthough=『〜だけどね』。文頭の『〜だけれども』とは別物", sc:"文の最後にゾウと聞こえたら逆接"},
+  {cat:"文中の小さい罠", en:"Coffee or something?", jp:"コーヒーか何かどう？", kw:"or something", ex:"or something=〜か何か(ぼかし)", sc:"文末のオアサムシンはぼかしの合図"},
+  {cat:"文中の小さい罠", en:"We talked about games and stuff", jp:"ゲームとか色々話したよ", kw:"and stuff", ex:"and stuff=〜とかそういうの(ぼかし)", sc:"列挙を省略する時の文末"},
+  {cat:"文中の小さい罠", en:"If anything, it got worse", jp:"どちらかと言えば、悪化したよ", kw:"if anything", ex:"if anything=どちらかと言えば・むしろ", sc:"予想と逆方向だと言う時"},
+  {cat:"文中の小さい罠", en:"Then again, it might rain", jp:"いや待てよ、雨かもな", kw:"then again", ex:"then again=いや、でも考え直すと", sc:"直前の自分の発言をひっくり返す時"},
+  {cat:"文中の小さい罠", en:"After all, it's free", jp:"だってタダだしね", kw:"after all", ex:"after all=①だって〜だし ②結局。『全部の後』ではない", sc:"理由の後付けや結論"},
+  {cat:"文中の小さい罠", en:"Why did you go there in the first place?", jp:"そもそもなんでそこに行ったの？", kw:"in the first place", ex:"in the first place=そもそも。『最初の場所で』ではない", sc:"根本を問い直す時"},
+  {cat:"文中の小さい罠", en:"At this point, I don't care", jp:"もはやどうでもいいよ", kw:"at this point", ex:"at this point=もはや・ここまで来ると", sc:"あきらめ混じりの発言"},
+  {cat:"文中の小さい罠", en:"Why? Just because", jp:"なんでって、なんとなくだよ", kw:"just because", ex:"単独のJust because=理由を言いたくない時の『なんとなく』", sc:"理由を聞かれてはぐらかす返し"},
+  {cat:"文中の小さい罠", en:"Just saying", jp:"いや、言ってみただけ", kw:"just saying", ex:"Just saying=深い意味はないよ(でも本音は言った)", sc:"軽く毒を吐いた後の逃げ"},
+  {cat:"文中の小さい罠", en:"Just checking", jp:"確認しただけだよ", kw:"just checking", ex:"Just checking=念のため聞いただけ", sc:"質問の意図を軽くする時"},
+  {cat:"文中の小さい罠", en:"Not that I know of", jp:"私の知る限りでは、ないね", kw:"not that I know of", ex:"Not that I know of=知る範囲では違う(断言回避)", sc:"Yes/No質問への慎重な否定"},
+  {cat:"文中の小さい罠", en:"Not that it matters", jp:"まあ、どうでもいいことだけど", kw:"not that it matters", ex:"Not that 〜=〜ってわけじゃないけど(前置き)", sc:"補足を投げやりに付け足す時"},
+  {cat:"文中の小さい罠", en:"We won three times in a row", jp:"3連勝したんだよ", kw:"in a row", ex:"in a row=連続で。『列の中で』ではない", sc:"連続記録の自慢"},
+  {cat:"文中の小さい罠", en:"He left for good", jp:"彼は永久に去ったんだ", kw:"for good", ex:"for good=永久に。『良いことのために』ではない", sc:"もう戻らない話"},
+  {cat:"文中の小さい罠", en:"He called me out of the blue", jp:"突然電話がかかってきたんだ", kw:"out of the blue", ex:"out of the blue=前触れなく突然(青空から雷の比喩)", sc:"予想外の出来事の描写"},
+  {cat:"文中の小さい罠", en:"Off the top of my head, maybe five", jp:"ぱっと思いつく限りだと、5個かな", kw:"top of my head", ex:"off the top of my head=即答ベースで(正確さ保証なし)", sc:"うろ覚えで答える前置き"},
+  {cat:"文中の小さい罠", en:"Are we on the same page?", jp:"認識合ってるよね？", kw:"same page", ex:"on the same page=認識が一致してる。『同じページ』の比喩", sc:"打ち合わせの確認"},
+  {cat:"文中の小さい罠", en:"Let's play it by ear", jp:"成り行きで決めようよ", kw:"play it by ear", ex:"直訳『耳で演奏』→楽譜なし=計画なしで臨機応変に", sc:"予定を固めない提案"},
+  {cat:"文中の小さい罠", en:"Can I take a rain check?", jp:"また今度でもいい？", kw:"rain check", ex:"rain check=雨天順延券→『次の機会に』の断り", sc:"誘いを前向きに延期する時"},
+  {cat:"文中の小さい罠", en:"It's a long shot, but let's try", jp:"望み薄だけど、やってみよう", kw:"long shot", ex:"long shot=遠距離射撃→成功率の低い賭け", sc:"ダメ元の挑戦"},
+  {cat:"文中の小さい罠", en:"Does that ring a bell?", jp:"聞き覚えない？", kw:"ring a bell", ex:"直訳『ベルを鳴らす』→記憶に引っかかる", sc:"思い出させようとする質問"},
+  {cat:"文中の小さい罠", en:"So much for the picnic", jp:"ピクニックはこれでおじゃんだね", kw:"so much for", ex:"So much for 〜=〜はここまで(当てが外れた)", sc:"雨などで計画が潰れた時"},
+  {cat:"文中の小さい罠", en:"No offense, but I don't like it", jp:"悪気はないけど、好みじゃないな", kw:"no offense", ex:"No offense=攻撃の意図はない=気を悪くしないで", sc:"言いにくい意見の前置き"},
+  {cat:"文中の小さい罠", en:"That's a whole other story", jp:"それはまた別の話だよ", kw:"whole other", ex:"a whole other story=全然別の(長い)話", sc:"話題を切り上げる時"},
+
+  // ===== お店・旅行の化け定型 (20) — 現地で聞こえてくる、直訳できない決まり文句 =====
+  {cat:"お店・旅行", en:"For here or to go?", jp:"店内ですか？お持ち帰りですか？", kw:"to go", ex:"to go=持ち帰り。『行くために』ではない", sc:"カフェ・ファストフードで注文直後に必ず"},
+  {cat:"お店・旅行", en:"You're all set", jp:"お手続き完了です", kw:"all set", ex:"all set=準備・手続き完了。超頻出なのに直訳不能", sc:"会計・チェックインの締めの一言"},
+  {cat:"お店・旅行", en:"That'll be ten dollars", jp:"10ドルになります", kw:"that'll be", ex:"That'll be 金額=お会計は〜です。未来形なのは『合計するとそうなる』から", sc:"レジで金額を言われる時"},
+  {cat:"お店・旅行", en:"Coming right up", jp:"すぐお持ちします", kw:"coming right up", ex:"直訳『すぐ上がってくる』→『ただいまお作りします』", sc:"注文を受けた店員の返事"},
+  {cat:"お店・旅行", en:"Table for two?", jp:"2名様ですか？", kw:"table for", ex:"Table for 人数=〜名様。主語も動詞もない省略形", sc:"レストランの入口"},
+  {cat:"お店・旅行", en:"Are you in line?", jp:"列に並んでますか？", kw:"in line", ex:"in line=並んでいる。『線の中』ではない", sc:"レジ前で後ろから聞かれる"},
+  {cat:"お店・旅行", en:"Is this seat taken?", jp:"この席、誰かいますか？", kw:"taken", ex:"taken=(席が)使われている。『取られた』の受け身から", sc:"相席の確認"},
+  {cat:"お店・旅行", en:"You can't miss it", jp:"すぐ見つかりますよ", kw:"can't miss", ex:"直訳『見逃せない』→『絶対わかるから大丈夫』", sc:"道案内の締めの定番"},
+  {cat:"お店・旅行", en:"This is my stop", jp:"あ、ここで降ります", kw:"my stop", ex:"stop=自分の降りる駅・停留所", sc:"バス・電車で隣の人が立つ時"},
+  {cat:"お店・旅行", en:"Excuse me, coming through", jp:"すみません、通ります", kw:"coming through", ex:"coming through=通り抜けます。人混みの定型", sc:"混雑で後ろから聞こえる"},
+  {cat:"お店・旅行", en:"Can I get you anything?", jp:"何かお持ちしましょうか？", kw:"get you", ex:"get 人 物=人に物を持ってくる。『あなたを得る』ではない", sc:"店員・ホストの声かけ"},
+  {cat:"お店・旅行", en:"It's on me", jp:"ここは私のおごりで", kw:"on me", ex:"on 人=〜の負担で。『私の上』ではない", sc:"お会計でごちそうする宣言"},
+  {cat:"お店・旅行", en:"It's on the house", jp:"お店からのサービスです", kw:"on the house", ex:"the house=店。店の負担=無料サービス", sc:"一品サービスしてもらえる時"},
+  {cat:"お店・旅行", en:"My treat", jp:"私のおごりね", kw:"treat", ex:"treat=ごちそう・もてなし。It's on meと同じ", sc:"おごる宣言"},
+  {cat:"お店・旅行", en:"Are you being helped?", jp:"ご用件は承っておりますか？", kw:"being helped", ex:"直訳『助けられていますか』→『他の店員が対応中ですか』", sc:"店員が声をかけてくる定型"},
+  {cat:"お店・旅行", en:"I'm just looking", jp:"見てるだけです", kw:"just looking", ex:"just looking=(買う気はまだない)見てるだけ", sc:"店員への定番の返し"},
+  {cat:"お店・旅行", en:"Do you take card?", jp:"カード使えますか？", kw:"take", ex:"take=(支払い方法を)受け付ける。『取る』ではない", sc:"支払い前の確認"},
+  {cat:"お店・旅行", en:"How would you like it?", jp:"どのようにいたしますか？(焼き加減など)", kw:"how would you like", ex:"ステーキの焼き加減・卵の調理法などを聞く定型", sc:"注文の詳細を聞かれる時"},
+  {cat:"お店・旅行", en:"Keep the change", jp:"お釣りは取っておいて", kw:"keep the change", ex:"change=お釣り。『変化を保て』ではない", sc:"チップ文化圏の会計"},
+  {cat:"お店・旅行", en:"Last call", jp:"ラストオーダーです", kw:"last call", ex:"last call=最後の注文受付。バーの閉店前の合図", sc:"閉店間際の店内アナウンス"},
+
+  // ===== 皮肉・ニュアンス反転 (12) — 言葉通り受け取ると真逆になる =====
+  {cat:"皮肉・反転", en:"You wish", jp:"そうだといいけどね(ないない)", kw:"you wish", ex:"直訳『君は願う』→『それは願望でしょ』の皮肉", sc:"見栄や希望的観測への突っ込み"},
+  {cat:"皮肉・反転", en:"Good for you", jp:"よかったじゃん(言い方次第で皮肉)", kw:"good for you", ex:"棒読みだと『はいはい、良かったね』の嫌味になる", sc:"トーンで祝福か皮肉か判断"},
+  {cat:"皮肉・反転", en:"Look who's talking", jp:"どの口が言ってるんだよ", kw:"who's talking", ex:"直訳『誰が話してるか見ろ』→『お前が言うな』", sc:"ブーメラン発言への突っ込み"},
+  {cat:"皮肉・反転", en:"Speak for yourself", jp:"一緒にしないでよ", kw:"speak for yourself", ex:"直訳『自分のために話せ』→『それは君だけの意見』", sc:"勝手に代弁された時の反論"},
+  {cat:"皮肉・反転", en:"If you say so", jp:"はいはい、そういうことにしとくよ", kw:"if you say so", ex:"直訳『君がそう言うなら』→納得してない譲歩", sc:"渋々引き下がる時"},
+  {cat:"皮肉・反転", en:"You're telling me", jp:"それな、痛いほどわかる", kw:"you're telling me", ex:"直訳『君は私に言っている』→『言われなくても知ってる=激しく同意』", sc:"実感こもった同意"},
+  {cat:"皮肉・反転", en:"Nice try", jp:"惜しかったね(その手には乗らないよ)", kw:"nice try", ex:"褒め言葉に見えて『残念でした』の意味が主", sc:"ごまかしを見破った時"},
+  {cat:"皮肉・反転", en:"Very funny", jp:"はいはい、面白い面白い(怒)", kw:"very funny", ex:"真顔で言うと『全然面白くない』の皮肉", sc:"いたずらされた時の返し"},
+  {cat:"皮肉・反転", en:"Thanks a lot", jp:"(皮肉で)どうもありがとうございましたね", kw:"thanks a lot", ex:"文脈次第で本気の感謝にも最大級の皮肉にもなる", sc:"迷惑をかけられた時の棘のある一言"},
+  {cat:"皮肉・反転", en:"Yeah, right", jp:"はいはい、嘘乙", kw:"yeah right", ex:"直訳『うん正しい』→『信じてないよ』。YeahとRightで肯定+肯定=否定", sc:"疑わしい話への返し"},
+  {cat:"皮肉・反転", en:"Big deal", jp:"だから何？大したことないじゃん", kw:"big deal", ex:"単独で言うと『それがどうした』の皮肉(No big dealとは別物)", sc:"自慢話への冷めた返し"},
+  {cat:"皮肉・反転", en:"Whatever", jp:"はいはい、もういいよ", kw:"whatever", ex:"単独のWhatever=議論を投げる『どうでもいい』", sc:"呆れて話を打ち切る時"},
+
+  // ===== 遠回しの依頼・保留 (13) — 丁寧すぎて逆にわからない型 =====
+  {cat:"遠回し表現", en:"Do you mind if I sit here?", jp:"ここ座ってもいいですか？", kw:"do you mind", ex:"mind=嫌がる。OKの返事はNo(嫌じゃない)。Yesと答えると『ダメ』になる罠", sc:"許可を求められた時、返事の向きに注意"},
+  {cat:"遠回し表現", en:"Would you mind opening the window?", jp:"窓を開けていただけますか？", kw:"would you mind", ex:"mind+動詞ing=〜してもらえますか(丁寧)。返事はNo=OK", sc:"丁寧なお願いをされる時"},
+  {cat:"遠回し表現", en:"I was wondering if you could help me", jp:"手伝っていただけないかなと思いまして", kw:"I was wondering", ex:"過去進行形なのは丁寧さのため。実質『お願いがあります』", sc:"かしこまった依頼の切り出し"},
+  {cat:"遠回し表現", en:"Any chance you could come early?", jp:"早めに来られたりしない？", kw:"any chance", ex:"Any chance 〜?=可能性ある?=もしできたらお願い", sc:"ダメ元のお願い"},
+  {cat:"遠回し表現", en:"Would it be possible to change my seat?", jp:"席を変えていただくことは可能ですか？", kw:"would it be possible", ex:"最上級に丁寧な依頼の型。実質『変えてほしい』", sc:"ホテルや機内での丁寧な交渉"},
+  {cat:"遠回し表現", en:"If it's not too much trouble", jp:"お手数でなければ", kw:"too much trouble", ex:"trouble=手間。依頼のクッション言葉", sc:"お願いの前置き"},
+  {cat:"遠回し表現", en:"I'd appreciate it", jp:"そうしていただけると助かります", kw:"appreciate", ex:"appreciate=ありがたく思う。依頼の締めに付く", sc:"お願いの念押し"},
+  {cat:"遠回し表現", en:"It doesn't hurt to ask", jp:"聞くだけならタダだよ", kw:"doesn't hurt", ex:"直訳『聞いても痛くない』→ダメ元で聞いてみれば", sc:"遠慮してる人の背中を押す時"},
+  {cat:"遠回し表現", en:"I'll see what I can do", jp:"できるかどうか、やってみます", kw:"see what I can do", ex:"確約しない引き受け方。期待しすぎ注意のサイン", sc:"店員や担当者の含みのある返事"},
+  {cat:"遠回し表現", en:"I'll get back to you on that", jp:"その件は後ほどお返事します", kw:"get back to", ex:"get back to 人=あとで返事する。『戻る』ではない", sc:"即答を避ける返事の定番"},
+  {cat:"遠回し表現", en:"We'll see", jp:"まあ、様子を見ようか(たぶんやらない)", kw:"we'll see", ex:"直訳『見てみよう』→やんわりした保留・実質の断りのことも", sc:"曖昧に流された時"},
+  {cat:"遠回し表現", en:"I'll think about it", jp:"考えとくよ(=前向きとは限らない)", kw:"think about it", ex:"考えとく=日本語同様、断りの婉曲なことが多い", sc:"営業や誘いへの逃げの返事"},
+  {cat:"遠回し表現", en:"Maybe some other time", jp:"また今度ね(社交辞令のことも)", kw:"some other time", ex:"another timeへの先送り。本気度はトーン次第", sc:"誘いを断られる時の定番"},
+
+  // ===== 海外ドラマ・日常ノリ (40) — シットコムでも実況でも飛び交う、単語から意味が出ない口語熟語 =====
+  {cat:"ドラマ・日常ノリ", en:"They really hit it off", jp:"あの二人、すごく意気投合したね", kw:"hit it off", ex:"hit it off=出会ってすぐ仲良くなる。『打つ』とは無関係", sc:"初対面同士が盛り上がった話"},
+  {cat:"ドラマ・日常ノリ", en:"Why don't you ask her out?", jp:"彼女をデートに誘えばいいじゃん", kw:"ask out", ex:"ask 人 out=デートに誘う。outが付くだけで恋愛の意味に", sc:"恋愛の背中押し"},
+  {cat:"ドラマ・日常ノリ", en:"I got stood up", jp:"デートすっぽかされた…", kw:"stand up", ex:"stand 人 up=約束をすっぽかす。『立たせる』ではない", sc:"待ちぼうけの報告"},
+  {cat:"ドラマ・日常ノリ", en:"She's out of my league", jp:"彼女は高嶺の花だよ", kw:"out of my league", ex:"league=リーグ→自分の所属階級の外=釣り合わない", sc:"恋愛の自虐"},
+  {cat:"ドラマ・日常ノリ", en:"It's complicated", jp:"(関係が)ちょっと複雑でね", kw:"complicated", ex:"恋愛関係を聞かれた時の定番の濁し方。SNSのステータスにもある定型", sc:"付き合ってるの?への曖昧な返事"},
+  {cat:"ドラマ・日常ノリ", en:"Are you seeing anyone?", jp:"誰か付き合ってる人いるの？", kw:"seeing", ex:"see 人=付き合う(この用法)。『見る』ではない", sc:"恋愛状況の質問"},
+  {cat:"ドラマ・日常ノリ", en:"I don't wanna be the third wheel", jp:"お邪魔虫にはなりたくないよ", kw:"third wheel", ex:"third wheel=三輪目=カップルに同行する余り者", sc:"デートに誘われた独り身の遠慮"},
+  {cat:"ドラマ・日常ノリ", en:"He got cold feet", jp:"彼、直前で怖気づいたんだ", kw:"cold feet", ex:"cold feet=冷たい足→土壇場でのびびり", sc:"本番直前の逃げ腰"},
+  {cat:"ドラマ・日常ノリ", en:"Shotgun!", jp:"助手席もーらい！", kw:"shotgun", ex:"call shotgun=助手席の権利を宣言(西部劇の護衛席が語源)", sc:"車に乗る前の早い者勝ち宣言"},
+  {cat:"ドラマ・日常ノリ", en:"Dibs on the last slice", jp:"最後の一切れは俺の！", kw:"dibs", ex:"dibs on 〜=〜の先取り宣言", sc:"早い者勝ちの主張"},
+  {cat:"ドラマ・日常ノリ", en:"My bad", jp:"わりぃ、俺のミス", kw:"my bad", ex:"My bad=カジュアルな謝罪。文法的に変だが定型", sc:"軽いミスを謝る時"},
+  {cat:"ドラマ・日常ノリ", en:"Duh", jp:"当たり前じゃん", kw:"duh", ex:"Duh=わかりきったことを言われた時の『でしょうね』", sc:"当然すぎる発言への返し"},
+  {cat:"ドラマ・日常ノリ", en:"Shut up! Really?", jp:"嘘でしょ！？マジで？", kw:"shut up(驚き)", ex:"驚きのShut up!=『黙れ』ではなく『信じられない!』。イントネーションで判別", sc:"驚きのニュースを聞いた時(特に女性が多用)"},
+  {cat:"ドラマ・日常ノリ", en:"You didn't!", jp:"やったの！？嘘でしょ！", kw:"you didn't", ex:"You didn't!=『やってないよね!?(やったんでしょ!)』の驚き", sc:"とんでもない行動の告白への反応"},
+  {cat:"ドラマ・日常ノリ", en:"Too soon?", jp:"(冗談が)まだ早かった？", kw:"too soon", ex:"不幸な出来事をネタにした直後の『不謹慎だった?』", sc:"ブラックジョークの後の様子見"},
+  {cat:"ドラマ・日常ノリ", en:"So sue me", jp:"文句あるなら訴えれば？(開き直り)", kw:"sue me", ex:"sue=訴える→『悪かったね、どうぞご自由に』の開き直り", sc:"軽い非難への居直り"},
+  {cat:"ドラマ・日常ノリ", en:"Don't judge me", jp:"引かないでよ・ジャッジしないで", kw:"judge", ex:"judge=批判的に評価する。恥ずかしい趣味の告白とセット", sc:"変な習慣を白状する時の予防線"},
+  {cat:"ドラマ・日常ノリ", en:"Spill it", jp:"ほら、白状しなよ", kw:"spill", ex:"spill=こぼす→秘密を漏らす。Spill the beansの略", sc:"隠し事を問い詰める時"},
+  {cat:"ドラマ・日常ノリ", en:"Say no more", jp:"皆まで言うな、了解した", kw:"say no more", ex:"直訳『もう言うな』→『全部わかった、任せろ』", sc:"察しよく引き受ける時"},
+  {cat:"ドラマ・日常ノリ", en:"Read the room", jp:"空気読めよ", kw:"read the room", ex:"直訳『部屋を読め』→その場の空気を察しろ", sc:"場違いな言動への突っ込み"},
+  {cat:"ドラマ・日常ノリ", en:"For the record, I was against it", jp:"一応言っとくけど、私は反対したからね", kw:"for the record", ex:"直訳『記録のために』→『はっきり明言しておくと』", sc:"立場を残しておきたい時"},
+  {cat:"ドラマ・日常ノリ", en:"In my defense, I was tired", jp:"言い訳させてもらうと、疲れてたんだよ", kw:"in my defense", ex:"直訳『私の弁護では』→『弁明すると』のユーモア前置き", sc:"やらかしの言い訳の枕詞"},
+  {cat:"ドラマ・日常ノリ", en:"You're off the hook", jp:"今回は見逃してあげる・お咎めなしだ", kw:"off the hook", ex:"hook=釣り針。針から外れた=責任・疑いから解放", sc:"許してもらえた時"},
+  {cat:"ドラマ・日常ノリ", en:"Is that a thing?", jp:"え、それって実在するの？(流行ってるの？)", kw:"a thing", ex:"be a thing=世間に存在する・流行っている", sc:"聞いたことない習慣・流行への反応"},
+  {cat:"ドラマ・日常ノリ", en:"Famous last words", jp:"それ絶対フラグだよ", kw:"famous last words", ex:"直訳『有名な最期の言葉』→『余裕発言は死亡フラグ』", sc:"『楽勝だよ』的発言への突っ込み"},
+  {cat:"ドラマ・日常ノリ", en:"Knock on wood", jp:"(縁起直しに)木に触っとこ", kw:"knock on wood", ex:"幸運が続く話をした後に木を叩く迷信。『調子いいこと言っちゃったけど無事でありますように』", sc:"順調自慢の後の縁起直し"},
+  {cat:"ドラマ・日常ノリ", en:"Speak of the devil", jp:"噂をすれば(本人が来た)", kw:"speak of the devil", ex:"直訳『悪魔の話をすれば』→噂の本人が現れた時の定型", sc:"話題の人物がちょうど現れた瞬間"},
+  {cat:"ドラマ・日常ノリ", en:"Let's address the elephant in the room", jp:"みんな触れずにいる例の話、しようか", kw:"elephant in the room", ex:"直訳『部屋の中の象』→全員気づいてるのに誰も触れない問題", sc:"気まずい本題に切り込む時"},
+  {cat:"ドラマ・日常ノリ", en:"He threw me under the bus", jp:"あいつ、俺を売りやがった", kw:"under the bus", ex:"直訳『バスの下に投げた』→自分可愛さに人を犠牲にする", sc:"責任をなすりつけられた話"},
+  {cat:"ドラマ・日常ノリ", en:"Third time's the charm", jp:"三度目の正直だよ", kw:"third time", ex:"charm=幸運のお守り。3回目はうまくいくの定型", sc:"2回失敗した後の再挑戦"},
+  {cat:"ドラマ・日常ノリ", en:"I've been meaning to call you", jp:"ずっと連絡しようと思ってたんだよ", kw:"been meaning to", ex:"mean to=〜するつもり。been meaning to=ずっとしようと思ってた(できてない)", sc:"ご無沙汰の言い訳"},
+  {cat:"ドラマ・日常ノリ", en:"It's the thought that counts", jp:"気持ちが大事なんだよ", kw:"thought that counts", ex:"count=重要である。『大事なのは気持ちの方』", sc:"微妙なプレゼントへのフォロー"},
+  {cat:"ドラマ・日常ノリ", en:"Way ahead of you", jp:"とっくにやってるよ", kw:"ahead of you", ex:"直訳『君のずっと先』→『先回りして済ませてある』", sc:"指示される前に済ませてた時のドヤ"},
+  {cat:"ドラマ・日常ノリ", en:"Don't hold your breath", jp:"期待しないで待ってな(当分ないよ)", kw:"hold your breath", ex:"直訳『息を止めるな』→息を止めて待てるほど早く来ない=望み薄", sc:"実現しそうにない期待への忠告"},
+  {cat:"ドラマ・日常ノリ", en:"I'm on it", jp:"今やってます！任せて！", kw:"on it", ex:"be on it=すでに取りかかってる", sc:"指示への即答"},
+  {cat:"ドラマ・日常ノリ", en:"What are you up to?", jp:"今何してるの？(何か企んでる？)", kw:"up to", ex:"be up to=〜して過ごす/企む。up to somethingだと『何か企んでる』", sc:"様子伺いの連絡・怪しい行動への質問"},
+  {cat:"ドラマ・日常ノリ", en:"Make yourself at home", jp:"自分の家だと思ってくつろいでね", kw:"at home", ex:"直訳『家にいるようにしろ』→おもてなしの定型", sc:"家に招いた時の一言"},
+  {cat:"ドラマ・日常ノリ", en:"Can I crash here tonight?", jp:"今夜泊めてもらっていい？", kw:"crash", ex:"crash=泊まる(この用法)。『衝突』ではない", sc:"終電を逃した夜の頼み"},
+  {cat:"ドラマ・日常ノリ", en:"Let's split it", jp:"割り勘にしようよ", kw:"split", ex:"split=割る→split the bill=割り勘", sc:"会計の相談"},
+  {cat:"ドラマ・日常ノリ", en:"Don't be a stranger", jp:"また顔出してよね", kw:"stranger", ex:"直訳『他人になるな』→『疎遠にならないでね』", sc:"別れ際の社交定型"},
+];
+
+// Total: 190 phrases
+
+// Total: 100 phrases
+
+// Total: 190 phrases
+
+// Total: 190 phrases
+
+let activeCats = new Set(DATA.map(d => d.cat));
+let filtered = [...DATA];
+let curIndex = 0;
+let isPlaying = false;
+let repeatCount = 1;
+let repeatTotal = 5;
+let synth = window.speechSynthesis;
+let englishVoice = null;
+let japaneseVoice = null;
+let activeStatusFilter = 'all';
+let excludeSpeakable = false;
+let excludeKnown = false;
+let appMode = 'listen'; // listen | quiz | quiz5 | quiz3 | quiz2 | quizInstant
+let quizTimer = null;
+
+// 各クイズモードの考える時間(ms)。quizだけユーザーが選択可能
+const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800, quizScene: 6000, srs: 6000 };
+// 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
+const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2', quizScene: 'quizInstant' };
+const RANDOM_MODES = new Set(['quiz2', 'quizInstant', 'quizScene', 'srs']); // 出題順をランダムにするモード
+function isSceneMode() { return appMode === 'quizScene' || appMode === 'srs'; }
+function isSrsMode() { return appMode === 'srs'; }
+
+// ===== 間隔反復(SRS) =====
+// 話せるフラグのフレーズだけを対象に、忘却曲線に沿って復習日を管理する。
+// srsData[en] = { due: 次回復習日(YYYY-MM-DD), step: 現在の間隔段階 }
+// 間隔段階(日): [1, 3, 7, 14, 30, 60]。言えたら次段階へ、詰まったら最初へ戻す。
+const SRS_INTERVALS = [1, 3, 7, 14, 30, 60];
+let srsData = {};
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function addDays(dateStr, days) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+// 話せるフラグが付いているか
+function isSpeakable(item) {
+  // 間隔反復の対象は「情景モードで★話せるにした語」だけ
+  return statusMap.quizScene && statusMap.quizScene[item.en] === 'speakable';
+}
+// SRS対象(話せる)のうち、今日以前が復習期限のもの
+function isSrsDue(item) {
+  if (!isSpeakable(item)) return false;
+  const rec = srsData[item.en];
+  if (!rec) return true; // まだ一度も復習していない話せる語は即対象
+  return rec.due <= todayStr();
+}
+function srsDueCount() { return DATA.filter(isSrsDue).length; }
+// 話せる語の総数(期限に関係なく)
+function srsTotalCount() { return DATA.filter(isSpeakable).length; }
+// 「言えた」→次の間隔へ / 「詰まった」→最初へ
+function srsGrade(item, ok) {
+  const rec = srsData[item.en] || { step: -1 };
+  let step = ok ? Math.min(rec.step + 1, SRS_INTERVALS.length - 1) : 0;
+  srsData[item.en] = { step: step, due: addDays(todayStr(), SRS_INTERVALS[step]) };
+  scheduleSave();
+}
+// モードごとの固定リピート回数(指定がなければユーザー選択値を使う)
+// モードごとのリピート回数の上限とデフォルト。指定のないモードは max10/default5
+const MODE_REPEAT_CFG = {
+  quiz5:       { max: 4, def: 3 },
+  quiz3:       { max: 3, def: 2 },
+  quiz2:       { max: 2, def: 1 },
+  quizInstant: { max: 2, def: 1 },
+  quizScene:   { max: 2, def: 1 },
+  srs:         { max: 2, def: 1 },
+};
+function repeatCfg() {
+  return MODE_REPEAT_CFG[appMode] || { max: 10, def: 5 };
+}
+function getRepeatTotal() {
+  return repeatTotal;
+}
+// モードに応じてリピート選択肢を作り直し、デフォルトを適用する
+function rebuildRepeatOptions() {
+  const cfg = repeatCfg();
+  if (repeatTotal > cfg.max) repeatTotal = cfg.def;
+  let html = '';
+  for (let i = 1; i <= cfg.max; i++) {
+    html += `<option value="${i}"${i === repeatTotal ? ' selected' : ''}>${i}回</option>`;
+  }
+  repeatSelect.innerHTML = html;
+  repeatSelect.value = String(repeatTotal);
+}
+
+function isQuizMode() { return appMode !== 'listen'; }
+
+function isCleared(status) { return status === 'known' || status === 'speakable'; }
+
+// そのフレーズが現在のモードの対象かどうか
+function isUnlocked(item) {
+  const src = MODE_SOURCE[appMode];
+  if (!src) return true; // listen / quiz は全フレーズ対象
+  return isCleared(statusMap[src][item.en]);
+}
+
+function unlockedCount(mode) {
+  const src = MODE_SOURCE[mode];
+  if (!src) return DATA.length;
+  return DATA.filter(d => isCleared(statusMap[src][d.en])).length;
+}
+
+function getThinkMs() {
+  if (MODE_THINK_MS[appMode]) return MODE_THINK_MS[appMode];
+  return parseInt(document.getElementById('thinkTimeSelect').value);
+}
+
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'practical4'; // distinguishes this app's data from the gta player
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+
+let currentUser = null;
+let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
+let saveTimer = null;
+
+function loadStatusMap() {
+  return statusMap;
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  setSyncBadge('保存中...');
+  saveTimer = setTimeout(saveStatusMap, 600);
+}
+
+function saveStatusMap(retry) {
+  if (!currentUser) return;
+  // POSTで送る(GETだとデータ量が増えたときURL長の上限を超えて保存が失敗するため)
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      action: 'save',
+      user: APP_KEY + ':' + currentUser,
+      data: JSON.stringify({ _statusMap: statusMap, _srs: srsData })
+    })
+  })
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.error) throw new Error(res.error);
+      setSyncBadge('保存済み');
+    })
+    .catch(() => {
+      if (!retry) {
+        setSyncBadge('保存リトライ中...');
+        setTimeout(() => saveStatusMap(true), 1500);
+      } else {
+        setSyncBadge('⚠保存失敗 タップで再試行');
+      }
+    });
+}
+
+function loadFromServer(user) {
+  const url = GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY + ':' + user);
+  return fetch(url)
+    .then(r => r.json())
+    .then(res => {
+      try {
+        let parsed = JSON.parse(res.data || '{}');
+        // 新形式: { _statusMap, _srs } を分離
+        if (parsed && parsed._statusMap) {
+          srsData = parsed._srs || {};
+          parsed = parsed._statusMap;
+        }
+        // 旧フォーマット(モード分け前)は listen バケットへ移行
+        if (parsed && (parsed.listen || parsed.quiz)) {
+          statusMap = {
+            listen: parsed.listen || {},
+            quiz: parsed.quiz || {},
+            quiz5: parsed.quiz5 || {},
+            quiz3: parsed.quiz3 || {},
+            quiz2: parsed.quiz2 || {},
+            quizInstant: parsed.quizInstant || {},
+            quizScene: parsed.quizScene || {},
+            srs: parsed.srs || {}
+          };
+        } else {
+          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
+        }
+      } catch (e) {
+        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
+      }
+    });
+}
+
+function setSyncBadge(text) {
+  const badge = document.getElementById('syncBadge');
+  badge.style.display = 'block';
+  badge.textContent = text;
+}
+
+const STATUS_DEFS = [
+  { key: 'learning', icon: '!', label: '未習得' },
+  { key: 'known', icon: '◯', label: '覚えた' },
+  { key: 'speakable', icon: '★', label: '話せる' },
+];
+
+function currentBucket() {
+  return statusMap[appMode];
+}
+
+function getStatus(item) {
+  return currentBucket()[item.en] || 'none';
+}
+
+function setStatus(item, status) {
+  const bucket = currentBucket();
+  if (bucket[item.en] === status) {
+    delete bucket[item.en];
+  } else {
+    bucket[item.en] = status;
+  }
+  scheduleSave();
+  renderList();
+  renderNowPlayingStatus();
+  renderStats();
+  buildModeFilters();
+}
+
+function buildStatusButtonsEl(item, large) {
+  const wrap = document.createElement('div');
+  wrap.className = 'status-buttons';
+  STATUS_DEFS.forEach(def => {
+    const btn = document.createElement('button');
+    btn.className = 'status-btn';
+    btn.textContent = def.icon;
+    btn.title = def.label;
+    if (getStatus(item) === def.key) btn.classList.add('active-' + def.key);
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      setStatus(item, def.key);
+    };
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
+function renderNowPlayingStatus() {
+  const el = document.getElementById('nowPlayingStatus');
+  el.innerHTML = '';
+  if (filtered.length === 0) return;
+  el.appendChild(buildStatusButtonsEl(filtered[curIndex], true));
+}
+
+function renderStats() {
+  const counts = { none: 0, learning: 0, known: 0, speakable: 0 };
+  // そのモードの対象フレーズだけを数える(5秒/3秒モードは解放済みのみ)
+  DATA.filter(isUnlocked).forEach(d => {
+    const s = getStatus(d);
+    counts[s] = (counts[s] || 0) + 1;
+  });
+  const statsRow = document.getElementById('statsRow');
+  statsRow.innerHTML = `
+    <div class="stat-pill"><span class="num">${counts.speakable}</span><span class="label">話せる</span></div>
+    <div class="stat-pill"><span class="num">${counts.known}</span><span class="label">覚えた</span></div>
+    <div class="stat-pill"><span class="num">${counts.learning}</span><span class="label">未習得</span></div>
+    <div class="stat-pill"><span class="num">${counts.none}</span><span class="label">未チェック</span></div>
+  `;
+}
+
+function buildStatusFilters() {
+  const container = document.getElementById('statusFilters');
+  container.innerHTML = '';
+  const allDefs = [
+    { key: 'all', label: 'すべて' },
+    { key: 'speakable', label: '★話せる' },
+    { key: 'known', label: '◯覚えた' },
+    { key: 'learning', label: '!未習得' },
+    { key: 'none', label: '未チェック' },
+  ];
+  allDefs.forEach(def => {
+    const chip = document.createElement('div');
+    chip.className = 'status-chip' + (activeStatusFilter === def.key ? ' active' : '');
+    chip.textContent = def.label;
+    chip.onclick = () => {
+      activeStatusFilter = def.key;
+      applyFilter();
+      buildStatusFilters();
+    };
+    container.appendChild(chip);
+  });
+}
+
+
+const phraseEn = document.getElementById('phraseEn');
+const phraseJp = document.getElementById('phraseJp');
+const catTag = document.getElementById('catTag');
+const progressBar = document.getElementById('progressBar');
+const curIdxEl = document.getElementById('curIdx');
+const totalIdxEl = document.getElementById('totalIdx');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const rateSelect = document.getElementById('rateSelect');
+const repeatSelect = document.getElementById('repeatSelect');
+const jpToggle = document.getElementById('jpToggle');
+const catFilters = document.getElementById('catFilters');
+const listContainer = document.getElementById('listContainer');
+const voiceHint = document.getElementById('voiceHint');
+
+function loadVoices() {
+  const voices = synth.getVoices();
+  englishVoice = voices.find(v => v.lang.startsWith('en')) || null;
+  japaneseVoice = voices.find(v => v.lang.startsWith('ja')) || null;
+  if (!englishVoice) {
+    voiceHint.textContent = '英語音声が見つかりません。ブラウザ設定で英語の音声をインストールしてください。';
+  } else {
+    voiceHint.textContent = '';
+  }
+}
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+loadVoices();
+
+function buildFilters() {
+  const cats = [...new Set(DATA.map(d => d.cat))];
+  catFilters.innerHTML = '';
+  cats.forEach(cat => {
+    const chip = document.createElement('div');
+    chip.className = 'cat-chip active';
+    chip.textContent = cat;
+    chip.onclick = () => {
+      if (activeCats.has(cat)) {
+        if (activeCats.size === 1) return;
+        activeCats.delete(cat);
+        chip.classList.remove('active');
+      } else {
+        activeCats.add(cat);
+        chip.classList.add('active');
+      }
+      applyFilter();
+    };
+    catFilters.appendChild(chip);
+  });
+}
+
+function applyFilter() {
+  filtered = DATA.filter(d => {
+    if (appMode === 'srs') return isSrsDue(d); // 間隔反復は今日期限の話せる語のみ(カテゴリ絞りは無視)
+    if (!isUnlocked(d)) return false;
+    if (!activeCats.has(d.cat)) return false;
+    if (activeStatusFilter !== 'all' && getStatus(d) !== activeStatusFilter) return false;
+    if (excludeSpeakable && getStatus(d) === 'speakable') return false;
+    if (excludeKnown && getStatus(d) === 'known') return false;
+    return true;
+  });
+  // 2秒・即射モードは順番暗記を防ぐため出題順をシャッフル
+  if (RANDOM_MODES.has(appMode)) {
+    for (let i = filtered.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+    }
+  }
+  curIndex = 0;
+  renderList();
+  updateDisplay();
+}
+
+function buildExcludeSpeakableToggle() {
+  const container = document.getElementById('excludeSpeakableRow');
+  container.innerHTML = '';
+
+  const chip1 = document.createElement('div');
+  chip1.className = 'status-chip' + (excludeSpeakable ? ' active' : '');
+  chip1.textContent = excludeSpeakable ? '★話せるは流さない (ON)' : '★話せるも流す (OFF)';
+  chip1.onclick = () => {
+    excludeSpeakable = !excludeSpeakable;
+    buildExcludeSpeakableToggle();
+    applyFilter();
+  };
+  container.appendChild(chip1);
+
+  const chip2 = document.createElement('div');
+  chip2.className = 'status-chip' + (excludeKnown ? ' active' : '');
+  chip2.textContent = excludeKnown ? '◯覚えたは流さない (ON)' : '◯覚えたも流す (OFF)';
+  chip2.onclick = () => {
+    excludeKnown = !excludeKnown;
+    buildExcludeSpeakableToggle();
+    applyFilter();
+  };
+  container.appendChild(chip2);
+}
+
+function renderList() {
+  listContainer.innerHTML = '';
+  filtered.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'phrase-row' + (i === curIndex ? ' current' : '');
+    const mainDiv = document.createElement('div');
+    mainDiv.className = 'row-main';
+    mainDiv.innerHTML = `
+      <span class="idx">${i + 1}</span>
+      <span class="en">${item.en}</span>
+      <span class="jp">${item.jp}</span>
+    `;
+    mainDiv.onclick = () => {
+      stopSpeaking();
+      curIndex = i;
+      updateDisplay();
+      if (isPlaying) speakCurrent();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    row.appendChild(mainDiv);
+    row.appendChild(buildStatusButtonsEl(item, false));
+    listContainer.appendChild(row);
+  });
+}
+
+function updateDisplay() {
+  const emptyBox = document.getElementById('emptyMsg');
+  if (filtered.length === 0) {
+    emptyBox.style.display = 'block';
+    if (appMode === 'srs') {
+      const total = srsTotalCount();
+      emptyBox.textContent = total === 0
+        ? '「★話せる」にした語がまだありません。情景モードなどで話せるようになった語がここに集まります。'
+        : '今日の復習は完了です！お疲れさまでした。次の復習日にまた出題されます。';
+    } else {
+      emptyBox.textContent = MODE_SOURCE[appMode]
+        ? '対象フレーズがありません。前のモードで「◯覚えた」にチェックしたフレーズがここに追加されます。'
+        : '対象フレーズがありません。フィルター条件を確認してください。';
+    }
+    document.getElementById('phraseJpQuiz').style.display = 'none';
+    phraseEn.textContent = '—';
+    phraseEn.style.opacity = '1';
+    phraseJp.textContent = '';
+    document.getElementById('kwBox').style.display = 'none';
+    document.getElementById('nowPlayingStatus').innerHTML = '';
+    curIdxEl.textContent = '0 / 0';
+    progressBar.style.width = '0%';
+    return;
+  }
+  emptyBox.style.display = 'none';
+  document.getElementById('srsGradeRow').style.display = 'none';
+  const item = filtered[curIndex];
+  catTag.textContent = item.cat;
+  curIdxEl.textContent = (curIndex + 1) + ' / ' + filtered.length;
+  totalIdxEl.textContent = '';
+  progressBar.style.width = ((curIndex) / Math.max(filtered.length - 1, 1)) * 100 + '%';
+
+  const phraseJpQuiz = document.getElementById('phraseJpQuiz');
+
+  if (isQuizMode()) {
+    // 日本語(情景モードは情景文)を先に出し、考える時間のあと英語を表示する
+    phraseJpQuiz.style.display = 'block';
+    phraseJpQuiz.textContent = isSceneMode() ? ('【状況】' + (item.sc || item.jp)) : item.jp;
+    phraseEn.textContent = '？？？';
+    phraseEn.style.opacity = '0.3';
+    phraseJp.textContent = '';
+  } else {
+    phraseJpQuiz.style.display = 'none';
+    phraseEn.textContent = item.en;
+    phraseEn.style.opacity = '1';
+    phraseJp.textContent = item.jp;
+    if (item.kw) {
+      document.getElementById('kwWord').textContent = item.kw;
+      document.getElementById('kwEx').textContent = item.ex || '';
+      document.getElementById('kwBox').style.display = 'block';
+    } else {
+      document.getElementById('kwBox').style.display = 'none';
+    }
+  }
+
+  document.querySelectorAll('.phrase-row').forEach((r, i) => {
+    r.classList.toggle('current', i === curIndex);
+  });
+  renderNowPlayingStatus();
+}
+
+function revealAnswer() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  phraseEn.textContent = item.en;
+  phraseEn.style.opacity = '1';
+  if (isSceneMode()) {
+    document.getElementById('phraseJpQuiz').textContent = '【状況】' + (item.sc || item.jp) + '  →  ' + item.jp;
+  }
+  if (isSrsMode()) {
+    document.getElementById('srsGradeRow').style.display = 'flex';
+  }
+  // show keyword box
+  if (item.kw) {
+    document.getElementById('kwWord').textContent = item.kw;
+    document.getElementById('kwEx').textContent = item.ex || '';
+    document.getElementById('kwBox').style.display = 'block';
+  }
+}
+
+function speakCurrent() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  const rate = parseFloat(rateSelect.value);
+  const wantJp = jpToggle.value === 'yes';
+
+  if (isQuizMode()) {
+    // 日本語音声 → 考える時間 → 英語表示+音声
+    const thinkMs = getThinkMs();
+    clearTimeout(quizTimer);
+
+    if (japaneseVoice) {
+      const uttJpFirst = new SpeechSynthesisUtterance(isSceneMode() ? (item.sc || item.jp) : item.jp);
+      uttJpFirst.lang = 'ja-JP';
+      uttJpFirst.voice = japaneseVoice;
+      uttJpFirst.rate = 1;
+      uttJpFirst.onend = () => {
+        quizTimer = setTimeout(() => {
+          if (!isPlaying) return;
+          revealAnswer();
+          speakEnglishThenAdvance(item, rate);
+        }, thinkMs);
+      };
+
+      synth.cancel();
+      synth.speak(uttJpFirst);
+    } else {
+      quizTimer = setTimeout(() => {
+        if (!isPlaying) return;
+        revealAnswer();
+        speakEnglishThenAdvance(item, rate);
+      }, thinkMs);
+    }
+    return;
+  }
+
+  speakEnglishThenAdvance(item, rate, wantJp);
+}
+
+function speakEnglishThenAdvance(item, rate, wantJp) {
+  const uttEn = new SpeechSynthesisUtterance(item.en);
+  uttEn.lang = 'en-US';
+  uttEn.rate = rate;
+  if (englishVoice) uttEn.voice = englishVoice;
+
+  uttEn.onend = () => {
+    repeatCount++;
+    if (repeatCount < getRepeatTotal()) {
+      if (isPlaying) speakEnglishThenAdvance(item, rate, wantJp);
+      return;
+    }
+    repeatCount = 0;
+    if (isSrsMode()) {
+      // 間隔反復は自己申告ボタンで進むため、ここで停止してボタンを待つ
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      document.getElementById('srsGradeRow').style.display = 'flex';
+      return;
+    }
+    const reviewMs = isQuizMode() ? parseInt(document.getElementById('reviewTimeSelect').value) : 0;
+    const proceed = () => {
+      if (!isPlaying) return;
+      if (wantJp && japaneseVoice) {
+        const uttJp = new SpeechSynthesisUtterance(item.jp);
+        uttJp.lang = 'ja-JP';
+        uttJp.voice = japaneseVoice;
+        uttJp.rate = 1;
+        uttJp.onend = () => { if (isPlaying) goNext(true); };
+        synth.speak(uttJp);
+      } else {
+        goNext(true);
+      }
+    };
+    if (reviewMs > 0) {
+      clearTimeout(quizTimer);
+      quizTimer = setTimeout(proceed, reviewMs);
+    } else {
+      proceed();
+    }
+  };
+
+  synth.cancel();
+  synth.speak(uttEn);
+}
+
+function goNext(auto) {
+  curIndex = (curIndex + 1) % filtered.length;
+  updateDisplay();
+  if (isPlaying) speakCurrent();
+}
+
+function goPrev() {
+  stopSpeaking();
+  curIndex = (curIndex - 1 + filtered.length) % filtered.length;
+  updateDisplay();
+  if (isPlaying) speakCurrent();
+}
+
+function stopSpeaking() {
+  synth.cancel();
+  clearTimeout(quizTimer);
+  repeatCount = 0;
+}
+
+function buildModeFilters() {
+  const container = document.getElementById('modeFilters');
+  container.innerHTML = '';
+  const modes = [
+    { key: 'listen', label: '聞き流し' },
+    { key: 'quiz', label: 'クイズ(時間可変)' },
+    { key: 'quiz5', label: '5秒モード' },
+    { key: 'quiz3', label: '3秒(2回)' },
+    { key: 'quiz2', label: '2秒(1回)' },
+    { key: 'quizInstant', label: '即射(1回)' },
+    { key: 'quizScene', label: '情景モード' },
+    { key: 'srs', label: '仕上げ(間隔反復)' },
+  ];
+  modes.forEach(m => {
+    const chip = document.createElement('div');
+    chip.className = 'status-chip' + (appMode === m.key ? ' active' : '');
+    let n;
+    if (m.key === 'srs') { n = srsDueCount(); }
+    else { n = unlockedCount(m.key); }
+    const showCount = MODE_SOURCE[m.key] || m.key === 'srs';
+    chip.textContent = showCount ? `${m.label} (${n})` : m.label;
+    if (showCount && n === 0) chip.style.opacity = '0.4';
+    chip.onclick = () => {
+      stopSpeaking();
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      document.getElementById('srsGradeRow').style.display = 'none';
+      appMode = m.key;
+      repeatTotal = repeatCfg().def; // モードのデフォルトに合わせる
+      rebuildRepeatOptions();
+      document.getElementById('jpToggleWrap').style.display = (appMode === 'listen') ? 'block' : 'none';
+      document.getElementById('thinkTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
+      document.getElementById('reviewTimeWrap').style.display = isQuizMode() ? 'block' : 'none';
+      buildModeFilters();
+      applyFilter();
+      renderStats();
+      updateDisplay();
+    };
+    container.appendChild(chip);
+  });
+}
+
+playBtn.onclick = () => {
+  isPlaying = !isPlaying;
+  playBtn.textContent = isPlaying ? '⏸' : '▶';
+  if (isPlaying) {
+    repeatCount = 0;
+    if (isQuizMode()) updateDisplay(); // 答えを隠した状態に戻す
+    speakCurrent();
+  } else {
+    stopSpeaking();
+  }
+};
+
+nextBtn.onclick = () => { stopSpeaking(); goNext(); };
+prevBtn.onclick = goPrev;
+
+repeatSelect.onchange = () => { repeatTotal = parseInt(repeatSelect.value); };
+rebuildRepeatOptions();
+
+// 間隔反復の「言えた/詰まった」ボタン
+document.getElementById('srsPass').onclick = () => srsAdvance(true);
+document.getElementById('srsFail').onclick = () => srsAdvance(false);
+function srsAdvance(ok) {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  srsGrade(item, ok);           // 復習日を更新
+  document.getElementById('srsGradeRow').style.display = 'none';
+  // この問題をリストから外して次へ(今日のノルマを消化していく)
+  filtered.splice(curIndex, 1);
+  buildModeFilters();           // チップの残り数を更新
+  if (filtered.length === 0) {
+    updateDisplay();            // 空表示(今日の分は完了)
+    return;
+  }
+  if (curIndex >= filtered.length) curIndex = 0;
+  updateDisplay();
+  isPlaying = true;
+  playBtn.textContent = '⏸';
+  speakCurrent();
+}
+
+function initApp() {
+  buildFilters();
+  buildStatusFilters();
+  buildModeFilters();
+  buildExcludeSpeakableToggle();
+  renderStats();
+  renderList();
+  updateDisplay();
+}
+
+function startSession(user) {
+  currentUser = user;
+  localStorage.setItem(LOCAL_USER_KEY, user);
+  document.getElementById('loginStatus').textContent = '読み込み中...';
+  loadFromServer(user).then(() => {
+    document.getElementById('loginOverlay').style.display = 'none';
+    setSyncBadge(user + ' で同期中');
+    initApp();
+  }).catch(() => {
+    document.getElementById('loginStatus').textContent = '通信に失敗しました。もう一度お試しください。';
+  });
+}
+
+document.getElementById('loginBtn').onclick = () => {
+  const val = document.getElementById('passInput').value.trim();
+  if (!val) {
+    document.getElementById('loginStatus').textContent = '合言葉を入力してください';
+    return;
+  }
+  startSession(val);
+};
+document.getElementById('passInput').onkeydown = (e) => {
+  if (e.key === 'Enter') document.getElementById('loginBtn').click();
+};
+
+document.getElementById('syncBadge').onclick = () => {
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗') !== -1) {
+    saveStatusMap();
+    return;
+  }
+  if (currentUser) loadFromServer(currentUser).then(() => {
+    setSyncBadge(currentUser + ' で同期中(更新済み)');
+    initApp();
+  });
+};
+
+// auto-login if a saved username exists on this device
+const savedUser = localStorage.getItem(LOCAL_USER_KEY);
+if (savedUser) {
+  document.getElementById('passInput').value = savedUser;
+  startSession(savedUser);
+}
+</script>
+</body>
+</html>
