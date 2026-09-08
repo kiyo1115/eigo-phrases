@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -21,9 +22,28 @@
     font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     min-height: 100vh;
     padding: 20px;
+  }
+  .layout {
+    display: flex;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: flex-start;
+  }
+  .main-col {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-width: 0;
+  }
+  .side-col {
+    width: 320px;
+    flex-shrink: 0;
+  }
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; }
+    .side-col { width: 100%; }
   }
   .header { text-align: center; margin-bottom: 20px; }
   .header h1 { font-size: 22px; color: var(--amber); }
@@ -92,16 +112,21 @@
   }
 
   .history {
-    width: 100%; max-width: 640px; margin-top: 10px;
+    background: var(--panel); border-radius: 14px; padding: 16px;
+    border: 1px solid var(--amber-dim);
+    position: sticky; top: 20px;
   }
-  .history h3 { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; }
+  .history h3 { font-size: 14px; color: var(--amber); margin-bottom: 12px; }
   .hist-item {
-    background: var(--panel); border-radius: 8px; padding: 10px 14px;
-    margin-bottom: 6px; display: flex; justify-content: space-between;
-    align-items: center; gap: 10px;
+    background: var(--bg); border-radius: 10px; padding: 12px 14px;
+    margin-bottom: 8px; cursor: pointer;
+    border: 1px solid transparent; transition: border-color .15s, transform .1s;
   }
-  .hist-en { color: var(--amber); font-weight: 700; font-size: 15px; }
-  .hist-jp { color: var(--text-dim); font-size: 12px; }
+  .hist-item:hover { border-color: var(--amber); transform: translateX(-2px); }
+  .hist-item:active { transform: scale(0.98); }
+  .hist-en { color: var(--amber); font-weight: 700; font-size: 16px; display: block; margin-bottom: 3px; }
+  .hist-jp { color: var(--text-dim); font-size: 12px; display: block; }
+  .hist-empty { color: var(--text-dim); font-size: 13px; text-align: center; padding: 20px 0; }
 
   .err { color: #ff8080; font-size: 13px; margin-top: 10px; text-align: center; max-width: 640px; }
 </style>
@@ -112,45 +137,52 @@
     <div class="sub">日本語でつぶやくと、近い英語フレーズを表示します(373フレーズ)</div>
   </div>
 
-  <div class="mic-status">
-    <div class="mic-dot" id="micDot"></div>
-    <div class="mic-label" id="micLabel">停止中</div>
-  </div>
+  <div class="layout">
+    <div class="main-col">
+      <div class="mic-status">
+        <div class="mic-dot" id="micDot"></div>
+        <div class="mic-label" id="micLabel">停止中</div>
+      </div>
 
-  <button id="toggleBtn">▶ 待ち受け開始</button>
+      <button id="toggleBtn">▶ 待ち受け開始</button>
 
-  <div class="heard" id="heard">まだ何も聞き取っていません</div>
-  <div class="match-info" id="matchInfo">　</div>
+      <div class="heard" id="heard">まだ何も聞き取っていません</div>
+      <div class="match-info" id="matchInfo">　</div>
 
-  <div class="result-card">
-    <div id="resultArea">
-      <div class="result-empty">ここに英語が表示されます</div>
+      <div class="result-card">
+        <div id="resultArea">
+          <div class="result-empty">ここに英語が表示されます</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="ctrl">
+          <label>最低一致度</label>
+          <select id="threshold">
+            <option value="0.15">かなりゆるい</option>
+            <option value="0.25" selected>ゆるい</option>
+            <option value="0.35">普通</option>
+            <option value="0.5">厳しい</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>英語を読み上げ</label>
+          <select id="speakToggle">
+            <option value="no" selected>しない</option>
+            <option value="yes">する</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="errBox" class="err"></div>
     </div>
-  </div>
 
-  <div class="controls">
-    <div class="ctrl">
-      <label>最低一致度</label>
-      <select id="threshold">
-        <option value="0.2">ゆるい</option>
-        <option value="0.35" selected>普通</option>
-        <option value="0.5">厳しい</option>
-      </select>
+    <div class="side-col">
+      <div class="history">
+        <h3>履歴(クリックで再表示)</h3>
+        <div id="historyList"><div class="hist-empty">まだありません</div></div>
+      </div>
     </div>
-    <div class="ctrl">
-      <label>英語を読み上げ</label>
-      <select id="speakToggle">
-        <option value="no" selected>しない</option>
-        <option value="yes">する</option>
-      </select>
-    </div>
-  </div>
-
-  <div id="errBox" class="err"></div>
-
-  <div class="history">
-    <h3>履歴(直近5件)</h3>
-    <div id="historyList"></div>
   </div>
 
 <script>
@@ -566,19 +598,40 @@ PHRASES.forEach(p => {
 // 聞き取った日本語に最も近いフレーズを1つ返す
 function findBest(heard) {
   const h = normalize(heard);
-  if (!h) return null;
+  if (!h || h.length < 2) return null;
   let best = null, bestScore = 0;
   for (const p of PHRASES) {
-    // coreとcleanの両方で測って高い方を採用
     const s1 = similarity(h, p._core);
     const s2 = similarity(h, p._clean);
-    // 部分包含ボーナス: 聞いた文にフレーズの核が含まれていれば加点
-    let bonus = 0;
-    if (p._core.length >= 2 && h.includes(p._core)) bonus = 0.3;
-    const score = Math.max(s1, s2) + bonus;
+    let score = Math.max(s1, s2);
+    // 包含ボーナス(双方向): 聞いた文に核が含まれる or 核に聞いた文が含まれる
+    if (p._core.length >= 2) {
+      if (h.includes(p._core)) score += 0.35;          // 「〇〇だよ」の中に核がある
+      else if (p._core.includes(h) && h.length >= 3) score += 0.25; // 核の一部を言った
+    }
+    // 連続部分一致ボーナス: 3文字以上の共通部分列があれば加点
+    const common = longestCommonSubstr(h, p._core);
+    if (common >= 3) score += 0.15 * (common / Math.max(h.length, p._core.length));
     if (score > bestScore) { bestScore = score; best = p; }
   }
   return best ? { phrase: best, score: bestScore } : null;
+}
+
+// 最長共通部分文字列の長さ
+function longestCommonSubstr(a, b) {
+  if (!a || !b) return 0;
+  let max = 0;
+  const dp = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = 0;
+    for (let j = 1; j <= b.length; j++) {
+      const tmp = dp[j];
+      if (a[i-1] === b[j-1]) { dp[j] = prev + 1; if (dp[j] > max) max = dp[j]; }
+      else dp[j] = 0;
+      prev = tmp;
+    }
+  }
+  return max;
 }
 
 // ===== 音声認識 =====
@@ -603,22 +656,29 @@ if (!SR) {
   recognition.lang = 'ja-JP';
   recognition.continuous = true;      // 連続認識
   recognition.interimResults = true;  // 途中結果も拾う
+  recognition.maxAlternatives = 5;    // 認識候補を複数もらって照合精度を上げる
 
   recognition.onresult = (event) => {
     let interim = '', final = '';
+    let alternatives = []; // 認識候補を集める
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const t = event.results[i][0].transcript;
-      if (event.results[i].isFinal) final += t;
+      const res = event.results[i];
+      const t = res[0].transcript;
+      // 候補(alternatives)を全部集める
+      for (let j = 0; j < res.length; j++) alternatives.push(res[j].transcript);
+      if (res.isFinal) final += t;
       else interim += t;
     }
     if (interim) {
       heardEl.innerHTML = '聞き取り中… <span>' + escapeHtml(interim) + '</span>';
       heardEl.classList.add('pulse');
+      // 途中経過でも照合して素早く反応(拾いやすくする)
+      handleHeard(interim, alternatives, true);
     }
     if (final) {
       heardEl.innerHTML = '認識: <span>' + escapeHtml(final) + '</span>';
       heardEl.classList.remove('pulse');
-      handleHeard(final);
+      handleHeard(final, alternatives, false);
     }
   };
 
@@ -635,32 +695,49 @@ if (!SR) {
   };
 }
 
-function handleHeard(text) {
+function handleHeard(text, alternatives, isInterim) {
   const threshold = parseFloat(document.getElementById('threshold').value);
-  const result = findBest(text);
-  if (result && result.score >= threshold) {
+  // 認識候補すべてで照合し、最も高いスコアを採用(拾いやすくする)
+  const candidates = alternatives && alternatives.length ? alternatives : [text];
+  let best = null;
+  for (const cand of candidates) {
+    const r = findBest(cand);
+    if (r && (!best || r.score > best.score)) best = r;
+  }
+  if (best && best.score >= threshold) {
     matchInfoEl.className = 'match-info hit';
-    matchInfoEl.textContent = '✓ マッチ (一致度 ' + result.score.toFixed(2) + ')';
-    showResult(result.phrase);
-  } else if (result) {
-    // 惜しい候補はあったが閾値未満 → 参考として小さく出す
-    matchInfoEl.className = 'match-info miss';
-    matchInfoEl.textContent = '△ 近い候補: ' + result.phrase.en + ' (一致度 ' + result.score.toFixed(2) + ' / 閾値 ' + threshold + ')';
-  } else {
-    matchInfoEl.className = 'match-info miss';
-    matchInfoEl.textContent = '該当なし';
+    matchInfoEl.textContent = '✓ マッチ (一致度 ' + best.score.toFixed(2) + ')';
+    showResult(best.phrase);
+  } else if (!isInterim) {
+    // 確定時のみ「近い候補」「該当なし」を表示(途中経過ではちらつかせない)
+    if (best) {
+      matchInfoEl.className = 'match-info miss';
+      matchInfoEl.textContent = '△ 近い候補: ' + best.phrase.en + ' (一致度 ' + best.score.toFixed(2) + ' / 閾値 ' + threshold + ')';
+    } else {
+      matchInfoEl.className = 'match-info miss';
+      matchInfoEl.textContent = '該当なし';
+    }
   }
 }
 
-function showResult(p) {
+let currentEn = null;
+function showResult(p, fromHistory) {
+  // 同じフレーズが連続したら何もしない(ちらつき防止)
+  if (!fromHistory && currentEn === p.en) return;
+  currentEn = p.en;
   resultArea.innerHTML =
     '<div class="result-en">' + escapeHtml(p.en) + '</div>' +
     '<div class="result-jp">' + escapeHtml(p.jp) + '</div>';
 
-  // 履歴に追加
-  history.unshift(p);
-  if (history.length > 5) history.pop();
-  renderHistory();
+  // 履歴に追加(履歴クリックからの再表示では追加しない)
+  if (!fromHistory) {
+    // 既に履歴にある同じものは一旦除いて先頭へ(重複を防ぎ最新順に)
+    const idx = history.findIndex(h => h.en === p.en);
+    if (idx !== -1) history.splice(idx, 1);
+    history.unshift(p);
+    if (history.length > 10) history.pop();
+    renderHistory();
+  }
 
   // 英語読み上げ
   if (document.getElementById('speakToggle').value === 'yes') {
@@ -669,10 +746,22 @@ function showResult(p) {
 }
 
 function renderHistory() {
-  historyList.innerHTML = history.map(p =>
-    '<div class="hist-item"><span class="hist-en">' + escapeHtml(p.en) +
-    '</span><span class="hist-jp">' + escapeHtml(p.jp) + '</span></div>'
+  if (history.length === 0) {
+    historyList.innerHTML = '<div class="hist-empty">まだありません</div>';
+    return;
+  }
+  historyList.innerHTML = history.map((p, i) =>
+    '<div class="hist-item" data-i="' + i + '">' +
+    '<span class="hist-en">' + escapeHtml(p.en) + '</span>' +
+    '<span class="hist-jp">' + escapeHtml(p.jp) + '</span></div>'
   ).join('');
+  // クリックでそのフレーズを大きく再表示
+  [...historyList.querySelectorAll('.hist-item')].forEach(el => {
+    el.onclick = () => {
+      const p = history[parseInt(el.dataset.i)];
+      if (p) showResult(p, true);
+    };
+  });
 }
 
 function escapeHtml(s) {
