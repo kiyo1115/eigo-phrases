@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTA実況 台本集 音声プレイヤー</title>
+<style>
+  :root {
+    --bg:#0f0d0b; --panel:#1a1613; --amber:#ff8c2e; --amber-dim:#7a4518;
+    --text:#f5efe8; --text-dim:#9a8f83; --green:#4ade80;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
+    padding:20px; max-width:820px; margin:0 auto;
+  }
+  .eyebrow { color:var(--text-dim); font-size:13px; letter-spacing:1px; }
+  h1 { font-size:26px; margin:4px 0 20px; }
+  h1 span { color:var(--amber); }
+  a.back { color:var(--text-dim); font-size:13px; text-decoration:none; display:inline-block; margin-bottom:16px; }
+
+  .filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+  .chip {
+    background:var(--panel); border:1px solid var(--amber-dim); color:var(--text-dim);
+    border-radius:999px; padding:8px 14px; font-size:13px; cursor:pointer;
+  }
+  .chip.active { background:var(--amber); color:#1a1613; border-color:var(--amber); font-weight:700; }
+
+  .card {
+    background:var(--panel); border:2px solid var(--amber-dim); border-radius:18px;
+    padding:32px 26px; margin-bottom:16px; text-align:center; min-height:240px;
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .cat-tag {
+    display:inline-block; align-self:center; background:rgba(255,140,46,0.12);
+    border:1px solid var(--amber-dim); color:var(--amber);
+    border-radius:999px; padding:4px 14px; font-size:12px; margin-bottom:20px;
+  }
+  .en { font-size:24px; line-height:1.6; font-weight:500; margin-bottom:20px; word-break:break-word; }
+  .en b { color:var(--amber); font-weight:800; }
+  .en.hidden { opacity:0.15; }
+  .jp { font-size:15px; color:var(--text-dim); line-height:1.7; margin-bottom:16px; }
+  .jp.hidden { display:none; }
+  .kwbox {
+    background:rgba(255,140,46,0.07); border:1px solid var(--amber-dim);
+    border-radius:10px; padding:12px 14px; font-size:13px; color:var(--text-dim);
+    text-align:left; line-height:1.7;
+  }
+  .kwbox.hidden { display:none; }
+  .kwbox b { color:var(--amber); }
+
+  .progress { height:4px; background:var(--panel); border-radius:2px; margin:6px 0; overflow:hidden; }
+  .progress-bar { height:100%; background:var(--amber); width:0%; transition:width .2s; }
+  .plabel { display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); margin-bottom:16px; }
+
+  .controls { display:flex; gap:12px; align-items:center; justify-content:center; margin-bottom:16px; }
+  .btn { background:var(--panel); border:1px solid var(--amber-dim); color:var(--text); border-radius:50%;
+    width:52px; height:52px; font-size:18px; cursor:pointer; }
+  .btn.play { background:var(--amber); color:#1a1613; width:64px; height:64px; font-size:24px; border:none; }
+
+  .settings { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-bottom:20px; }
+  .setting { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .setting label { font-size:11px; color:var(--text-dim); }
+  .setting select {
+    background:var(--panel); color:var(--text); border:1px solid var(--amber-dim);
+    border-radius:8px; padding:6px 10px; font-size:13px;
+  }
+
+  .list { margin-top:10px; }
+  .list h3 { font-size:13px; color:var(--text-dim); margin-bottom:10px; }
+  .row {
+    background:var(--panel); border-radius:8px; padding:12px 14px; margin-bottom:6px;
+    cursor:pointer; border:1px solid transparent;
+  }
+  .row:hover { border-color:var(--amber-dim); }
+  .row.current { border-color:var(--amber); }
+  .row .ren { font-size:14px; }
+  .row .ren b { color:var(--amber); }
+  .row .rjp { font-size:11px; color:var(--text-dim); margin-top:3px; }
+</style>
+</head>
+<body>
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">GTA6 英語実況 / 台本集 音声版</div>
+  <h1>実況<span>台本</span>集 <span style="font-size:16px;">(175本)</span></h1>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="card">
+    <div class="cat-tag" id="catTag"></div>
+    <div class="en" id="enText">▶ を押すと再生します</div>
+    <div class="jp hidden" id="jpText"></div>
+    <div class="kwbox hidden" id="kwBox"></div>
+  </div>
+
+  <div class="progress"><div class="progress-bar" id="pbar"></div></div>
+  <div class="plabel"><span id="curIdx">0</span><span id="totIdx">0</span></div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn">⏮</button>
+    <button class="btn play" id="playBtn">▶</button>
+    <button class="btn" id="nextBtn">⏭</button>
+  </div>
+
+  <div class="settings">
+    <div class="setting">
+      <label>読み上げ速度</label>
+      <select id="rate">
+        <option value="0.7">ゆっくり (0.7x)</option>
+        <option value="0.85" selected>やや遅め (0.85x)</option>
+        <option value="1">普通 (1.0x)</option>
+      </select>
+    </div>
+    <div class="setting">
+      <label>リピート</label>
+      <select id="repeat">
+        <option value="1" selected>1回</option>
+        <option value="2">2回</option>
+        <option value="3">3回</option>
+      </select>
+    </div>
+    <div class="setting">
+      <label>自動で次へ</label>
+      <select id="autoNext">
+        <option value="yes" selected>する</option>
+        <option value="no">しない</option>
+      </select>
+    </div>
+    <div class="setting">
+      <label>日本語表示</label>
+      <select id="showJp">
+        <option value="yes" selected>する</option>
+        <option value="no">しない</option>
+      </select>
+    </div>
+    <div class="setting">
+      <label>次までの間</label>
+      <select id="gap">
+        <option value="1500">1.5秒</option>
+        <option value="2500" selected>2.5秒</option>
+        <option value="4000">4秒</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="list">
+    <h3 id="listTitle">一覧(タップで移動)</h3>
+    <div id="listBox"></div>
+  </div>
+
+<script>
+const DATA = [
+  {cat:"ミッション開始", en:"Okay, **here we go**. Let me **see what happens**. Hmm, **something feels off**... but whatever, **let's just go**.", jp:"よし、行くぞ。どうなるか見てみよう。うーん、何か嫌な感じがする…けどまあ、とりあえず行こう。", kw:"here we go / let's see what happens / something feels off / let's just go"},
+  {cat:"ミッション開始", en:"Alright, **let's do this**. First, **steal a car**. Oh, **this place is huge**. Okay, **let's see** where to go.", jp:"よし、やるぞ。まず車を盗む。お、ここめっちゃ広い。よし、どこ行くか見てみよう。", kw:"Alright let's do this / Steal a car / This place is huge / Let's see"},
+  {cat:"ミッション開始", en:"**Here we go again**. New mission, new **objective**. **Let me think about this for a second**... okay, **worth a shot**.", jp:"またいくぞ。新しいミッション、新しい目標。ちょっと考えさせて…よし、やってみる価値はある。", kw:"Here we go again / Objective / Let me think about this for a second / Worth a shot"},
+  {cat:"ミッション開始", en:"**Okay so here's the thing** — I have no plan. **I don't know, let's just go**. **Let's see what happens**.", jp:"えっと、実はね、ノープラン。わからん、行こう。どうなるか見てみよう。", kw:"Okay so here's the thing / I don't know, let's just go / Let's see what happens"},
+  {cat:"ミッション開始", en:"**This is it**. Big mission. **Everything's on the line**. **Let's make this count**. **Here goes nothing**.", jp:"いよいよだ。大きなミッション。全部かかってる。無駄にしないようにしよう。ダメ元でいく。", kw:"This is it / Everything's on the line / Let's make this count / Here goes nothing"},
+  {cat:"ミッション開始", en:"**What should I do next?** Hmm. There's a **side mission** here. **Worth a shot**, right? **Let's do this**.", jp:"次は何しよう。うーん。ここにサブミッションがある。やってみる価値あるよね？ やるぞ。", kw:"What should I do next? / Side mission / Worth a shot / Alright let's do this"},
+  {cat:"ミッション開始", en:"**Okay so...** where do I even start. **Let me just try something**. If it works, it works. **Here we go**.", jp:"えーっと…そもそもどこから始めよう。ちょっと何か試してみる。うまくいけばラッキー。行くぞ。", kw:"Okay so... / Let me just try something / Here we go"},
+  {cat:"ミッション開始", en:"**It's now or never**. **Trust me on this** — this is gonna be good. **Watch this**. **Let's finish this**.", jp:"今しかない。信じてほしい、これは良くなる。これ見てて。終わらせよう。", kw:"It's now or never / Trust me on this / Watch this / Let's finish this"},
+  {cat:"ミッション開始", en:"New game, **save the game** first. Okay. **Alright let's do this**. **Stick around for this**, it's gonna be fun.", jp:"新しいゲーム、まずセーブ。よし。やるぞ。これは見逃さないで、面白くなるから。", kw:"Save the game / Alright let's do this / Stick around for this"},
+  {cat:"ミッション開始", en:"**Let's see**. **Checkpoint** is over there. **I'll just go this way**. **Let's see what happens**.", jp:"見てみよう。チェックポイントはあっち。とりあえずこっち行く。どうなるか見てみよう。", kw:"Let's see / Checkpoint / I'll just go this way / Let's see what happens"},
+  {cat:"ミッション開始", en:"**Here we go**. Deep breath. **This is the moment**. **Let's make this count** — no mistakes this time.", jp:"行くぞ。深呼吸。今がその瞬間。無駄にしないように、今回はミスなし。", kw:"Here we go / This is the moment / Let's make this count"},
+  {cat:"ミッション開始", en:"**Alright let's do this**. **I'm actually excited** for this one. **Let's see what happens**. **Watch this**.", jp:"よし、やるぞ。これはちょっとワクワクしてる。どうなるか見てみよう。これ見てて。", kw:"Alright let's do this / Let's see what happens / Watch this"},
+  {cat:"ミッション開始", en:"**Okay so here's the thing** — I've never done this mission. **I have no idea what's going on**, but **let's just go**.", jp:"えっと、実はね、このミッションやったことない。わけわからんけど、とりあえず行こう。", kw:"Okay so here's the thing / I have no idea what's going on / let's just go"},
+  {cat:"ミッション開始", en:"**What should I do next?** Let me check the **objective**. Okay, got it. **Here we go**. **Worth a shot**.", jp:"次は何しよう。目標を確認しよう。よし、把握した。行くぞ。やってみる価値はある。", kw:"What should I do next? / Objective / Here we go / Worth a shot"},
+  {cat:"ミッション開始", en:"**This is it**, the final mission. **My heart is racing** already. **Let's finish this**. **Here goes nothing**.", jp:"いよいよ最終ミッション。もう心臓バクバク。終わらせよう。ダメ元でいく。", kw:"This is it / My heart is racing / Let's finish this / Here goes nothing"},
+  {cat:"ミッション開始", en:"**Let me think about this for a second**. Okay. **New plan**. **Trust me on this**. **Alright let's do this**.", jp:"ちょっと考えさせて。よし。作戦変更。信じてほしい。やるぞ。", kw:"Let me think about this for a second / New plan / Trust me on this / Alright let's do this"},
+  {cat:"ミッション開始", en:"**Here we go again**. Same mission, take two. **Let's not do that again** — the last part. **Let's see**.", jp:"またいくぞ。同じミッション、テイク2。あれは二度とやめとこう、最後のとこ。見てみよう。", kw:"Here we go again / Let's not do that again / Let's see"},
+  {cat:"ミッション開始", en:"**Okay so...** this looks complicated. **Just bear with me** here. **Let me just try something**. **Here we go**.", jp:"えーっと…これは複雑そう。ちょっと付き合って。何か試してみる。行くぞ。", kw:"Okay so... / Just bear with me / Let me just try something / Here we go"},
+  {cat:"ミッション開始", en:"**Let's go!** New area, **this place is huge**. **Let me show you something** cool. **Watch this**.", jp:"よっしゃ！ 新エリア、めっちゃ広い。ちょっといいもの見せる。これ見てて。", kw:"Let's go! / This place is huge / Let me show you something / Watch this"},
+  {cat:"ミッション開始", en:"**Alright let's do this**. **I've got this**. Probably. **Let's see what happens**. **Here goes nothing**.", jp:"よし、やるぞ。これはいける。たぶん。どうなるか見てみよう。ダメ元でいく。", kw:"Alright let's do this / I've got this / Let's see what happens / Here goes nothing"},
+  {cat:"ミッション開始", en:"**This is it**. **Stick around for this** one, guys. **It's now or never**. **Let's finish this**.", jp:"いよいよだ。これは見逃さないで、みんな。今しかない。終わらせよう。", kw:"This is it / Stick around for this / It's now or never / Let's finish this"},
+  {cat:"ミッション開始", en:"**What should I do next?** So many **objectives**. **I'll figure it out**. **Let's just go** and see.", jp:"次は何しよう。目標が多すぎ。なんとかする。とりあえず行って見てみよう。", kw:"What should I do next? / Objective / I'll figure it out / let's just go"},
+  {cat:"ミッション開始", en:"**Okay so here's the thing** — big risk, big reward. **Worth a shot**. **Let's make this count**. **Here we go**.", jp:"えっと、実はね、ハイリスク・ハイリターン。やる価値ある。無駄にしないように。行くぞ。", kw:"Okay so here's the thing / Worth a shot / Let's make this count / Here we go"},
+  {cat:"ミッション開始", en:"**Let me just try something** crazy. **Trust me on this**. **You'll see why in a second**. **Watch this**.", jp:"ちょっとヤバいこと試してみる。信じてほしい。すぐ理由が分かるから。これ見てて。", kw:"Let me just try something / Trust me on this / You'll see why in a second / Watch this"},
+  {cat:"ミッション開始", en:"**Here we go**. **This is actually insane** but let's do it. **Let's see what happens**. **Alright let's do this**.", jp:"行くぞ。これマジでやばいけどやろう。どうなるか見てみよう。よし、やるぞ。", kw:"Here we go / This is actually insane / Let's see what happens / Alright let's do this"},
+  {cat:"警察に追われる", en:"Oh no. **The cops are after me**. **I'm going too fast** — **watch out**! Okay, **I need to lose the cops**.", jp:"やば。警察に追われてる。スピード出しすぎ、危ない！ よし、警察をまかないと。", kw:"The cops are after me / I'm going too fast / Watch out / Lose the cops"},
+  {cat:"警察に追われる", en:"**I'm being chased**! **Oh come on**, where did they come from? **I need to calm down**. **New plan**.", jp:"追われてる！ うわ最悪、どこから来た？ 落ち着かないと。作戦変更。", kw:"I'm being chased / Oh come on! / I need to calm down / New plan"},
+  {cat:"警察に追われる", en:"**Run a red light**, go go go! **That was close**. **The cops are after me** but I think **I'm in the clear**.", jp:"信号無視、行け行け！ 今のギリ。警察に追われてるけど、たぶん振り切れた。", kw:"Run a red light / That was close / The cops are after me / I'm in the clear"},
+  {cat:"警察に追われる", en:"**I'm cornered**. **I'm surrounded**. **Oh my god**. Okay okay, **I need to focus**. **Here goes nothing**.", jp:"追い詰められた。囲まれてる。マジか。よしよし、集中しないと。ダメ元でいく。", kw:"I'm cornered / I'm surrounded / Oh my god / I need to focus / Here goes nothing"},
+  {cat:"警察に追われる", en:"**Switch cars**, quick! **That was a close call**. Phew. **The cops are after me** still. **Lose the cops**.", jp:"車乗り換え、急げ！ 危機一髪だった。ふう。まだ警察に追われてる。まこう。", kw:"Switch cars / That was a close call / The cops are after me / Lose the cops"},
+  {cat:"警察に追われる", en:"**I missed the turn**! **Oh come on**. **The cops are after me** and now **I'm cornered**. **This is a mess**.", jp:"曲がり損ねた！ うわ最悪。警察に追われてて、追い詰められた。めちゃくちゃだ。", kw:"I missed the turn / Oh come on! / The cops are after me / I'm cornered / This is a mess"},
+  {cat:"警察に追われる", en:"**Drift** around the corner — yes! **That was amazing**. **I'm in the clear**. **Did you see that?**", jp:"コーナーをドリフト、よし！ すごかった。振り切れた。今の見た？", kw:"Drift / That was amazing / I'm in the clear / You see that?"},
+  {cat:"警察に追われる", en:"**I crashed**. **I'm dead**... no wait, still alive. **The cops are after me**. **I need to slow down**.", jp:"クラッシュした。死んだ…いや待って、まだ生きてる。警察に追われてる。スピード落とさないと。", kw:"I crashed / I'm dead / The cops are after me / I need to slow down"},
+  {cat:"警察に追われる", en:"**Take cover**! They're shooting. **I got shot**. **I'm low on health**. **I need backup**.", jp:"隠れろ！ 撃ってきてる。撃たれた。体力少ない。応援が必要だ。", kw:"Take cover / I got shot / I'm low on health / I need backup"},
+  {cat:"警察に追われる", en:"**Lose the cops**, come on. **Run a red light**. **That was close**. Okay, **I think I'm in the clear**.", jp:"警察まけ、頼む。信号無視。今のギリ。よし、たぶん振り切れた。", kw:"Lose the cops / Run a red light / That was close / I'm in the clear"},
+  {cat:"警察に追われる", en:"**Oh no**, more cops. **This is out of control**. **I'm freaking out**. **I need to calm down**. **New plan**.", jp:"やば、警察増えた。制御不能。焦ってる。落ち着かないと。作戦変更。", kw:"Oh no! / This is out of control / I'm freaking out / I need to calm down / New plan"},
+  {cat:"警察に追われる", en:"**Ram into** that car — move! **The cops are after me**. **I'm going too fast**. **That was close**.", jp:"あの車に体当たり、どけ！ 警察に追われてる。スピード出しすぎ。今のギリ。", kw:"Ram into / The cops are after me / I'm going too fast / That was close"},
+  {cat:"警察に追われる", en:"**I flipped the car**. **Oh come on**, seriously? **The cops are after me**. **I need to try again**.", jp:"横転した。うわ最悪、マジで？ 警察に追われてる。もう一回やらないと。", kw:"I flipped the car / Oh come on! / The cops are after me / I need to try again"},
+  {cat:"警察に追われる", en:"**Hold on** — helicopter?! **You've got to be kidding me**. **This is insane**. **I need to get out of here**.", jp:"ちょっと待って、ヘリ？！ ふざけんな。やばい。ここから出ないと。", kw:"Hold on / You've got to be kidding me / This is actually insane / I want to get out of here"},
+  {cat:"警察に追われる", en:"**I'm in the clear**. Finally. **That was terrifying**. **My heart is racing**. **I need to calm down**.", jp:"振り切れた。やっと。怖かった。心臓バクバク。落ち着かないと。", kw:"I'm in the clear / That was terrifying / My heart is racing / I need to calm down"},
+  {cat:"警察に追われる", en:"**Switch cars** here. Blend in. **Just so you know**, this always works. **Lose the cops**. **You see that?**", jp:"ここで車乗り換え。紛れる。一応言っとくと、これいつも効く。まいた。見た？", kw:"Switch cars / Just so you know / Lose the cops / You see that?"},
+  {cat:"警察に追われる", en:"**The cops are after me** again. **Story of my life**. Okay, **I'll figure it out**. **Here we go**.", jp:"また警察に追われてる。いつもこう。よし、なんとかする。行くぞ。", kw:"The cops are after me / Story of my life / I'll figure it out / Here we go"},
+  {cat:"警察に追われる", en:"**I'm being chased** and **I'm low on health**. **This can't be good**. **I need backup**. **Take cover**.", jp:"追われてて体力少ない。これはまずい。応援が必要。隠れろ。", kw:"I'm being chased / I'm low on health / This can't be good / I need backup / Take cover"},
+  {cat:"警察に追われる", en:"**Run a red light** — **oh come on**, a truck! **That was a close call**. **I'm in the clear**. Barely.", jp:"信号無視、うわ最悪、トラック！ 危機一髪。振り切れた。ギリギリで。", kw:"Run a red light / Oh come on! / That was a close call / I'm in the clear"},
+  {cat:"警察に追われる", en:"**I need to lose the cops**. **Drift** — **watch this**. Yes! **That actually worked**. **I'm in the clear**.", jp:"警察まかないと。ドリフト、これ見てて。よし！ マジでうまくいった。振り切れた。", kw:"Lose the cops / Drift / Watch this / That actually worked / I'm in the clear"},
+  {cat:"警察に追われる", en:"**Oh my god**, roadblock. **I'm cornered**. **Ram into** it — **here goes nothing**! **That was close**.", jp:"マジか、検問。追い詰められた。突っ込む、ダメ元だ！ 今のギリ。", kw:"Oh my god / I'm cornered / Ram into / Here goes nothing / That was close"},
+  {cat:"警察に追われる", en:"**The cops are after me**. **What should I do next?** **I don't know, let's just go**. **Lose the cops**.", jp:"警察に追われてる。次どうする？ わからん、行こう。まく。", kw:"The cops are after me / What should I do next? / I don't know, let's just go / Lose the cops"},
+  {cat:"警察に追われる", en:"**I'm going too fast**, **I missed the turn** again. **Oh come on**. **I need to slow down**. **Here we go**.", jp:"スピード出しすぎ、また曲がり損ねた。うわ最悪。落ち着かないと。行くぞ。", kw:"I'm going too fast / I missed the turn / Oh come on! / I need to slow down / Here we go"},
+  {cat:"警察に追われる", en:"**That was close**. Way too close. **I can't believe I did that**. **I'm in the clear** now. **Moving on**.", jp:"今のギリ。ギリすぎ。自分でもよくやったと思う。今は振り切れた。次いこう。", kw:"That was close / I can't believe I did that / I'm in the clear / Moving on"},
+  {cat:"警察に追われる", en:"**I'm surrounded**. **This is a disaster**. **I'm done**... no. **I need to focus**. **Here goes nothing**.", jp:"囲まれてる。大惨事。もうダメだ…いや。集中しないと。ダメ元でいく。", kw:"I'm surrounded / This is a disaster / I'm done / I need to focus / Here goes nothing"},
+  {cat:"ミスした瞬間", en:"Ah, **I messed up**. **That was a mistake**. **I hate this**... but okay, **I'll figure it out**. **Moving on**.", jp:"あー、やらかした。あれは間違いだった。もう嫌だ…けどまあ、なんとかする。次いこう。", kw:"I messed up / That was a mistake / I hate this / I'll figure it out / Moving on"},
+  {cat:"ミスした瞬間", en:"**I screwed up** big time. **Everything is falling apart**. **Oh come on**. **Let's not do that again**.", jp:"完全に失敗した。全部崩れてきてる。うわ最悪。二度とあれはやめとこう。", kw:"I screwed up / Everything is falling apart / Oh come on! / Let's not do that again"},
+  {cat:"ミスした瞬間", en:"**I took a wrong turn**. **Story of my life**. **I need to be more careful**. **Let's try again**.", jp:"曲がる場所間違えた。いつもこう。もっと気をつけないと。やり直そう。", kw:"I took a wrong turn / Story of my life / I need to be more careful / Let's try again"},
+  {cat:"ミスした瞬間", en:"**I failed the mission**. **Oh no**. **That didn't go as planned**. **At least I tried**. **Back to square one**.", jp:"ミッション失敗。やば。計画通りいかなかった。まあ挑戦はした。振り出しに戻る。", kw:"I failed the mission / Oh no! / That didn't go as planned / At least I tried / Back to square one"},
+  {cat:"ミスした瞬間", en:"**I dropped it**. **You've got to be kidding me**. **This keeps happening**. **I need to slow down**.", jp:"落とした。ふざけんな。これがまた起きた。落ち着かないと。", kw:"I dropped it / You've got to be kidding me / This keeps happening / I need to slow down"},
+  {cat:"ミスした瞬間", en:"**I made the wrong choice**. **I should have known**. **I could have done better**. **Moving on**.", jp:"間違った選択をした。分かってたはずなのに。もっとうまくできたのに。次いこう。", kw:"I made the wrong choice / I should have known / I could have done better / Moving on"},
+  {cat:"ミスした瞬間", en:"**I crashed** the car. **That was a mistake**. **I'm so bad at this**. But **I'm getting better at this**. Maybe.", jp:"車をクラッシュした。あれは間違いだった。本当に下手。でも上達してきてる。たぶん。", kw:"I crashed / That was a mistake / I'm so bad at this / I'm getting better at this"},
+  {cat:"ミスした瞬間", en:"**I ran out of time**. **Oh come on**, so close. **That was close**. **I need to try again**. **Here we go**.", jp:"時間切れ。うわ最悪、惜しい。惜しかった。もう一回やらないと。行くぞ。", kw:"I ran out of time / Oh come on! / That was close / I need to try again / Here we go"},
+  {cat:"ミスした瞬間", en:"**I jinxed it**. I said it would work and now **everything is falling apart**. **What is wrong with me?**", jp:"変なフラグ立てた。うまくいくって言った途端に全部崩れてる。どうかしてる？", kw:"I jinxed it / Everything is falling apart / What is wrong with me?"},
+  {cat:"ミスした瞬間", en:"**That backfired**. Badly. **I dug myself into a hole**. **I'm paying for it now**. **I need a new plan**.", jp:"裏目に出た。ひどく。自分で墓穴掘った。今その代償払ってる。新しい作戦が必要。", kw:"That backfired / I dug myself into a hole / I'm paying for it now / New plan"},
+  {cat:"ミスした瞬間", en:"**I walked right into that**. **I should have seen that coming**. **Story of my life**. **Let's not do that again**.", jp:"まんまと引っかかった。気づくべきだった。いつもこう。二度とあれはやめとこう。", kw:"I walked right into that / I should have seen that coming / Story of my life / Let's not do that again"},
+  {cat:"ミスした瞬間", en:"**I flipped the car** again. **This keeps happening**. **I'm so bad at this**. **I need to focus**.", jp:"また横転した。これがまた起きた。本当に下手。集中しないと。", kw:"I flipped the car / This keeps happening / I'm so bad at this / I need to focus"},
+  {cat:"ミスした瞬間", en:"**I got confused** and pressed the wrong button. **That was a mistake**. **My bad**. **Moving on**.", jp:"混乱してボタン間違えた。あれは間違いだった。ごめん。次いこう。", kw:"I got confused / That was a mistake / Moving on"},
+  {cat:"ミスした瞬間", en:"**I'm out of ammo**. **Oh no**. **I keep missing** anyway. **This is a mess**. **I need backup**.", jp:"弾切れ。やば。どうせ弾当たらないし。めちゃくちゃだ。応援が必要。", kw:"I'm out of ammo / Oh no! / I keep missing / This is a mess / I need backup"},
+  {cat:"ミスした瞬間", en:"**I blew my cover**. **He's onto me** now. **Oh come on**. **New plan** — **let's just go**.", jp:"正体バレた。あいつ気づいてる。うわ最悪。作戦変更、とりあえず行こう。", kw:"I blew my cover / He's onto me / Oh come on! / New plan / let's just go"},
+  {cat:"ミスした瞬間", en:"**I rushed it**. **I was too reckless**. **That was a mistake**. **I need to slow down**. **Let's try again**.", jp:"焦って雑にやった。無謀すぎた。あれは間違いだった。落ち着かないと。やり直そう。", kw:"I rushed it / I was too reckless / That was a mistake / I need to slow down / Let's try again"},
+  {cat:"ミスした瞬間", en:"**I made the same mistake again**. **What is wrong with me?** Okay. **I need to stop overthinking**. **Focus**.", jp:"また同じミスした。どうかしてる？ よし。考えすぎるのやめないと。集中。", kw:"I made the same mistake again / What is wrong with me? / I need to stop overthinking / I need to focus"},
+  {cat:"ミスした瞬間", en:"**Everything is falling apart**. **This is out of control**. **I don't even care anymore**. **Whatever works**.", jp:"全部崩れてきてる。制御不能。もう知らん。うまくいけばなんでもいい。", kw:"Everything is falling apart / This is out of control / I don't even care anymore / Whatever works"},
+  {cat:"ミスした瞬間", en:"**I was too greedy**. Should've stopped. **That backfired**. **Lesson learned**. **Let's not do that again**.", jp:"欲張りすぎた。やめとけばよかった。裏目に出た。学んだ。二度とあれはやめとこう。", kw:"I was too greedy / That backfired / Let's not do that again"},
+  {cat:"ミスした瞬間", en:"**I got carried away** and **I messed up**. **Oh come on**. **At least I tried**. **Moving on**.", jp:"調子に乗ってやらかした。うわ最悪。まあ挑戦はした。次いこう。", kw:"I got carried away / I messed up / Oh come on! / At least I tried / Moving on"},
+  {cat:"ミスした瞬間", en:"**That's it, I'm done**... no wait. **I can do better than this**. **Let's try again**. **Here we go**.", jp:"終わった…いや待って。もっとやれるはず。やり直そう。行くぞ。", kw:"That's it, I'm done / I can do better than this / Let's try again / Here we go"},
+  {cat:"ミスした瞬間", en:"**I missed the turn**, **I crashed**, **I'm dead**. **This keeps happening**. **Back to square one**.", jp:"曲がり損ねて、クラッシュして、死んだ。これがまた起きた。振り出しに戻る。", kw:"I missed the turn / I crashed / I'm dead / This keeps happening / Back to square one"},
+  {cat:"ミスした瞬間", en:"**I'm completely screwed**. **This is a disaster**. **How did this happen?** **I have no idea**. **Whatever**.", jp:"完全に詰んだ。大惨事。何でこうなった？ わからん。まあいいや。", kw:"I'm completely screwed / This is a disaster / How did this happen!? / I have no idea what's going on"},
+  {cat:"ミスした瞬間", en:"**I should have waited**. **I rushed it** and **that was a mistake**. **I need to be more careful** next time.", jp:"待てばよかった。焦って、あれは間違いだった。次はもっと気をつけないと。", kw:"I should have waited / I rushed it / That was a mistake / I need to be more careful"},
+  {cat:"ミスした瞬間", en:"**Oh my god**, **I messed up** so bad. **This is painful to watch**. **I'll figure it out**. **Let's try again**.", jp:"マジか、めっちゃやらかした。見てられない。なんとかする。やり直そう。", kw:"Oh my god / I messed up / This is painful to watch / I'll figure it out / Let's try again"},
+  {cat:"うまくいった", en:"Wait... **it worked**! **I can't believe that worked**. **You see that?** **I knew it**. **I'm actually proud of myself**.", jp:"待って…うまくいった！ まさかうまくいくとは。今の見た？ やっぱりね。我ながらよくやった。", kw:"It worked / I can't believe that worked / You see that? / I knew it / I'm actually proud of myself"},
+  {cat:"うまくいった", en:"**That was amazing**. **Did you see that?** **That's the best I've done**. **Let's go!**", jp:"すごかった。今の見た？ 自己ベスト。よっしゃ！", kw:"That was amazing / You see that? / That's the best I've done / Let's go!"},
+  {cat:"うまくいった", en:"**Headshot**! **Let's go!** **That was impressive**, even for me. **I'm getting better at this**.", jp:"ヘッドショット！ よっしゃ！ 我ながら見事。上達してきてる。", kw:"Headshot / Let's go! / I'm getting better at this"},
+  {cat:"うまくいった", en:"**I took him down**. Clean. **That actually worked**. **I told you so**. **Watch this** next one.", jp:"仕留めた。綺麗に。マジでうまくいった。だから言ったでしょ。次のこれ見てて。", kw:"I took him down / That actually worked / I told you so / Watch this"},
+  {cat:"うまくいった", en:"**I'm in the clear** and mission complete. **That was close** but **I made it**. **Let's go!**", jp:"振り切れてミッション完了。ギリだったけどやり遂げた。よっしゃ！", kw:"I'm in the clear / That was close / I made it / Let's go!"},
+  {cat:"うまくいった", en:"**That's more like it**. Finally. **I knew this would happen**. **Not bad**, right? **I love this**.", jp:"その調子。やっと。こうなると思ってた。悪くないでしょ？ これ最高。", kw:"That's more like it / I knew this would happen / Not bad / I love this"},
+  {cat:"うまくいった", en:"**I can't believe that worked**. **What are the odds?** **That was hilarious**. **You see that?**", jp:"まさかうまくいくとは。こんな偶然ある？ 面白かった。今の見た？", kw:"I can't believe that worked / What are the odds / That was hilarious / You see that?"},
+  {cat:"うまくいった", en:"**That actually worked**! **I'm actually proud of myself**. **That's pretty good**. **Let me show you something** else.", jp:"マジでうまくいった！ 我ながらよくやった。なかなかいい。もう一個見せる。", kw:"That actually worked / I'm actually proud of myself / That's pretty good / Let me show you something"},
+  {cat:"うまくいった", en:"**Drift** into the parking spot — perfect. **That was amazing**. **Did you see that?** **I've still got it**.", jp:"ドリフトで駐車、完璧。すごかった。見た？ まだ腕は落ちてない。", kw:"Drift / That was amazing / You see that?"},
+  {cat:"うまくいった", en:"**I made it**! Against all odds. **I can't believe I did that**. **This is actually fun**. **Let's go!**", jp:"やり遂げた！ 逆境の中。自分でも信じられない。これ意外と楽しい。よっしゃ！", kw:"I made it / I can't believe I did that / This is actually fun / Let's go!"},
+  {cat:"うまくいった", en:"**That's the best I've done** so far. **I'm getting better at this**. **Trust me on this**, practice works.", jp:"今までで一番の出来。上達してきてる。信じて、練習は効く。", kw:"That's the best I've done / I'm getting better at this / Trust me on this"},
+  {cat:"うまくいった", en:"**It worked**, somehow. **I have no idea how**, but **I'll take it**. **Not bad**. **Moving on**.", jp:"なぜかうまくいった。どうやったか分からんけど、まあいい。悪くない。次いこう。", kw:"It worked / Not bad / Moving on"},
+  {cat:"うまくいった", en:"**Let's go!** **That was amazing**. **My heart is racing** but in a good way. **I love this** game.", jp:"よっしゃ！ すごかった。心臓バクバク、でもいい意味で。このゲーム最高。", kw:"Let's go! / That was amazing / My heart is racing / I love this"},
+  {cat:"うまくいった", en:"**I knew it**. Told you it would work. **That's more like it**. **I'm actually proud of myself**.", jp:"やっぱりね。うまくいくって言ったでしょ。その調子。我ながらよくやった。", kw:"I knew it / That's more like it / I'm actually proud of myself"},
+  {cat:"うまくいった", en:"**That actually worked** first try. **What are the odds?** **I'm getting better at this**. **Let's go!**", jp:"一発でうまくいった。こんな偶然ある？ 上達してきてる。よっしゃ！", kw:"That actually worked / What are the odds / I'm getting better at this / Let's go!"},
+  {cat:"うまくいった", en:"Mission complete. **That was close** but **I made it**. **At least it worked**. **That'll do**.", jp:"ミッション完了。ギリだったけどやり遂げた。まあうまくいった。それでよしとしよう。", kw:"That was close / I made it / It worked / That'll do"},
+  {cat:"うまくいった", en:"**You see that?** **That was impressive**. **I told you so**. **Stick around**, more coming.", jp:"見た？ 見事だった。だから言ったでしょ。見てて、まだあるから。", kw:"You see that? / I told you so / Stick around for this"},
+  {cat:"うまくいった", en:"**I took him down** with a **headshot**. **Let's go!** **That was amazing**. **Did you see that?**", jp:"ヘッドショットで仕留めた。よっしゃ！ すごかった。見た？", kw:"I took him down / Headshot / Let's go! / That was amazing / You see that?"},
+  {cat:"うまくいった", en:"**That's pretty good** actually. **Not bad** for a beginner. **I'm getting better at this**. **I love this**.", jp:"実はなかなかいい。初心者にしては悪くない。上達してきてる。これ最高。", kw:"That's pretty good / Not bad / I'm getting better at this / I love this"},
+  {cat:"うまくいった", en:"**I can't believe that worked**. **This is actually fun**. **I'm actually proud of myself**. **Let's keep going**.", jp:"まさかうまくいくとは。これ意外と楽しい。我ながらよくやった。続けよう。", kw:"I can't believe that worked / This is actually fun / I'm actually proud of myself"},
+  {cat:"うまくいった", en:"**Everything is going great**. **That's more like it**. **I've got this**. **Watch this** finish.", jp:"全部順調。その調子。これはいける。このフィニッシュ見てて。", kw:"This is going great / That's more like it / I've got this / Watch this"},
+  {cat:"うまくいった", en:"**That was close** but **that actually worked**. **My heart is racing**. **That was amazing**. **Let's go!**", jp:"ギリだったけどマジでうまくいった。心臓バクバク。すごかった。よっしゃ！", kw:"That was close / That actually worked / My heart is racing / That was amazing / Let's go!"},
+  {cat:"うまくいった", en:"**I made it** to the checkpoint. **That's more like it**. **I'm getting better at this**. **Moving on**.", jp:"チェックポイントに到達。その調子。上達してきてる。次いこう。", kw:"I made it / That's more like it / I'm getting better at this / Moving on"},
+  {cat:"うまくいった", en:"**Did you see that?** No? **Let me show you something** — I'll do it again. **Watch this**. **I told you so**.", jp:"見た？ 見てない？ もう一回見せる。これ見てて。だから言ったでしょ。", kw:"You see that? / Let me show you something / Watch this / I told you so"},
+  {cat:"うまくいった", en:"**That was impressive**, I'll admit. **I can't believe I did that**. **I'm actually proud of myself**. **Let's go!**", jp:"認める、見事だった。自分でも信じられない。我ながらよくやった。よっしゃ！", kw:"I can't believe I did that / I'm actually proud of myself / Let's go!"},
+  {cat:"予想外の出来事", en:"Whoa — **that came out of nowhere**. **I was not ready for that**. **My heart is racing**. **That's insane**!", jp:"うわ、それは突然だった。心の準備できてなかった。心臓バクバク。マジありえない！", kw:"That came out of nowhere / I was not ready for that / My heart is racing / That's insane"},
+  {cat:"予想外の出来事", en:"**Hold on, what just happened?** **I have no idea what's going on**. **That was unexpected**. **Let me see**.", jp:"ちょっと待て、今何が。わけわからん。予想外だった。見てみよう。", kw:"Hold on, what just happened? / I have no idea what's going on / That was unexpected / Let's see"},
+  {cat:"予想外の出来事", en:"**No way! Are you serious!?** **That gave me chills**. **I did not expect that**. **What are the odds?**", jp:"マジか！ 鳥肌立った。予想してなかった。こんな偶然ある？", kw:"No way! Are you serious!? / That gave me chills / I did not expect that / What are the odds"},
+  {cat:"予想外の出来事", en:"**That escalated quickly**. **This is actually insane**. **Wait, what just happened?** **I'm freaking out**.", jp:"一気に話が大きくなった。マジやばい。ちょっと待て、今何が。焦ってる。", kw:"That escalated quickly / This is actually insane / Hold on, what just happened? / I'm freaking out"},
+  {cat:"予想外の出来事", en:"**That caught me off guard**. **Oh my god**. **That was terrifying**. **I need to calm down** for a sec.", jp:"不意を突かれた。マジか。怖かった。ちょっと落ち着かないと。", kw:"That caught me off guard / Oh my god / That was terrifying / I need to calm down"},
+  {cat:"予想外の出来事", en:"**This is unreal**. **That blew my mind**. **I can't believe this**. **Did you see that?** Insane.", jp:"現実とは思えない。度肝抜かれた。信じられない。今の見た？ やばい。", kw:"This is unreal / That blew my mind / I can't believe this / You see that?"},
+  {cat:"予想外の出来事", en:"**Something's coming**... **oh my god**. **That came out of nowhere**. **I was not ready for that**.", jp:"何か来る…マジか。突然だった。準備できてなかった。", kw:"Something's coming / Oh my god / That came out of nowhere / I was not ready for that"},
+  {cat:"予想外の出来事", en:"**What is happening!?** **This is out of control**. **That escalated quickly**. **Just bear with me**.", jp:"何が起きてるんだ！ 制御不能。一気に話が大きくなった。ちょっと待ってて。", kw:"What is happening!? / This is out of control / That escalated quickly / Just bear with me"},
+  {cat:"予想外の出来事", en:"**Huh? Wait, what?** **That was unexpected**. **I did not expect that** at all. **This is nuts**.", jp:"あれ？え、何。予想外。全く予想してなかった。イカれてる。", kw:"Huh? Wait, what? / That was unexpected / I did not expect that / This is nuts"},
+  {cat:"予想外の出来事", en:"**No way**. **That actually happened?** **My jaw dropped**. **I can't believe this**. **What are the odds?**", jp:"まさか。あれマジで起きた？ 唖然。信じられない。こんな偶然ある？", kw:"No way! Are you serious!? / My jaw dropped / I can't believe this / What are the odds"},
+  {cat:"予想外の出来事", en:"**That gave me chills**. **This is unreal**. **I'm shaking**. **That was terrifying**. **Give me a second**.", jp:"鳥肌立った。現実とは思えない。震えてる。怖かった。ちょっと時間ちょうだい。", kw:"That gave me chills / This is unreal / I'm shaking / That was terrifying"},
+  {cat:"予想外の出来事", en:"**Wait, what just happened?** Rewind. **I have no idea what's going on**. **That came out of nowhere**.", jp:"ちょっと待て、今何が。巻き戻したい。わけわからん。突然だった。", kw:"Hold on, what just happened? / I have no idea what's going on / That came out of nowhere"},
+  {cat:"予想外の出来事", en:"**Oh my god**, did that just — **that's insane**. **I was not ready for that**. **My heart is racing**.", jp:"マジか、今のって…やばい。準備できてなかった。心臓バクバク。", kw:"Oh my god / That's insane / I was not ready for that / My heart is racing"},
+  {cat:"予想外の出来事", en:"**That escalated quickly**. From zero to chaos. **This is actually insane**. **What is happening!?**", jp:"一気に話が大きくなった。ゼロから大混乱。マジやばい。何が起きてるんだ！", kw:"That escalated quickly / This is actually insane / What is happening!?"},
+  {cat:"予想外の出来事", en:"**Something's not right**... **oh my god**, there it is. **That came out of nowhere**. **That was terrifying**.", jp:"何かおかしい…マジか、来た。突然だった。怖かった。", kw:"Something's not right / Oh my god / That came out of nowhere / That was terrifying"},
+  {cat:"予想外の出来事", en:"**No way! Are you serious!?** **This is unreal**. **You see that?** **That blew my mind**.", jp:"マジか！ 現実とは思えない。見た？ 度肝抜かれた。", kw:"No way! Are you serious!? / This is unreal / You see that? / That blew my mind"},
+  {cat:"予想外の出来事", en:"**That caught me off guard**. **I'm freaking out**. **Wait, what just happened?** **I need a second**.", jp:"不意を突かれた。焦ってる。ちょっと待て、今何が。少し時間ちょうだい。", kw:"That caught me off guard / I'm freaking out / Hold on, what just happened?"},
+  {cat:"予想外の出来事", en:"**This is nuts**. **That was unexpected**. **I did not expect that**. **What are the odds?** Crazy.", jp:"イカれてる。予想外。予想してなかった。こんな偶然ある？ やばい。", kw:"This is nuts / That was unexpected / I did not expect that / What are the odds"},
+  {cat:"予想外の出来事", en:"**My jaw dropped**. **That's insane**. **I can't believe this**. **Stick around** — you gotta see this again.", jp:"唖然。やばい。信じられない。見てて、これもう一回見せたい。", kw:"My jaw dropped / That's insane / I can't believe this / Stick around for this"},
+  {cat:"予想外の出来事", en:"**Something's coming**. **My heart is racing**. **Oh my god** — **that came out of nowhere**! **Terrifying**.", jp:"何か来る。心臓バクバク。マジか、突然だった！ 怖い。", kw:"Something's coming / My heart is racing / Oh my god / That came out of nowhere / That was terrifying"},
+  {cat:"予想外の出来事", en:"**That escalated quickly**. **I have no idea what's going on** anymore. **This is out of control**.", jp:"一気に話が大きくなった。もうわけわからん。制御不能。", kw:"That escalated quickly / I have no idea what's going on / This is out of control"},
+  {cat:"予想外の出来事", en:"**Wait, what?** **That was unexpected**. **This is unreal**. **I was not ready for that**. **Give me a sec**.", jp:"え、何。予想外。現実とは思えない。準備できてなかった。ちょっと時間ちょうだい。", kw:"Huh? Wait, what? / That was unexpected / This is unreal / I was not ready for that"},
+  {cat:"予想外の出来事", en:"**That gave me chills**. Genuinely. **I'm shaking**. **That was terrifying**. **I need to calm down**.", jp:"鳥肌立った。マジで。震えてる。怖かった。落ち着かないと。", kw:"That gave me chills / I'm shaking / That was terrifying / I need to calm down"},
+  {cat:"予想外の出来事", en:"**No way**. **That blew my mind**. **What are the odds?** **This is actually insane**. **Did you see that?**", jp:"まさか。度肝抜かれた。こんな偶然ある？ マジやばい。見た？", kw:"No way! Are you serious!? / That blew my mind / What are the odds / This is actually insane / You see that?"},
+  {cat:"予想外の出来事", en:"**Oh my god**, **that came out of nowhere**. **My heart is racing**. **That caught me off guard**. Wow.", jp:"マジか、突然だった。心臓バクバク。不意を突かれた。うわ。", kw:"Oh my god / That came out of nowhere / My heart is racing / That caught me off guard"},
+  {cat:"ピンチ→立て直し", en:"**I'm cornered** and **I'm low on health**. **This can't be good**. Okay — **I need to calm down**. **New plan**.", jp:"追い詰められて体力少ない。これはまずい。よし、落ち着かないと。作戦変更。", kw:"I'm cornered / I'm low on health / This can't be good / I need to calm down / New plan"},
+  {cat:"ピンチ→立て直し", en:"**Everything is falling apart**. **I'm freaking out**. Deep breath. **I need to focus**. **I'll figure it out**.", jp:"全部崩れてきてる。焦ってる。深呼吸。集中しないと。なんとかする。", kw:"Everything is falling apart / I'm freaking out / I need to focus / I'll figure it out"},
+  {cat:"ピンチ→立て直し", en:"**The plan just fell apart**. **Oh come on**. Okay, **moving on**. **New plan** — **let me just try something**.", jp:"計画が崩れた。うわ最悪。よし、次いこう。作戦変更、何か試してみる。", kw:"The plan just fell apart / Oh come on! / Moving on / New plan / Let me just try something"},
+  {cat:"ピンチ→立て直し", en:"**I'm surrounded**. **This is out of control**. **I need to stop overthinking**. Just move. **Here goes nothing**.", jp:"囲まれてる。制御不能。考えすぎるのやめないと。とにかく動け。ダメ元でいく。", kw:"I'm surrounded / This is out of control / I need to stop overthinking / Here goes nothing"},
+  {cat:"ピンチ→立て直し", en:"**I messed up** and now **I'm in trouble**. **I need to calm down**. **New plan**. **Let's try again**.", jp:"やらかして今ピンチ。落ち着かないと。作戦変更。やり直そう。", kw:"I messed up / I need to calm down / New plan / Let's try again"},
+  {cat:"ピンチ→立て直し", en:"**This is a mess**. **I have no idea what's going on**. Okay. **I need to focus**. **Let me just try something**.", jp:"めちゃくちゃだ。わけわからん。よし。集中しないと。何か試してみる。", kw:"This is a mess / I have no idea what's going on / I need to focus / Let me just try something"},
+  {cat:"ピンチ→立て直し", en:"**I'm low on health** and **I'm out of ammo**. **This can't be good**. **Take cover**. **I need backup**.", jp:"体力少ないし弾切れ。これはまずい。隠れろ。応援が必要。", kw:"I'm low on health / I'm out of ammo / This can't be good / Take cover / I need backup"},
+  {cat:"ピンチ→立て直し", en:"**I'm freaking out**. **I need to slow down**. **I need to stop overthinking**. Okay. **Here we go**. **Focus**.", jp:"焦ってる。落ち着かないと。考えすぎるのやめないと。よし。行くぞ。集中。", kw:"I'm freaking out / I need to slow down / I need to stop overthinking / Here we go / I need to focus"},
+  {cat:"ピンチ→立て直し", en:"**That backfired**. **Back to square one**. But okay, **I can do better than this**. **New plan**. **Let's go**.", jp:"裏目に出た。振り出しに戻る。でもよし、もっとやれるはず。作戦変更。行こう。", kw:"That backfired / Back to square one / I can do better than this / New plan"},
+  {cat:"ピンチ→立て直し", en:"**I'm cornered**, **I'm surrounded**, **I'm losing my mind**. STOP. **I need to calm down**. **Here goes nothing**.", jp:"追い詰められて、囲まれて、もう限界。ストップ。落ち着かないと。ダメ元でいく。", kw:"I'm cornered / I'm surrounded / I'm losing my mind / I need to calm down / Here goes nothing"},
+  {cat:"ピンチ→立て直し", en:"**Nothing is working**. **I'm getting frustrated**. **I need to slow down**. **Let me think for a second**. **New plan**.", jp:"何もうまくいかない。イライラしてきた。落ち着かないと。ちょっと考えさせて。作戦変更。", kw:"Nothing is working / I need to slow down / Let me think about this for a second / New plan"},
+  {cat:"ピンチ→立て直し", en:"**This is out of control**. **I don't even care anymore**... no, wait. **I need to focus**. **Let's try again**.", jp:"制御不能。もう知らん…いや、待って。集中しないと。やり直そう。", kw:"This is out of control / I don't even care anymore / I need to focus / Let's try again"},
+  {cat:"ピンチ→立て直し", en:"**I blew my cover**. **He's onto me**. **Oh come on**. Okay, **new plan**. **Let me just try something** else.", jp:"正体バレた。あいつ気づいてる。うわ最悪。よし、作戦変更。別の何か試してみる。", kw:"I blew my cover / He's onto me / Oh come on! / New plan / Let me just try something"},
+  {cat:"ピンチ→立て直し", en:"**I ran out of time** again. **Oh come on**. **I need to be more careful**. **Back to square one**. **Here we go**.", jp:"また時間切れ。うわ最悪。もっと気をつけないと。振り出しに戻る。行くぞ。", kw:"I ran out of time / Oh come on! / I need to be more careful / Back to square one / Here we go"},
+  {cat:"ピンチ→立て直し", en:"**This is a disaster**. **I'm freaking out**. Okay okay. **I need to calm down** and **focus**. **New plan**.", jp:"大惨事。焦ってる。よしよし。落ち着いて集中しないと。作戦変更。", kw:"This is a disaster / I'm freaking out / I need to calm down / I need to focus / New plan"},
+  {cat:"ピンチ→立て直し", en:"**I keep missing**. **I'm getting sloppy**. **I need to focus**. **Let me try again**. **Here goes nothing**.", jp:"弾が当たらない。雑になってきた。集中しないと。もう一回やる。ダメ元でいく。", kw:"I keep missing / I'm getting sloppy / I need to focus / I need to try again / Here goes nothing"},
+  {cat:"ピンチ→立て直し", en:"**Everything is falling apart** and **I'm losing my mind**. **I need to slow down**. **I'll figure it out**.", jp:"全部崩れてて、もう限界。落ち着かないと。なんとかする。", kw:"Everything is falling apart / I'm losing my mind / I need to slow down / I'll figure it out"},
+  {cat:"ピンチ→立て直し", en:"**I'm completely screwed**. **How did this happen?** Okay, no panic. **New plan**. **Let's just go**.", jp:"完全に詰んだ。何でこうなった？ よし、パニックなし。作戦変更。とりあえず行こう。", kw:"I'm completely screwed / How did this happen!? / New plan / let's just go"},
+  {cat:"ピンチ→立て直し", en:"**I'm pinned down**. **I need backup**. **This can't be good**. **I need to calm down**. **Here we go**.", jp:"身動き取れず撃たれてる。応援が必要。これはまずい。落ち着かないと。行くぞ。", kw:"I'm pinned down / I need backup / This can't be good / I need to calm down / Here we go"},
+  {cat:"ピンチ→立て直し", en:"**That didn't go as planned**. At all. **Back to square one**. **I can do better than this**. **Let's try again**.", jp:"計画通りいかなかった。全く。振り出しに戻る。もっとやれるはず。やり直そう。", kw:"That didn't go as planned / Back to square one / I can do better than this / Let's try again"},
+  {cat:"ピンチ→立て直し", en:"**I'm cornered**. **Think, think**. **I need to stop overthinking** actually. Just go. **Here goes nothing**.", jp:"追い詰められた。考えろ、考えろ。いや考えすぎるのやめないと。とにかく行け。ダメ元でいく。", kw:"I'm cornered / I need to stop overthinking / Here goes nothing"},
+  {cat:"ピンチ→立て直し", en:"**This keeps happening**. **I'm getting frustrated**. **I need to slow down**. **New plan**. **Let's do this**.", jp:"これがまた起きる。イライラしてきた。落ち着かないと。作戦変更。やるぞ。", kw:"This keeps happening / I need to slow down / New plan / Alright let's do this"},
+  {cat:"ピンチ→立て直し", en:"**I'm out of ammo** and **I'm surrounded**. **This can't be good**. **Take cover**. **I'll figure it out**.", jp:"弾切れで囲まれてる。これはまずい。隠れろ。なんとかする。", kw:"I'm out of ammo / I'm surrounded / This can't be good / Take cover / I'll figure it out"},
+  {cat:"ピンチ→立て直し", en:"**Oh come on**, **not again**. **I need to calm down**. Deep breath. **New plan**. **Let's finish this**.", jp:"うわ最悪、またか。落ち着かないと。深呼吸。作戦変更。終わらせよう。", kw:"Oh come on! / I need to calm down / New plan / Let's finish this"},
+  {cat:"ピンチ→立て直し", en:"**Everything is falling apart** but **I'm not done yet**. **I need to focus**. **I've got this**. **Here we go**.", jp:"全部崩れてるけどまだ終わってない。集中しないと。これはいける。行くぞ。", kw:"Everything is falling apart / I need to focus / I've got this / Here we go"},
+  {cat:"場面の締め", en:"Okay, **that's good enough for now**. **At least I tried**. **It is what it is**. **Let's call it a day**.", jp:"よし、今はこれで十分。まあ挑戦はした。しょうがない。今日はここまで。", kw:"That's good enough for now / At least I tried / It is what it is / Let's call it a day"},
+  {cat:"場面の締め", en:"**We made it**. Finally. **That could have been worse**. **That'll do**. **Let's call it a day**.", jp:"やり遂げた。やっと。もっと悪くなり得た。それでよし。今日はここまで。", kw:"I made it / That could have been worse / That'll do / Let's call it a day"},
+  {cat:"場面の締め", en:"**Well, that happened**. **I have no idea what just happened**, but **it is what it is**. **Moving on**.", jp:"まあ、色々あったな。何が起きたか分からんけど、しょうがない。次いこう。", kw:"Well, that happened / It is what it is / Moving on"},
+  {cat:"場面の締め", en:"**That was terrible** but **at least I tried**. **You win some, you lose some**. **Let's call it a day**.", jp:"ひどかったけど挑戦はした。勝つ時も負ける時もある。今日はここまで。", kw:"That was terrible / At least I tried / You win some, you lose some / Let's call it a day"},
+  {cat:"場面の締め", en:"**Good enough**. **That'll do** for today. **This is fine**. Honestly, **could be worse**. **Moving on**.", jp:"十分。今日はそれでよし。これでいい。正直、最悪よりマシ。次いこう。", kw:"Good enough / That'll do / This is fine / Could be worse / Moving on"},
+  {cat:"場面の締め", en:"**That settles it**. Mission done. **I'm actually proud of myself**. **That's the best I've done**. **Let's call it a day**.", jp:"これで決まり。ミッション完了。我ながらよくやった。自己ベスト。今日はここまで。", kw:"That settles it / I'm actually proud of myself / That's the best I've done / Let's call it a day"},
+  {cat:"場面の締め", en:"**Story of my life** — so close. **At least I tried**. **Better late than never**. **Let's call it a day**.", jp:"いつもこう、惜しい。まあ挑戦はした。遅くてもやらないよりマシ。今日はここまで。", kw:"Story of my life / At least I tried / Better late than never / Let's call it a day"},
+  {cat:"場面の締め", en:"**That'll do**. Not perfect, but **good enough**. **I'm getting better at this**. **See you next time**.", jp:"それでよし。完璧じゃないけど十分。上達してきてる。また次回。", kw:"That'll do / Good enough / I'm getting better at this"},
+  {cat:"場面の締め", en:"**Well, that happened**. **It is what it is**. **That's good enough for now**. Thanks for watching. **Moving on**.", jp:"まあ、色々あった。しょうがない。今はこれで十分。見てくれてありがとう。次いこう。", kw:"Well, that happened / It is what it is / That's good enough for now / Moving on"},
+  {cat:"場面の締め", en:"**I made it** in the end. **That could have been worse**. **I'm actually proud of myself**. **That settles it**.", jp:"最後にはやり遂げた。もっと悪くなり得た。我ながらよくやった。これで決まり。", kw:"I made it / That could have been worse / I'm actually proud of myself / That settles it"},
+  {cat:"場面の締め", en:"**That was a disaster** but **it is what it is**. **You win some, you lose some**. **Let's call it a day**.", jp:"大惨事だったけどしょうがない。勝つ時も負ける時もある。今日はここまで。", kw:"This is a disaster / It is what it is / You win some, you lose some / Let's call it a day"},
+  {cat:"場面の締め", en:"Okay. **That'll do**. **At least I tried**. **Could be worse**, right? **See you in the next one**.", jp:"よし。それでよし。まあ挑戦はした。最悪よりマシでしょ？ また次回。", kw:"That'll do / At least I tried / Could be worse"},
+  {cat:"場面の締め", en:"**Good enough for now**. **I'll figure out the rest** later. **That settles it**. **Let's call it a day**.", jp:"今はこれで十分。残りは後でなんとかする。これで決まり。今日はここまで。", kw:"That's good enough for now / I'll figure it out / That settles it / Let's call it a day"},
+  {cat:"場面の締め", en:"**That was close** but **we made it**. **I can't believe that worked**. **That'll do**. **Moving on**.", jp:"ギリだったけどやり遂げた。まさかうまくいくとは。それでよし。次いこう。", kw:"That was close / I made it / I can't believe that worked / That'll do / Moving on"},
+  {cat:"場面の締め", en:"**Story of my life**. **At least I tried** though. **It is what it is**. **See you next time**, everyone.", jp:"いつもこう。でもまあ挑戦はした。しょうがない。またね、みんな。", kw:"Story of my life / At least I tried / It is what it is"},
+  {cat:"場面の締め", en:"**Well, this is fine**. **Good enough**. **That could have been worse**. **Let's call it a day**.", jp:"まあ、これでいい。十分。もっと悪くなり得た。今日はここまで。", kw:"This is fine / Good enough / That could have been worse / Let's call it a day"},
+  {cat:"場面の締め", en:"**That settles it**. Done and done. **I'm actually proud of myself**. **Thanks for sticking around**. **See you**.", jp:"これで決まり。完了。我ながらよくやった。見続けてくれてありがとう。またね。", kw:"That settles it / I'm actually proud of myself"},
+  {cat:"場面の締め", en:"**We made it** to the end. **That could have been worse**. **Not bad**. **That'll do**. **Moving on**.", jp:"最後まで来た。もっと悪くなり得た。悪くない。それでよし。次いこう。", kw:"I made it / That could have been worse / Not bad / That'll do / Moving on"},
+  {cat:"場面の締め", en:"**That was terrible**, I'll be honest. **But at least I tried**. **You win some, you lose some**. **Call it a day**.", jp:"正直ひどかった。でもまあ挑戦はした。勝つ時も負ける時もある。今日はここまで。", kw:"That was terrible / At least I tried / You win some, you lose some / Let's call it a day"},
+  {cat:"場面の締め", en:"**Good enough**. **It is what it is**. **I'm getting better at this**, slowly. **See you in the next one**.", jp:"十分。しょうがない。ゆっくり上達してきてる。また次回。", kw:"Good enough / It is what it is / I'm getting better at this"},
+  {cat:"場面の締め", en:"**That'll do** for today. **Could be worse**. **At least I tried**. Thanks everyone. **Let's call it a day**.", jp:"今日はそれでよし。最悪よりマシ。まあ挑戦はした。みんなありがとう。今日はここまで。", kw:"That'll do / Could be worse / At least I tried / Let's call it a day"},
+  {cat:"場面の締め", en:"**Well, that happened**. **That was unexpected** to the end. **It is what it is**. **Moving on**.", jp:"まあ、色々あった。最後まで予想外。しょうがない。次いこう。", kw:"Well, that happened / That was unexpected / It is what it is / Moving on"},
+  {cat:"場面の締め", en:"**We made it**, somehow. **That could have been worse**. **I'm actually proud of myself**. **That settles it**.", jp:"なんとかやり遂げた。もっと悪くなり得た。我ながらよくやった。これで決まり。", kw:"I made it / That could have been worse / I'm actually proud of myself / That settles it"},
+  {cat:"場面の締め", en:"**That's good enough for now**. **At least I tried** my best. **Better late than never**. **See you next time**.", jp:"今はこれで十分。ベストは尽くした。遅くてもやらないよりマシ。また次回。", kw:"That's good enough for now / At least I tried / Better late than never"},
+  {cat:"場面の締め", en:"Okay, **that settles it**. **Good enough**. **This is fine**. **You win some, you lose some**. **Let's call it a day**.", jp:"よし、これで決まり。十分。これでいい。勝つ時も負ける時もある。今日はここまで。", kw:"That settles it / Good enough / This is fine / You win some, you lose some / Let's call it a day"},
+];
+// ===== 状態 =====
+let curIndex = 0;
+let filtered = [];
+let activeCat = 'all';
+let isPlaying = false;
+let repeatCount = 0;
+let synth = window.speechSynthesis;
+let enVoice = null, jaVoice = null;
+let timer = null;
+
+function loadVoices() {
+  const vs = synth.getVoices();
+  enVoice = vs.find(v => v.lang.startsWith('en')) || null;
+  jaVoice = vs.find(v => v.lang.startsWith('ja')) || null;
+}
+loadVoices();
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+
+// **太字** をHTMLの<b>に
+function boldify(s) {
+  return escapeHtml(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+}
+// 読み上げ用に**を除去
+function plain(s) { return s.replace(/\*\*/g, ''); }
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// カテゴリchip
+const cats = ['all', ...new Set(DATA.map(d => d.cat))];
+const catLabel = { all: 'すべて' };
+function buildFilters() {
+  const box = document.getElementById('filters');
+  box.innerHTML = '';
+  cats.forEach(c => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (activeCat === c ? ' active' : '');
+    const n = c === 'all' ? DATA.length : DATA.filter(d => d.cat === c).length;
+    chip.textContent = (catLabel[c] || c) + ' (' + n + ')';
+    chip.onclick = () => { activeCat = c; stop(); applyFilter(); buildFilters(); };
+    box.appendChild(chip);
+  });
+}
+
+function applyFilter() {
+  filtered = DATA.filter(d => activeCat === 'all' || d.cat === activeCat);
+  curIndex = 0;
+  render();
+  renderList();
+}
+
+function render() {
+  const showJp = document.getElementById('showJp').value === 'yes';
+  document.getElementById('totIdx').textContent = filtered.length;
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  document.getElementById('catTag').textContent = item.cat;
+  document.getElementById('enText').innerHTML = boldify(item.en);
+  document.getElementById('enText').classList.remove('hidden');
+  const jpEl = document.getElementById('jpText');
+  jpEl.textContent = item.jp;
+  jpEl.className = 'jp' + (showJp ? '' : ' hidden');
+  const kw = document.getElementById('kwBox');
+  kw.innerHTML = '<b>熟語:</b> ' + escapeHtml(item.kw);
+  kw.className = 'kwbox';
+  document.getElementById('curIdx').textContent = curIndex + 1;
+  document.getElementById('pbar').style.width = ((curIndex+1)/filtered.length*100) + '%';
+  renderList();
+}
+
+function renderList() {
+  const box = document.getElementById('listBox');
+  box.innerHTML = '';
+  filtered.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'row' + (i === curIndex ? ' current' : '');
+    row.innerHTML = '<div class="ren">' + boldify(item.en) + '</div><div class="rjp">' + escapeHtml(item.jp) + '</div>';
+    row.onclick = () => { stop(); curIndex = i; render(); window.scrollTo({top:0,behavior:'smooth'}); };
+    box.appendChild(row);
+  });
+}
+
+function speak() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  const rate = parseFloat(document.getElementById('rate').value);
+  const u = new SpeechSynthesisUtterance(plain(item.en));
+  u.lang = 'en-US';
+  if (enVoice) u.voice = enVoice;
+  u.rate = rate;
+  u.onend = () => {
+    repeatCount++;
+    const rep = parseInt(document.getElementById('repeat').value);
+    if (repeatCount < rep) { if (isPlaying) speak(); return; }
+    repeatCount = 0;
+    if (isPlaying && document.getElementById('autoNext').value === 'yes') {
+      const gap = parseInt(document.getElementById('gap').value);
+      timer = setTimeout(() => { if (isPlaying) { goNext(true); } }, gap);
+    } else {
+      isPlaying = false;
+      document.getElementById('playBtn').textContent = '▶';
+    }
+  };
+  synth.cancel();
+  synth.speak(u);
+}
+
+function goNext(auto) {
+  curIndex = (curIndex + 1) % filtered.length;
+  render();
+  if (isPlaying) speak();
+}
+function goPrev() {
+  curIndex = (curIndex - 1 + filtered.length) % filtered.length;
+  render();
+  if (isPlaying) speak();
+}
+function stop() {
+  isPlaying = false;
+  repeatCount = 0;
+  clearTimeout(timer);
+  synth.cancel();
+  document.getElementById('playBtn').textContent = '▶';
+}
+
+document.getElementById('playBtn').onclick = () => {
+  isPlaying = !isPlaying;
+  document.getElementById('playBtn').textContent = isPlaying ? '⏸' : '▶';
+  if (isPlaying) { repeatCount = 0; speak(); }
+  else stop();
+};
+document.getElementById('nextBtn').onclick = () => { stop(); goNext(); };
+document.getElementById('prevBtn').onclick = () => { stop(); goPrev(); };
+document.getElementById('showJp').onchange = render;
+
+buildFilters();
+applyFilter();
+</script>
+</body>
+</html>
