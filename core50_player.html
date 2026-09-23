@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>優先50語 聞き流しプレイヤー</title>
+<style>
+  :root {
+    --bg: #14110f;
+    --panel: #1c1815;
+    --amber: #ff8c2e;
+    --amber-dim: #c4691a;
+    --text: #ede5d8;
+    --text-dim: #968d7f;
+    --line: #2e2822;
+    --red: #d4453a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 6px 14px;
+    margin-bottom: 16px;
+    transition: 0.15s;
+  }
+  .back-link:hover { border-color: var(--amber-dim); color: var(--amber); }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--amber-dim);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 4px 0 24px;
+    letter-spacing: -0.01em;
+  }
+  h1 span { color: var(--amber); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .now-playing {
+    text-align: center;
+    padding: 28px 16px;
+  }
+  .cat-tag {
+    display: inline-block;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    border-radius: 99px;
+    padding: 3px 10px;
+    margin-bottom: 16px;
+  }
+  .phrase-en {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .phrase-jp {
+    font-size: 18px;
+    color: var(--text-dim);
+  }
+
+  .progress {
+    height: 3px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 20px 0 4px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--amber);
+    width: 0%;
+    transition: width 0.2s linear;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .btn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .btn:hover { border-color: var(--amber-dim); }
+  .btn-skip { width: 44px; height: 44px; font-size: 16px; }
+  .btn-play {
+    width: 64px; height: 64px;
+    font-size: 22px;
+    background: var(--amber);
+    border: none;
+    color: #1a1208;
+  }
+  .btn-play:hover { background: #ffa14f; }
+
+  .settings-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .settings-row > div { flex: 1; }
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+  select, input[type=range] {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .cat-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .cat-chip {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+  }
+  .cat-chip.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(255,140,46,0.08);
+  }
+
+  .list-title {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .phrase-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .phrase-row:hover { background: var(--bg); }
+  .phrase-row.current { background: rgba(255,140,46,0.1); }
+  .phrase-row .en { font-weight: 600; }
+  .phrase-row .jp { color: var(--text-dim); font-size: 14px; }
+  .phrase-row .idx {
+    color: var(--amber-dim);
+    font-size: 11px;
+    width: 24px;
+    flex-shrink: 0;
+  }
+  .row-main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .row-main .en, .row-main .jp { white-space: normal; }
+  .row-main .idx { align-self: flex-start; }
+
+  .status-buttons {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .status-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: 0.15s;
+  }
+  .status-btn:hover { border-color: var(--amber-dim); }
+  .status-btn.active-learning {
+    background: rgba(196,105,26,0.25);
+    border-color: var(--amber-dim);
+    color: var(--amber);
+  }
+  .status-btn.active-known {
+    background: rgba(255,140,46,0.3);
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+  .status-btn.active-speakable {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #1a1208;
+  }
+
+  .now-playing .status-buttons {
+    justify-content: center;
+    margin: 14px 0 0;
+  }
+  .now-playing .status-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+  .status-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 11px;
+  }
+  .stat-pill {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+  .stat-pill .num { font-size: 16px; font-weight: 700; color: var(--amber); display: block; }
+  .stat-pill .label { color: var(--text-dim); }
+
+  .status-filter-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .status-chip {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .status-chip.active {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(255,140,46,0.08);
+  }
+
+  .hint {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .login-box {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px 24px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-box h2 { font-size: 18px; margin: 0 0 6px; }
+  .login-box p { font-size: 12px; color: var(--text-dim); margin: 0 0 20px; }
+  .login-box input {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .login-box button {
+    width: 100%;
+    background: var(--amber);
+    border: none;
+    color: #1a1208;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .login-status {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 10px;
+    min-height: 14px;
+  }
+  .sync-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    color: var(--text-dim);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 4px 10px;
+    z-index: 10;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">実況台本集 / 最優先の50語</div>
+  <h1>優先<span>50語</span></h1>
+
+  <div class="panel" style="padding:14px 20px;">
+    <div class="status-filter-row" id="modeFilters" style="margin-top:0;"></div>
+  </div>
+
+  <div class="panel now-playing">
+    <div id="emptyMsg" style="display:none; font-size:13px; color:var(--text-dim); line-height:1.7; padding:8px 4px 16px;"></div>
+    <div class="cat-tag" id="catTag">状況描写</div>
+    <div class="phrase-jp" id="phraseJpQuiz" style="display:none; font-size:26px; font-weight:700; color:var(--text); margin-bottom:18px;"></div>
+    <div class="phrase-en" id="phraseEn">Loading...</div>
+    <div class="phrase-jp" id="phraseJp"></div>
+    <div id="kwBox" style="display:none; margin-top:14px; background:rgba(255,140,46,0.08); border:1px solid var(--amber-dim); border-radius:8px; padding:12px 14px; text-align:left;">
+      <div id="kwWord" style="font-size:15px; font-weight:700; color:var(--amber); margin-bottom:4px;"></div>
+      <div id="kwEx" style="font-size:13px; color:var(--text-dim); line-height:1.6;"></div>
+    </div>
+
+    <div id="srsGradeRow" style="display:none; margin-top:16px; gap:10px; justify-content:center;">
+      <button id="srsFail" style="flex:1; max-width:180px; padding:14px; border:none; border-radius:10px; background:#5a3030; color:#ffb3b3; font-size:15px; font-weight:700; cursor:pointer;">△ 詰まった<br><span style="font-size:11px; opacity:0.7; font-weight:400;">最初からやり直し</span></button>
+      <button id="srsPass" style="flex:1; max-width:180px; padding:14px; border:none; border-radius:10px; background:#2f4a30; color:#b3ffb8; font-size:15px; font-weight:700; cursor:pointer;">○ 言えた<br><span style="font-size:11px; opacity:0.7; font-weight:400;">間隔を伸ばす</span></button>
+    </div>
+
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-label"><span id="curIdx">0</span><span id="totalIdx">0</span></div>
+
+    <div class="controls">
+      <button class="btn btn-skip" id="prevBtn">⏮</button>
+      <button class="btn btn-play" id="playBtn">▶</button>
+      <button class="btn btn-skip" id="nextBtn">⏭</button>
+    </div>
+
+    <div class="settings-row">
+      <div>
+        <label>速度</label>
+        <select id="rateSelect">
+          <option value="0.8" selected>遅め (0.8x)</option>
+          <option value="1">標準 (1.0x)</option>
+          <option value="1.2">やや速い (1.2x)</option>
+        </select>
+      </div>
+      <div>
+        <label>リピート回数</label>
+        <select id="repeatSelect">
+          <option value="1">1回</option>
+          <option value="2">2回</option>
+          <option value="3">3回</option>
+          <option value="4">4回</option>
+          <option value="5" selected>5回</option>
+          <option value="6">6回</option>
+          <option value="7">7回</option>
+          <option value="8">8回</option>
+          <option value="9">9回</option>
+          <option value="10">10回</option>
+        </select>
+      </div>
+      <div id="jpToggleWrap">
+        <label>日本語も読む</label>
+        <select id="jpToggle">
+          <option value="no">英語のみ</option>
+          <option value="yes" selected>英→日</option>
+        </select>
+      </div>
+      <div id="thinkTimeWrap" style="display:none;">
+        <label>考える時間</label>
+        <select id="thinkTimeSelect">
+          <option value="3000">3秒</option>
+          <option value="5000">5秒</option>
+          <option value="8000" selected>8秒</option>
+          <option value="15000">15秒</option>
+          <option value="20000">20秒</option>
+        </select>
+      </div>
+      <div id="reviewTimeWrap" style="display:none;">
+        <label>答え確認時間</label>
+        <select id="reviewTimeSelect">
+          <option value="3000">3秒</option>
+          <option value="5000">5秒</option>
+          <option value="8000" selected>8秒</option>
+          <option value="10000">10秒</option>
+          <option value="15000">15秒</option>
+          <option value="20000">20秒</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hint" id="voiceHint"></div>
+
+    <div class="status-buttons" id="nowPlayingStatus"></div>
+    <div class="status-label">タップして習熟度を記録(端末に保存されます)</div>
+  </div>
+
+  <div class="panel">
+    <div class="stats-row" id="statsRow"></div>
+    <div class="status-filter-row" id="statusFilters"></div>
+    <div class="status-filter-row" id="excludeSpeakableRow" style="margin-top:8px;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="cat-filters" id="catFilters"></div>
+  </div>
+
+  <div class="panel">
+    <div class="list-title">フレーズ一覧（タップで再生）</div>
+    <div id="listContainer"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {cat:"人を轢く・ぶつける", en:"Oh no", jp:"やば", kw:"oh no", ex:"とっさに出る「やば」。何かやらかした瞬間に", sc:"運転中、前をよく見てなくて通行人を轢いてしまった瞬間"},
+  {cat:"人を轢く・ぶつける", en:"My bad", jp:"ごめん、俺のせい", kw:"my bad", ex:"自分のミスを認める軽い謝罪。sorryより口語的", sc:"自分のミスで味方や通行人に迷惑をかけて、素直に非を認める時"},
+  {cat:"人を轢く・ぶつける", en:"I didn't see you", jp:"見えなかった", kw:"didn't see", ex:"see=見える。見えてなかった、という言い訳", sc:"死角から出てきた人を轢いてしまい、見えなかったと言い訳する時"},
+  {cat:"人を轢く・ぶつける", en:"Are you okay?", jp:"大丈夫？", kw:"are you okay", ex:"轢いた相手への確認。ネタにもなる", sc:"轢いてしまった相手が倒れていて、一応声をかける時"},
+  {cat:"人を轢く・ぶつける", en:"That's your fault", jp:"そっちのせいだろ", kw:"your fault", ex:"fault=責任・せい。責任転嫁のツッコミ", sc:"勝手に飛び出してきた通行人にぶつかって、責任転嫁する時"},
+  {cat:"人を轢く・ぶつける", en:"I crashed", jp:"ぶつけた", kw:"crashed", ex:"crash=衝突する。車をぶつけた時", sc:"カーブを曲がりきれず壁や他の車に突っ込んだ時"},
+  {cat:"人を轢く・ぶつける", en:"I need to be more careful", jp:"もっと気をつけないと", kw:"be more careful", ex:"careful=注意深い。反省の定番", sc:"何度もぶつけていることに気づいて、自分を戒める時"},
+  {cat:"警察に追われる", en:"The cops are after me", jp:"警察に追われてる", kw:"after me", ex:"be after=〜を追いかけている", sc:"サイレンが鳴り、パトカーが後ろについてきた時"},
+  {cat:"警察に追われる", en:"I'm being chased", jp:"追われてる", kw:"being chased", ex:"be chased=追われる(受動態の進行形)", sc:"複数のパトカーに追いかけられて逃走中の時"},
+  {cat:"警察に追われる", en:"Lose the cops", jp:"警察をまく", kw:"lose", ex:"lose=まく・振り切る", sc:"路地に入るなどして、追ってくる警察を振り切ろうとする時"},
+  {cat:"警察に追われる", en:"That was close", jp:"危なかった", kw:"close", ex:"close=近い→危なかった", sc:"あと少しで捕まる・死ぬところをギリギリで切り抜けた時"},
+  {cat:"警察に追われる", en:"I need to get out of here", jp:"ここから出ないと", kw:"get out of here", ex:"get out of=〜から抜け出す", sc:"警察に囲まれそうで、その場から急いで離れたい時"},
+  {cat:"警察に追われる", en:"Oh come on", jp:"うわ最悪", kw:"come on", ex:"強いフラストレーション。うわ最悪", sc:"逃げ切ったと思ったらまた警察が現れて、うんざりした時"},
+  {cat:"分からない", en:"I have no idea what's going on", jp:"何が起きてるか分からん", kw:"no idea", ex:"have no idea=全く分からない", sc:"画面で何かが起きているが、状況がまったく飲み込めない時"},
+  {cat:"分からない", en:"I have no idea what this means", jp:"意味が全然分からん", kw:"what this means", ex:"means=意味する。英語の指示が読めない時", sc:"ミッションの英語の指示文を読んでも意味が取れない時"},
+  {cat:"分からない", en:"I understood none of that", jp:"一言も分からなかった", kw:"none of that", ex:"none=一つも〜ない。全く聞き取れなかった", sc:"NPCが長い英語を喋り終えたが、一言も聞き取れなかった時"},
+  {cat:"分からない", en:"I'm going to pretend I understood that", jp:"分かったフリをする", kw:"pretend", ex:"pretend=ふりをする。ネタとして強い", sc:"分かっていないのに、とりあえず頷いて先に進もうとする時"},
+  {cat:"分からない", en:"I'll just say yes and hope for the best", jp:"とりあえずYESにして祈る", kw:"hope for the best", ex:"分からないままYESで押し切るネタ", sc:"選択肢の意味が分からず、とりあえずYESを選ぶ時"},
+  {cat:"分からない", en:"I might have misunderstood", jp:"間違えたかも", kw:"might have", ex:"might have=〜したかもしれない", sc:"指示通りに動いたのに失敗し、解釈違いを疑う時"},
+  {cat:"分からない", en:"Let me guess", jp:"当ててみよう", kw:"let me guess", ex:"guess=推測する。答える前に当てにいく", sc:"英語の指示を正確には読めないが、状況から内容を推測する時"},
+  {cat:"操作が分からない", en:"Let me just try something", jp:"ちょっと試してみる", kw:"try something", ex:"とりあえず何か試す時の万能フレーズ", sc:"正解が分からないので、とりあえず何か操作を試してみる時"},
+  {cat:"操作が分からない", en:"Let's see if this works", jp:"うまくいくか試す", kw:"if this works", ex:"work=機能する・うまくいく", sc:"自信はないが、思いついた方法を試す直前"},
+  {cat:"操作が分からない", en:"How do I do this?", jp:"これどうやるの？", kw:"how do I", ex:"how=どうやって。操作が分からない時", sc:"走り方や銃の構え方など、操作方法が分からない時"},
+  {cat:"操作が分からない", en:"Nothing is working", jp:"何もうまくいかない", kw:"nothing is working", ex:"何を試してもダメな時", sc:"ボタンを色々押しても、何も思い通りに動かない時"},
+  {cat:"操作が分からない", en:"I figured it out", jp:"分かった", kw:"figured out", ex:"figure out=理解する・解決する", sc:"試行錯誤の末に、操作方法や仕掛けが分かった瞬間"},
+  {cat:"操作が分からない", en:"Let's try again", jp:"もう一回", kw:"try again", ex:"もう一回やる", sc:"一度失敗して、同じことにもう一度挑戦する時"},
+  {cat:"道が分からない", en:"What am I supposed to do here?", jp:"ここで何すればいい？", kw:"supposed to", ex:"be supposed to=〜することになっている", sc:"目的地に着いたが、次に何をすべきか分からない時"},
+  {cat:"道が分からない", en:"I'll just go this way", jp:"とりあえずこっち行く", kw:"this way", ex:"迷ったらとりあえずこっち", sc:"道が分からないので、とりあえず適当な方向に進む時"},
+  {cat:"道が分からない", en:"I took a wrong turn", jp:"曲がるとこ間違えた", kw:"wrong turn", ex:"turn=曲がり角。曲がる場所を間違えた", sc:"カーナビと違う道に入ってしまったと気づいた時"},
+  {cat:"道が分からない", en:"I missed the turn", jp:"曲がり損ねた", kw:"missed the turn", ex:"miss=逃す。曲がり損ねた", sc:"曲がるべき交差点をスピードが出すぎて通り過ぎた時"},
+  {cat:"道が分からない", en:"I'm completely lost", jp:"完全に迷った", kw:"completely lost", ex:"lost=迷った・置いていかれた", sc:"走り回った結果、自分がどこにいるか完全に分からなくなった時"},
+  {cat:"道が分からない", en:"This is taking forever", jp:"全然終わらん", kw:"taking forever", ex:"forever=永遠に。全然終わらない", sc:"目的地までの移動が長すぎて、うんざりしている時"},
+  {cat:"暴れる・挑発", en:"Get out of the way", jp:"どけ", kw:"out of the way", ex:"どけ。通行人やNPCに", sc:"道を塞いでいる通行人や車に、どけと言いたい時"},
+  {cat:"暴れる・挑発", en:"Bring it on", jp:"かかってこい", kw:"bring it on", ex:"挑発を受けて立つ", sc:"敵や警察に囲まれて、覚悟を決めて迎え撃つ時"},
+  {cat:"暴れる・挑発", en:"Back off", jp:"近寄るな", kw:"back off", ex:"引き下がれ・近寄るな", sc:"近づいてくる相手に、それ以上来るなと威嚇する時"},
+  {cat:"暴れる・挑発", en:"Watch out", jp:"危ない", kw:"watch out", ex:"とっさの警告。危ない", sc:"危険が迫っている相手に、とっさに警告する時"},
+  {cat:"暴れる・挑発", en:"Let's go!", jp:"よっしゃ！", kw:"let's go", ex:"テンションを上げる時の定番", sc:"うまくいって気分が上がり、勢いに乗る時"},
+  {cat:"暴れる・挑発", en:"This is a mess", jp:"めちゃくちゃだ", kw:"mess", ex:"mess=めちゃくちゃな状態", sc:"暴れた結果、周囲が大混乱になっている時"},
+  {cat:"間をつなぐ", en:"Okay so...", jp:"えーっと", kw:"okay so", ex:"話し始めのつなぎ。沈黙を消す", sc:"次に何を話すか考えながら、とりあえず言葉を出す時"},
+  {cat:"間をつなぐ", en:"Hold on", jp:"ちょっと待って", kw:"hold on", ex:"ちょっと待って。時間稼ぎに最適", sc:"何かに気づいて、一旦動きを止めたい時"},
+  {cat:"間をつなぐ", en:"Let me think", jp:"考えさせて", kw:"let me think", ex:"考えさせて。間を埋める", sc:"判断に迷って、少し考える時間が欲しい時"},
+  {cat:"間をつなぐ", en:"Let's see", jp:"見てみよう", kw:"let's see", ex:"見てみよう。何か確認する時", sc:"何かを確認しようと、画面やマップに目をやる時"},
+  {cat:"間をつなぐ", en:"Wait, what?", jp:"え、何？", kw:"wait what", ex:"理解が追いつかない時", sc:"一瞬で状況が変わって、理解が追いつかない時"},
+  {cat:"間をつなぐ", en:"Here we go", jp:"行くぞ", kw:"here we go", ex:"さあ行くぞ。何か始める時", sc:"いよいよ何かを始める、その直前"},
+  {cat:"間をつなぐ", en:"Alright", jp:"よし", kw:"alright", ex:"よし。区切りをつける一言", sc:"一区切りついて、次の行動に移る時"},
+  {cat:"成功・失敗", en:"It worked", jp:"うまくいった", kw:"it worked", ex:"work=うまくいく", sc:"半信半疑で試したことが、ちゃんと成功した時"},
+  {cat:"成功・失敗", en:"That actually worked", jp:"意外とうまくいった", kw:"actually", ex:"actually=意外と・実際に", sc:"うまくいくと思っていなかった無茶が、意外にも成功した時"},
+  {cat:"成功・失敗", en:"I made it", jp:"やり遂げた", kw:"made it", ex:"make it=やり遂げる・間に合う", sc:"ギリギリで目的地に到着した、あるいはミッションをクリアした時"},
+  {cat:"成功・失敗", en:"I messed up", jp:"やらかした", kw:"messed up", ex:"mess up=やらかす(軽めの失敗)", sc:"簡単なはずの操作をミスして、失敗した時"},
+  {cat:"成功・失敗", en:"That was a mistake", jp:"あれは間違いだった", kw:"mistake", ex:"判断ミスだった時", sc:"自分の判断が悪かったと、後から気づいた時"},
+  {cat:"成功・失敗", en:"At least I tried", jp:"まあ挑戦はした", kw:"at least", ex:"at least=少なくとも。失敗しても前向きに", sc:"失敗はしたが、挑戦したこと自体を前向きに捉える時"},
+  {cat:"成功・失敗", en:"Moving on", jp:"次いこう", kw:"moving on", ex:"次いこう。切り替える", sc:"失敗や出来事を引きずらず、次に進もうと切り替える時"},
+];
+
+// Total: 100 phrases
+
+// Total: 190 phrases
+
+// Total: 190 phrases
+
+let activeCats = new Set(DATA.map(d => d.cat));
+let filtered = [...DATA];
+let curIndex = 0;
+let isPlaying = false;
+let repeatCount = 1;
+let repeatTotal = 5;
+let synth = window.speechSynthesis;
+let englishVoice = null;
+let japaneseVoice = null;
+let activeStatusFilter = 'all';
+let excludeSpeakable = false;
+let excludeKnown = false;
+let appMode = 'listen'; // listen | quiz | quiz5 | quiz3 | quiz2 | quizInstant
+let quizTimer = null;
+
+// 各クイズモードの考える時間(ms)。quizだけユーザーが選択可能
+const MODE_THINK_MS = { quiz5: 5000, quiz3: 3000, quiz2: 2000, quizInstant: 800, quizScene: 6000, srs: 6000 };
+// 各モードの解放条件: そのモードに進むには「前のモード」で覚えた/話せる必要がある
+const MODE_SOURCE = { quiz5: 'quiz', quiz3: 'quiz5', quiz2: 'quiz3', quizInstant: 'quiz2', quizScene: 'quizInstant' };
+const RANDOM_MODES = new Set(['quiz2', 'quizInstant', 'quizScene', 'srs']); // 出題順をランダムにするモード
+function isSceneMode() { return appMode === 'quizScene' || appMode === 'srs'; }
+function isSrsMode() { return appMode === 'srs'; }
+
+// ===== 間隔反復(SRS) =====
+// 話せるフラグのフレーズだけを対象に、忘却曲線に沿って復習日を管理する。
+// srsData[en] = { due: 次回復習日(YYYY-MM-DD), step: 現在の間隔段階 }
+// 間隔段階(日): [1, 3, 7, 14, 30, 60]。言えたら次段階へ、詰まったら最初へ戻す。
+const SRS_INTERVALS = [1, 3, 7, 14, 30, 60];
+let srsData = {};
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function addDays(dateStr, days) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+// 話せるフラグが付いているか
+function isSpeakable(item) {
+  // 間隔反復の対象は「情景モードで★話せるにした語」だけ
+  return statusMap.quizScene && statusMap.quizScene[item.en] === 'speakable';
+}
+// SRS対象(話せる)のうち、今日以前が復習期限のもの
+function isSrsDue(item) {
+  if (!isSpeakable(item)) return false;
+  const rec = srsData[item.en];
+  if (!rec) return true; // まだ一度も復習していない話せる語は即対象
+  return rec.due <= todayStr();
+}
+function srsDueCount() { return DATA.filter(isSrsDue).length; }
+// 話せる語の総数(期限に関係なく)
+function srsTotalCount() { return DATA.filter(isSpeakable).length; }
+// 「言えた」→次の間隔へ / 「詰まった」→最初へ
+function srsGrade(item, ok) {
+  const rec = srsData[item.en] || { step: -1 };
+  let step = ok ? Math.min(rec.step + 1, SRS_INTERVALS.length - 1) : 0;
+  srsData[item.en] = { step: step, due: addDays(todayStr(), SRS_INTERVALS[step]) };
+  scheduleSave();
+}
+// モードごとの固定リピート回数(指定がなければユーザー選択値を使う)
+// モードごとのリピート回数の上限とデフォルト。指定のないモードは max10/default5
+const MODE_REPEAT_CFG = {
+  quiz5:       { max: 4, def: 3 },
+  quiz3:       { max: 3, def: 2 },
+  quiz2:       { max: 2, def: 1 },
+  quizInstant: { max: 2, def: 1 },
+  quizScene:   { max: 2, def: 1 },
+  srs:         { max: 2, def: 1 },
+};
+function repeatCfg() {
+  return MODE_REPEAT_CFG[appMode] || { max: 10, def: 5 };
+}
+function getRepeatTotal() {
+  return repeatTotal;
+}
+// モードに応じてリピート選択肢を作り直し、デフォルトを適用する
+function rebuildRepeatOptions() {
+  const cfg = repeatCfg();
+  if (repeatTotal > cfg.max) repeatTotal = cfg.def;
+  let html = '';
+  for (let i = 1; i <= cfg.max; i++) {
+    html += `<option value="${i}"${i === repeatTotal ? ' selected' : ''}>${i}回</option>`;
+  }
+  repeatSelect.innerHTML = html;
+  repeatSelect.value = String(repeatTotal);
+}
+
+function isQuizMode() { return appMode !== 'listen'; }
+
+function isCleared(status) { return status === 'known' || status === 'speakable'; }
+
+// そのフレーズが現在のモードの対象かどうか
+function isUnlocked(item) {
+  const src = MODE_SOURCE[appMode];
+  if (!src) return true; // listen / quiz は全フレーズ対象
+  return isCleared(statusMap[src][item.en]);
+}
+
+function unlockedCount(mode) {
+  const src = MODE_SOURCE[mode];
+  if (!src) return DATA.length;
+  return DATA.filter(d => isCleared(statusMap[src][d.en])).length;
+}
+
+function getThinkMs() {
+  if (MODE_THINK_MS[appMode]) return MODE_THINK_MS[appMode];
+  return parseInt(document.getElementById('thinkTimeSelect').value);
+}
+
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'core50'; // distinguishes this app's data from the gta player
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+
+let currentUser = null;
+let statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
+let saveTimer = null;
+
+function loadStatusMap() {
+  return statusMap;
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  setSyncBadge('保存中...');
+  saveTimer = setTimeout(saveStatusMap, 600);
+}
+
+function saveStatusMap(retry) {
+  if (!currentUser) return;
+  // POSTで送る(GETだとデータ量が増えたときURL長の上限を超えて保存が失敗するため)
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      action: 'save',
+      user: APP_KEY + ':' + currentUser,
+      data: JSON.stringify({ _statusMap: statusMap, _srs: srsData })
+    })
+  })
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.error) throw new Error(res.error);
+      setSyncBadge('保存済み');
+    })
+    .catch(() => {
+      if (!retry) {
+        setSyncBadge('保存リトライ中...');
+        setTimeout(() => saveStatusMap(true), 1500);
+      } else {
+        setSyncBadge('⚠保存失敗 タップで再試行');
+      }
+    });
+}
+
+function loadFromServer(user) {
+  const url = GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY + ':' + user);
+  return fetch(url)
+    .then(r => r.json())
+    .then(res => {
+      try {
+        let parsed = JSON.parse(res.data || '{}');
+        // 新形式: { _statusMap, _srs } を分離
+        if (parsed && parsed._statusMap) {
+          srsData = parsed._srs || {};
+          parsed = parsed._statusMap;
+        }
+        // 旧フォーマット(モード分け前)は listen バケットへ移行
+        if (parsed && (parsed.listen || parsed.quiz)) {
+          statusMap = {
+            listen: parsed.listen || {},
+            quiz: parsed.quiz || {},
+            quiz5: parsed.quiz5 || {},
+            quiz3: parsed.quiz3 || {},
+            quiz2: parsed.quiz2 || {},
+            quizInstant: parsed.quizInstant || {},
+            quizScene: parsed.quizScene || {},
+            srs: parsed.srs || {}
+          };
+        } else {
+          statusMap = { listen: parsed || {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
+        }
+      } catch (e) {
+        statusMap = { listen: {}, quiz: {}, quiz5: {}, quiz3: {}, quiz2: {}, quizInstant: {}, quizScene: {}, srs: {} };
+      }
+    });
+}
+
+function setSyncBadge(text) {
+  const badge = document.getElementById('syncBadge');
+  badge.style.display = 'block';
+  badge.textContent = text;
+}
+
+const STATUS_DEFS = [
+  { key: 'learning', icon: '!', label: '未習得' },
+  { key: 'known', icon: '◯', label: '覚えた' },
+  { key: 'speakable', icon: '★', label: '話せる' },
+];
+
+function currentBucket() {
+  return statusMap[appMode];
+}
+
+function getStatus(item) {
+  return currentBucket()[item.en] || 'none';
+}
+
+function setStatus(item, status) {
+  const bucket = currentBucket();
+  if (bucket[item.en] === status) {
+    delete bucket[item.en];
+  } else {
+    bucket[item.en] = status;
+  }
+  scheduleSave();
+  renderList();
+  renderNowPlayingStatus();
+  renderStats();
+  buildModeFilters();
+}
+
+function buildStatusButtonsEl(item, large) {
+  const wrap = document.createElement('div');
+  wrap.className = 'status-buttons';
+  STATUS_DEFS.forEach(def => {
+    const btn = document.createElement('button');
+    btn.className = 'status-btn';
+    btn.textContent = def.icon;
+    btn.title = def.label;
+    if (getStatus(item) === def.key) btn.classList.add('active-' + def.key);
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      setStatus(item, def.key);
+    };
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
+function renderNowPlayingStatus() {
+  const el = document.getElementById('nowPlayingStatus');
+  el.innerHTML = '';
+  if (filtered.length === 0) return;
+  el.appendChild(buildStatusButtonsEl(filtered[curIndex], true));
+}
+
+function renderStats() {
+  const counts = { none: 0, learning: 0, known: 0, speakable: 0 };
+  // そのモードの対象フレーズだけを数える(5秒/3秒モードは解放済みのみ)
+  DATA.filter(isUnlocked).forEach(d => {
+    const s = getStatus(d);
+    counts[s] = (counts[s] || 0) + 1;
+  });
+  const statsRow = document.getElementById('statsRow');
+  statsRow.innerHTML = `
+    <div class="stat-pill"><span class="num">${counts.speakable}</span><span class="label">話せる</span></div>
+    <div class="stat-pill"><span class="num">${counts.known}</span><span class="label">覚えた</span></div>
+    <div class="stat-pill"><span class="num">${counts.learning}</span><span class="label">未習得</span></div>
+    <div class="stat-pill"><span class="num">${counts.none}</span><span class="label">未チェック</span></div>
+  `;
+}
+
+function buildStatusFilters() {
+  const container = document.getElementById('statusFilters');
+  container.innerHTML = '';
+  const allDefs = [
+    { key: 'all', label: 'すべて' },
+    { key: 'speakable', label: '★話せる' },
+    { key: 'known', label: '◯覚えた' },
+    { key: 'learning', label: '!未習得' },
+    { key: 'none', label: '未チェック' },
+  ];
+  allDefs.forEach(def => {
+    const chip = document.createElement('div');
+    chip.className = 'status-chip' + (activeStatusFilter === def.key ? ' active' : '');
+    chip.textContent = def.label;
+    chip.onclick = () => {
+      activeStatusFilter = def.key;
+      applyFilter();
+      buildStatusFilters();
+    };
+    container.appendChild(chip);
+  });
+}
+
+
+const phraseEn = document.getElementById('phraseEn');
+const phraseJp = document.getElementById('phraseJp');
+const catTag = document.getElementById('catTag');
+const progressBar = document.getElementById('progressBar');
+const curIdxEl = document.getElementById('curIdx');
+const totalIdxEl = document.getElementById('totalIdx');
+const playBtn = document.getElementById('playBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const rateSelect = document.getElementById('rateSelect');
+const repeatSelect = document.getElementById('repeatSelect');
+const jpToggle = document.getElementById('jpToggle');
+const catFilters = document.getElementById('catFilters');
+const listContainer = document.getElementById('listContainer');
+const voiceHint = document.getElementById('voiceHint');
+
+function loadVoices() {
+  const voices = synth.getVoices();
+  englishVoice = voices.find(v => v.lang.startsWith('en')) || null;
+  japaneseVoice = voices.find(v => v.lang.startsWith('ja')) || null;
+  if (!englishVoice) {
+    voiceHint.textContent = '英語音声が見つかりません。ブラウザ設定で英語の音声をインストールしてください。';
+  } else {
+    voiceHint.textContent = '';
+  }
+}
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+loadVoices();
+
+function buildFilters() {
+  const cats = [...new Set(DATA.map(d => d.cat))];
+  catFilters.innerHTML = '';
+  cats.forEach(cat => {
+    const chip = document.createElement('div');
+    chip.className = 'cat-chip active';
+    chip.textContent = cat;
+    chip.onclick = () => {
+      if (activeCats.has(cat)) {
+        if (activeCats.size === 1) return;
+        activeCats.delete(cat);
+        chip.classList.remove('active');
+      } else {
+        activeCats.add(cat);
+        chip.classList.add('active');
+      }
+      applyFilter();
+    };
+    catFilters.appendChild(chip);
+  });
+}
+
+function applyFilter() {
+  filtered = DATA.filter(d => {
+    if (appMode === 'srs') return isSrsDue(d); // 間隔反復は今日期限の話せる語のみ(カテゴリ絞りは無視)
+    if (!isUnlocked(d)) return false;
+    if (!activeCats.has(d.cat)) return false;
+    if (activeStatusFilter !== 'all' && getStatus(d) !== activeStatusFilter) return false;
+    if (excludeSpeakable && getStatus(d) === 'speakable') return false;
+    if (excludeKnown && getStatus(d) === 'known') return false;
+    return true;
+  });
+  // 2秒・即射モードは順番暗記を防ぐため出題順をシャッフル
+  if (RANDOM_MODES.has(appMode)) {
+    for (let i = filtered.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+    }
+  }
+  curIndex = 0;
+  renderList();
+  updateDisplay();
+}
+
+function buildExcludeSpeakableToggle() {
+  const container = document.getElementById('excludeSpeakableRow');
+  container.innerHTML = '';
+
+  const chip1 = document.createElement('div');
+  chip1.className = 'status-chip' + (excludeSpeakable ? ' active' : '');
+  chip1.textContent = excludeSpeakable ? '★話せるは流さない (ON)' : '★話せるも流す (OFF)';
+  chip1.onclick = () => {
+    excludeSpeakable = !excludeSpeakable;
+    buildExcludeSpeakableToggle();
+    applyFilter();
+  };
+  container.appendChild(chip1);
+
+  const chip2 = document.createElement('div');
+  chip2.className = 'status-chip' + (excludeKnown ? ' active' : '');
+  chip2.textContent = excludeKnown ? '◯覚えたは流さない (ON)' : '◯覚えたも流す (OFF)';
+  chip2.onclick = () => {
+    excludeKnown = !excludeKnown;
+    buildExcludeSpeakableToggle();
+    applyFilter();
+  };
+  container.appendChild(chip2);
+}
+
+function renderList() {
+  listContainer.innerHTML = '';
+  filtered.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'phrase-row' + (i === curIndex ? ' current' : '');
+    const mainDiv = document.createElement('div');
+    mainDiv.className = 'row-main';
+    mainDiv.innerHTML = `
+      <span class="idx">${i + 1}</span>
+      <span class="en">${item.en}</span>
+      <span class="jp">${item.jp}</span>
+    `;
+    mainDiv.onclick = () => {
+      stopSpeaking();
+      curIndex = i;
+      updateDisplay();
+      if (isPlaying) speakCurrent();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    row.appendChild(mainDiv);
+    row.appendChild(buildStatusButtonsEl(item, false));
+    listContainer.appendChild(row);
+  });
+}
+
+function updateDisplay() {
+  const emptyBox = document.getElementById('emptyMsg');
+  if (filtered.length === 0) {
+    emptyBox.style.display = 'block';
+    if (appMode === 'srs') {
+      const total = srsTotalCount();
+      emptyBox.textContent = total === 0
+        ? '「★話せる」にした語がまだありません。情景モードなどで話せるようになった語がここに集まります。'
+        : '今日の復習は完了です！お疲れさまでした。次の復習日にまた出題されます。';
+    } else {
+      emptyBox.textContent = MODE_SOURCE[appMode]
+        ? '対象フレーズがありません。前のモードで「◯覚えた」にチェックしたフレーズがここに追加されます。'
+        : '対象フレーズがありません。フィルター条件を確認してください。';
+    }
+    document.getElementById('phraseJpQuiz').style.display = 'none';
+    phraseEn.textContent = '—';
+    phraseEn.style.opacity = '1';
+    phraseJp.textContent = '';
+    document.getElementById('kwBox').style.display = 'none';
+    document.getElementById('nowPlayingStatus').innerHTML = '';
+    curIdxEl.textContent = '0 / 0';
+    progressBar.style.width = '0%';
+    return;
+  }
+  emptyBox.style.display = 'none';
+  document.getElementById('srsGradeRow').style.display = 'none';
+  const item = filtered[curIndex];
+  catTag.textContent = item.cat;
+  curIdxEl.textContent = (curIndex + 1) + ' / ' + filtered.length;
+  totalIdxEl.textContent = '';
+  progressBar.style.width = ((curIndex) / Math.max(filtered.length - 1, 1)) * 100 + '%';
+
+  const phraseJpQuiz = document.getElementById('phraseJpQuiz');
+
+  if (isQuizMode()) {
+    // 日本語(情景モードは情景文)を先に出し、考える時間のあと英語を表示する
+    phraseJpQuiz.style.display = 'block';
+    phraseJpQuiz.textContent = isSceneMode() ? ('【状況】' + (item.sc || item.jp)) : item.jp;
+    phraseEn.textContent = '？？？';
+    phraseEn.style.opacity = '0.3';
+    phraseJp.textContent = '';
+  } else {
+    phraseJpQuiz.style.display = 'none';
+    phraseEn.textContent = item.en;
+    phraseEn.style.opacity = '1';
+    phraseJp.textContent = item.jp;
+    if (item.kw) {
+      document.getElementById('kwWord').textContent = item.kw;
+      document.getElementById('kwEx').textContent = item.ex || '';
+      document.getElementById('kwBox').style.display = 'block';
+    } else {
+      document.getElementById('kwBox').style.display = 'none';
+    }
+  }
+
+  document.querySelectorAll('.phrase-row').forEach((r, i) => {
+    r.classList.toggle('current', i === curIndex);
+  });
+  renderNowPlayingStatus();
+}
+
+function revealAnswer() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  phraseEn.textContent = item.en;
+  phraseEn.style.opacity = '1';
+  if (isSceneMode()) {
+    document.getElementById('phraseJpQuiz').textContent = '【状況】' + (item.sc || item.jp) + '  →  ' + item.jp;
+  }
+  if (isSrsMode()) {
+    document.getElementById('srsGradeRow').style.display = 'flex';
+  }
+  // show keyword box
+  if (item.kw) {
+    document.getElementById('kwWord').textContent = item.kw;
+    document.getElementById('kwEx').textContent = item.ex || '';
+    document.getElementById('kwBox').style.display = 'block';
+  }
+}
+
+function speakCurrent() {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  const rate = parseFloat(rateSelect.value);
+  const wantJp = jpToggle.value === 'yes';
+
+  if (isQuizMode()) {
+    // 日本語音声 → 考える時間 → 英語表示+音声
+    const thinkMs = getThinkMs();
+    clearTimeout(quizTimer);
+
+    if (japaneseVoice) {
+      const uttJpFirst = new SpeechSynthesisUtterance(isSceneMode() ? (item.sc || item.jp) : item.jp);
+      uttJpFirst.lang = 'ja-JP';
+      uttJpFirst.voice = japaneseVoice;
+      uttJpFirst.rate = 1;
+      uttJpFirst.onend = () => {
+        quizTimer = setTimeout(() => {
+          if (!isPlaying) return;
+          revealAnswer();
+          speakEnglishThenAdvance(item, rate);
+        }, thinkMs);
+      };
+
+      synth.cancel();
+      synth.speak(uttJpFirst);
+    } else {
+      quizTimer = setTimeout(() => {
+        if (!isPlaying) return;
+        revealAnswer();
+        speakEnglishThenAdvance(item, rate);
+      }, thinkMs);
+    }
+    return;
+  }
+
+  speakEnglishThenAdvance(item, rate, wantJp);
+}
+
+function speakEnglishThenAdvance(item, rate, wantJp) {
+  const uttEn = new SpeechSynthesisUtterance(item.en);
+  uttEn.lang = 'en-US';
+  uttEn.rate = rate;
+  if (englishVoice) uttEn.voice = englishVoice;
+
+  uttEn.onend = () => {
+    repeatCount++;
+    if (repeatCount < getRepeatTotal()) {
+      if (isPlaying) speakEnglishThenAdvance(item, rate, wantJp);
+      return;
+    }
+    repeatCount = 0;
+    if (isSrsMode()) {
+      // 間隔反復は自己申告ボタンで進むため、ここで停止してボタンを待つ
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      document.getElementById('srsGradeRow').style.display = 'flex';
+      return;
+    }
+    const reviewMs = isQuizMode() ? parseInt(document.getElementById('reviewTimeSelect').value) : 0;
+    const proceed = () => {
+      if (!isPlaying) return;
+      if (wantJp && japaneseVoice) {
+        const uttJp = new SpeechSynthesisUtterance(item.jp);
+        uttJp.lang = 'ja-JP';
+        uttJp.voice = japaneseVoice;
+        uttJp.rate = 1;
+        uttJp.onend = () => { if (isPlaying) goNext(true); };
+        synth.speak(uttJp);
+      } else {
+        goNext(true);
+      }
+    };
+    if (reviewMs > 0) {
+      clearTimeout(quizTimer);
+      quizTimer = setTimeout(proceed, reviewMs);
+    } else {
+      proceed();
+    }
+  };
+
+  synth.cancel();
+  synth.speak(uttEn);
+}
+
+function goNext(auto) {
+  curIndex = (curIndex + 1) % filtered.length;
+  updateDisplay();
+  if (isPlaying) speakCurrent();
+}
+
+function goPrev() {
+  stopSpeaking();
+  curIndex = (curIndex - 1 + filtered.length) % filtered.length;
+  updateDisplay();
+  if (isPlaying) speakCurrent();
+}
+
+function stopSpeaking() {
+  synth.cancel();
+  clearTimeout(quizTimer);
+  repeatCount = 0;
+}
+
+function buildModeFilters() {
+  const container = document.getElementById('modeFilters');
+  container.innerHTML = '';
+  const modes = [
+    { key: 'listen', label: '聞き流し' },
+    { key: 'quiz', label: 'クイズ(時間可変)' },
+    { key: 'quiz5', label: '5秒モード' },
+    { key: 'quiz3', label: '3秒(2回)' },
+    { key: 'quiz2', label: '2秒(1回)' },
+    { key: 'quizInstant', label: '即射(1回)' },
+    { key: 'quizScene', label: '情景モード' },
+    { key: 'srs', label: '仕上げ(間隔反復)' },
+  ];
+  modes.forEach(m => {
+    const chip = document.createElement('div');
+    chip.className = 'status-chip' + (appMode === m.key ? ' active' : '');
+    let n;
+    if (m.key === 'srs') { n = srsDueCount(); }
+    else { n = unlockedCount(m.key); }
+    const showCount = MODE_SOURCE[m.key] || m.key === 'srs';
+    chip.textContent = showCount ? `${m.label} (${n})` : m.label;
+    if (showCount && n === 0) chip.style.opacity = '0.4';
+    chip.onclick = () => {
+      stopSpeaking();
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      document.getElementById('srsGradeRow').style.display = 'none';
+      appMode = m.key;
+      repeatTotal = repeatCfg().def; // モードのデフォルトに合わせる
+      rebuildRepeatOptions();
+      document.getElementById('jpToggleWrap').style.display = (appMode === 'listen') ? 'block' : 'none';
+      document.getElementById('thinkTimeWrap').style.display = (appMode === 'quiz') ? 'block' : 'none';
+      document.getElementById('reviewTimeWrap').style.display = isQuizMode() ? 'block' : 'none';
+      buildModeFilters();
+      applyFilter();
+      renderStats();
+      updateDisplay();
+    };
+    container.appendChild(chip);
+  });
+}
+
+playBtn.onclick = () => {
+  isPlaying = !isPlaying;
+  playBtn.textContent = isPlaying ? '⏸' : '▶';
+  if (isPlaying) {
+    repeatCount = 0;
+    if (isQuizMode()) updateDisplay(); // 答えを隠した状態に戻す
+    speakCurrent();
+  } else {
+    stopSpeaking();
+  }
+};
+
+nextBtn.onclick = () => { stopSpeaking(); goNext(); };
+prevBtn.onclick = goPrev;
+
+repeatSelect.onchange = () => { repeatTotal = parseInt(repeatSelect.value); };
+rebuildRepeatOptions();
+
+// 間隔反復の「言えた/詰まった」ボタン
+document.getElementById('srsPass').onclick = () => srsAdvance(true);
+document.getElementById('srsFail').onclick = () => srsAdvance(false);
+function srsAdvance(ok) {
+  if (filtered.length === 0) return;
+  const item = filtered[curIndex];
+  srsGrade(item, ok);           // 復習日を更新
+  document.getElementById('srsGradeRow').style.display = 'none';
+  // この問題をリストから外して次へ(今日のノルマを消化していく)
+  filtered.splice(curIndex, 1);
+  buildModeFilters();           // チップの残り数を更新
+  if (filtered.length === 0) {
+    updateDisplay();            // 空表示(今日の分は完了)
+    return;
+  }
+  if (curIndex >= filtered.length) curIndex = 0;
+  updateDisplay();
+  isPlaying = true;
+  playBtn.textContent = '⏸';
+  speakCurrent();
+}
+
+function initApp() {
+  buildFilters();
+  buildStatusFilters();
+  buildModeFilters();
+  buildExcludeSpeakableToggle();
+  renderStats();
+  renderList();
+  updateDisplay();
+}
+
+function startSession(user) {
+  currentUser = user;
+  localStorage.setItem(LOCAL_USER_KEY, user);
+  document.getElementById('loginStatus').textContent = '読み込み中...';
+  loadFromServer(user).then(() => {
+    document.getElementById('loginOverlay').style.display = 'none';
+    setSyncBadge(user + ' で同期中');
+    initApp();
+  }).catch(() => {
+    document.getElementById('loginStatus').textContent = '通信に失敗しました。もう一度お試しください。';
+  });
+}
+
+document.getElementById('loginBtn').onclick = () => {
+  const val = document.getElementById('passInput').value.trim();
+  if (!val) {
+    document.getElementById('loginStatus').textContent = '合言葉を入力してください';
+    return;
+  }
+  startSession(val);
+};
+document.getElementById('passInput').onkeydown = (e) => {
+  if (e.key === 'Enter') document.getElementById('loginBtn').click();
+};
+
+document.getElementById('syncBadge').onclick = () => {
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗') !== -1) {
+    saveStatusMap();
+    return;
+  }
+  if (currentUser) loadFromServer(currentUser).then(() => {
+    setSyncBadge(currentUser + ' で同期中(更新済み)');
+    initApp();
+  });
+};
+
+// auto-login if a saved username exists on this device
+const savedUser = localStorage.getItem(LOCAL_USER_KEY);
+if (savedUser) {
+  document.getElementById('passInput').value = savedUser;
+  startSession(savedUser);
+}
+</script>
+</body>
+</html>
