@@ -82,7 +82,7 @@
       <label>練習セット</label>
       <select id="setSel">
         <option value="core" selected>優先50語</option>
-        <option value="tsukkomi">ツッコミ50</option>
+        <option value="tsukkomi">ツッコミ55</option>
       </select>
     </div>
     <div class="set">
@@ -175,20 +175,22 @@ const DATA_CORE = [
   {cat:"成功・失敗", scene:"引きずらず次に進む", en:"Moving on", jp:"次いこう"},
 ];
 const DATA_TSUKKOMI = [
+  {cat:"一言ツッコミ", scene:"NPCに車で轢かれた・罵られた", en:"Rude.", jp:"失礼だな"},
+  {cat:"一言ツッコミ", scene:"また同じ場所で同じ事故を起こした", en:"Classic.", jp:"いつものやつね"},
+  {cat:"一言ツッコミ", scene:"逃げ切った直後にまた警察が来た", en:"Seriously?", jp:"マジで？"},
+  {cat:"一言ツッコミ", scene:"一番来てほしくないタイミングで車が壊れた", en:"Of course.", jp:"ですよね"},
+  {cat:"一言ツッコミ", scene:"NPCが意味不明な行動をした", en:"Bro.", jp:"おい"},
+  {cat:"一言ツッコミ", scene:"星が一気に5つになった", en:"Great. Just great.", jp:"最高だな(皮肉)"},
   {cat:"すぎだろ", scene:"パトカーが5台以上集まってきた", en:"Too many cops!", jp:"警察多すぎだろ！"},
   {cat:"すぎだろ", scene:"敵の車がありえない速さで追ってくる", en:"Way too fast!", jp:"速すぎだろ！"},
   {cat:"すぎだろ", scene:"ちょっとぶつけただけで大爆発した", en:"That's too much!", jp:"やりすぎだろ！"},
-  {cat:"すぎだろ", scene:"同じミッションが何回やってもクリアできない", en:"This is too hard!", jp:"難しすぎだろ！"},
-  {cat:"すぎだろ", scene:"敵が来るはずなのに誰もいない", en:"It's too quiet", jp:"静かすぎるだろ"},
   {cat:"初めて見た", scene:"NPCが見たことない変な動きをした", en:"I've never seen that before", jp:"初めて見たわ"},
   {cat:"初めて見た", scene:"一瞬何かが画面を横切った", en:"What was that?", jp:"今の何？"},
   {cat:"初めて見た", scene:"車がありえない挙動で回転した", en:"Well, that's new", jp:"へえ、それは初めてだわ"},
-  {cat:"初めて見た", scene:"目の前で大事故が起きたのに強がる", en:"I've seen worse", jp:"もっとひどいの見たことあるわ"},
   {cat:"そんなことある?", scene:"NPCが高速道路を歩いて横断している", en:"Who does that?", jp:"そんなことする奴いる？"},
   {cat:"そんなことある?", scene:"通行人が銃を見ても平然と歩いている", en:"Is that normal?", jp:"それ普通なの？"},
   {cat:"そんなことある?", scene:"車が空を飛んでいった", en:"That's not normal", jp:"いや普通じゃないだろ"},
   {cat:"そんなことある?", scene:"理不尽すぎる死に方をした", en:"Is this a joke?", jp:"冗談だろ？"},
-  {cat:"そんなことある?", scene:"逃げ込んだ先にまた警察がいた", en:"What are the odds", jp:"こんな偶然ある？"},
   {cat:"なんでだよ", scene:"何もしてないのに警察に追われ始めた", en:"Why?!", jp:"なんでだよ！"},
   {cat:"なんでだよ", scene:"NPCが突然殴りかかってきた", en:"Why though?", jp:"いや、なんで？"},
   {cat:"なんでだよ", scene:"味方NPCが毎回同じミスをする", en:"Why are you like this?", jp:"お前なんでそうなの？"},
@@ -201,7 +203,6 @@ const DATA_TSUKKOMI = [
   {cat:"〜すな", scene:"道の真ん中でNPCが立ち止まっている", en:"Get out of the way", jp:"どけって"},
   {cat:"〜すな", scene:"NPCがしつこく近づいてくる", en:"Back off", jp:"近寄るなって"},
   {cat:"かと思った", scene:"轢いたNPCが普通に起き上がった", en:"I thought you were dead", jp:"死んだかと思ったわ"},
-  {cat:"かと思った", scene:"ゴール直前で失敗した", en:"I thought I had it", jp:"いけたと思ったのに"},
   {cat:"かと思った", scene:"看板やマネキンを人と見間違えた", en:"I thought that was a person", jp:"人かと思ったわ"},
   {cat:"〇〇ゲームなの?", scene:"夜の路地で急にNPCが飛び出してきた", en:"Is this a horror game now?", jp:"これホラーゲームなの？"},
   {cat:"〇〇ゲームなの?", scene:"轢いた人が何度も起き上がる", en:"Is this a zombie game?", jp:"ゾンビゲームなの？"},
@@ -214,6 +215,10 @@ const DATA_TSUKKOMI = [
   {cat:"相手へ", scene:"何度も同じNPCに絡まれる", en:"Not you again", jp:"またお前かよ"},
   {cat:"相手へ", scene:"NPCが理不尽な要求をしてきた", en:"Are you serious right now?", jp:"今マジで言ってる？"},
   {cat:"相手へ", scene:"最悪のタイミングでトラブル発生", en:"You've got to be kidding me", jp:"ふざけんなよ"},
+  {cat:"相手へ", scene:"NPCに急に変なことを言われた", en:"Excuse me?", jp:"は？"},
+  {cat:"相手へ", scene:"NPCが勝手に長々と喋り出した", en:"Nobody asked.", jp:"誰も聞いてねえよ"},
+  {cat:"相手へ", scene:"NPCがちょっとぶつかっただけでキレてきた", en:"Relax.", jp:"落ち着けって"},
+  {cat:"相手へ", scene:"NPCが壁に向かって全力で走り続けている", en:"What's wrong with you?", jp:"お前どうした？"},
   {cat:"自分へ", scene:"暴走車に文句を言ったら自分の車だった", en:"Oh, that was me", jp:"あ、俺だったわ"},
   {cat:"自分へ", scene:"凡ミスを連発した", en:"What is wrong with me?", jp:"俺どうかしてるだろ"},
   {cat:"自分へ", scene:"同じ場所で何度も事故る", en:"Why do I keep doing this?", jp:"なんで俺これ繰り返すんだよ"},
