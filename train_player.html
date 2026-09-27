@@ -98,6 +98,7 @@
       <select id="showAns">
         <option value="never" selected>出さない</option>
         <option value="after">場面の最後に出す</option>
+        <option value="always">常に出す</option>
       </select>
     </div>
     <div class="set">
@@ -284,6 +285,7 @@ function showScene(item){
     '</div>';
   count++;
   countEl.textContent = count;
+  if (document.getElementById('showAns').value === 'always') revealAnswer();
   if (document.getElementById('speak').value === 'yes') speakJa(item.scene);
 }
 
@@ -354,6 +356,7 @@ startBtn.onclick = ()=>{
 };
 
 document.getElementById('revealBtn').onclick = revealAnswer;
+document.getElementById('showAns').onchange = (ev)=>{ if (ev.target.value === 'always') revealAnswer(); };
 document.getElementById('skipBtn').onclick = ()=>{ if(running) nextScene(); else { if(queue.length===0) rebuild(); nextScene(); } };
 
 document.getElementById('setSel').onchange = (ev)=>{
