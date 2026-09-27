@@ -73,6 +73,7 @@
   <div class="ctrls">
     <button class="btn main" id="startBtn">▶ 開始</button>
     <button class="btn sub" id="revealBtn">答えを見る</button>
+    <button class="btn sub" id="speakEnBtn">🔊 英語を聞く</button>
     <button class="btn sub" id="skipBtn">次へ ⏭</button>
   </div>
 
@@ -280,7 +281,7 @@ function showScene(item){
     '<div class="scene">'+esc(item.scene)+'</div>' +
     '<div class="hint">'+(DATA===DATA_TSUKKOMI?'英語でツッコんでみる':'英語で何か言ってみる')+'</div>' +
     '<div class="answer" id="ansBox">' +
-      '<div class="en">'+esc(item.en)+'</div>' +
+      '<div class="en" style="cursor:pointer" onclick="playCurrentEn()">🔊 '+esc(item.en)+'</div>' +
       '<div class="jp">'+esc(item.jp)+'</div>' +
     '</div>';
   count++;
@@ -324,9 +325,11 @@ function startTimer(){
 }
 
 let jaVoice = null;
+let enVoice = null;
 function loadVoices(){
   const vs = speechSynthesis.getVoices();
   jaVoice = vs.find(v=>v.lang.startsWith('ja')) || null;
+  enVoice = vs.find(v=>v.lang === 'en-US') || vs.find(v=>v.lang.startsWith('en')) || null;
 }
 loadVoices();
 if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
@@ -355,6 +358,20 @@ startBtn.onclick = ()=>{
   }
 };
 
+function speakEn(text){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  if (enVoice) u.voice = enVoice;
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function playCurrentEn(){
+  if (!current) return;
+  revealAnswer();
+  speakEn(current.en);
+}
+document.getElementById('speakEnBtn').onclick = playCurrentEn;
 document.getElementById('revealBtn').onclick = revealAnswer;
 document.getElementById('showAns').onchange = (ev)=>{ if (ev.target.value === 'always') revealAnswer(); };
 document.getElementById('skipBtn').onclick = ()=>{ if(running) nextScene(); else { if(queue.length===0) rebuild(); nextScene(); } };
