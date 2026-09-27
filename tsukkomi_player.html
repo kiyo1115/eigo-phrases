@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ツッコミ50 聞き流しプレイヤー</title>
+<title>ツッコミ55 聞き流しプレイヤー</title>
 <style>
   :root {
     --bg: #14110f;
@@ -393,8 +393,8 @@
 
 <div class="wrap">
   <a class="back-link" href="index.html">← トップに戻る</a>
-  <div class="eyebrow">実況用 / ツッコミの型50</div>
-  <h1>ツッコミ<span>50</span></h1>
+  <div class="eyebrow">実況用 / ツッコミの型55</div>
+  <h1>ツッコミ<span>55</span></h1>
 
   <div class="panel" style="padding:14px 20px;">
     <div class="status-filter-row" id="modeFilters" style="margin-top:0;"></div>
@@ -503,20 +503,22 @@
 
 <script>
 const DATA = [
+  {cat:"一言ツッコミ", en:"Rude.", jp:"失礼だな", kw:"rude", ex:"rude=失礼な。一語で成立する最強ツッコミ", sc:"NPCに車で轢かれた・罵られた"},
+  {cat:"一言ツッコミ", en:"Classic.", jp:"いつものやつね", kw:"classic", ex:"classic=お決まりの。同じ失敗の繰り返しに真顔で", sc:"また同じ場所で同じ事故を起こした"},
+  {cat:"一言ツッコミ", en:"Seriously?", jp:"マジで？", kw:"seriously", ex:"seriously=本気で。呆れた聞き返し", sc:"逃げ切った直後にまた警察が来た"},
+  {cat:"一言ツッコミ", en:"Of course.", jp:"ですよね", kw:"of course", ex:"of course=当然。最悪の展開を真顔で受け入れる", sc:"一番来てほしくないタイミングで車が壊れた"},
+  {cat:"一言ツッコミ", en:"Bro.", jp:"おい", kw:"bro", ex:"呆れを一語で全部表す。ゲーム実況の定番", sc:"NPCが意味不明な行動をした"},
+  {cat:"一言ツッコミ", en:"Great. Just great.", jp:"最高だな(皮肉)", kw:"just great", ex:"皮肉。全然最高じゃない時に言う", sc:"星が一気に5つになった"},
   {cat:"すぎだろ", en:"Too many cops!", jp:"警察多すぎだろ！", kw:"too many", ex:"too many=多すぎる。数えられるものに使う", sc:"パトカーが5台以上集まってきた"},
   {cat:"すぎだろ", en:"Way too fast!", jp:"速すぎだろ！", kw:"way too", ex:"way too=あまりにも〜すぎる(tooの強調)", sc:"敵の車がありえない速さで追ってくる"},
   {cat:"すぎだろ", en:"That's too much!", jp:"やりすぎだろ！", kw:"too much", ex:"too much=やりすぎ・多すぎ", sc:"ちょっとぶつけただけで大爆発した"},
-  {cat:"すぎだろ", en:"This is too hard!", jp:"難しすぎだろ！", kw:"too hard", ex:"too+形容詞=〜すぎる", sc:"同じミッションが何回やってもクリアできない"},
-  {cat:"すぎだろ", en:"It's too quiet", jp:"静かすぎるだろ", kw:"too quiet", ex:"too quiet=静かすぎる(不気味さを含む)", sc:"敵が来るはずなのに誰もいない"},
   {cat:"初めて見た", en:"I've never seen that before", jp:"初めて見たわ", kw:"never seen", ex:"have never seen=一度も見たことない", sc:"NPCが見たことない変な動きをした"},
   {cat:"初めて見た", en:"What was that?", jp:"今の何？", kw:"what was that", ex:"直前に起きたことへのツッコミ", sc:"一瞬何かが画面を横切った"},
   {cat:"初めて見た", en:"Well, that's new", jp:"へえ、それは初めてだわ", kw:"that's new", ex:"that's new=新しい→初めて見た", sc:"車がありえない挙動で回転した"},
-  {cat:"初めて見た", en:"I've seen worse", jp:"もっとひどいの見たことあるわ", kw:"seen worse", ex:"worse=より悪い。強がりのツッコミ", sc:"目の前で大事故が起きたのに強がる"},
   {cat:"そんなことある?", en:"Who does that?", jp:"そんなことする奴いる？", kw:"who does that", ex:"そんなことする人いる？という定番ツッコミ", sc:"NPCが高速道路を歩いて横断している"},
   {cat:"そんなことある?", en:"Is that normal?", jp:"それ普通なの？", kw:"normal", ex:"normal=普通", sc:"通行人が銃を見ても平然と歩いている"},
   {cat:"そんなことある?", en:"That's not normal", jp:"いや普通じゃないだろ", kw:"not normal", ex:"not normal=普通じゃない", sc:"車が空を飛んでいった"},
   {cat:"そんなことある?", en:"Is this a joke?", jp:"冗談だろ？", kw:"joke", ex:"joke=冗談", sc:"理不尽すぎる死に方をした"},
-  {cat:"そんなことある?", en:"What are the odds", jp:"こんな偶然ある？", kw:"odds", ex:"odds=確率。そんな確率ある？", sc:"逃げ込んだ先にまた警察がいた"},
   {cat:"なんでだよ", en:"Why?!", jp:"なんでだよ！", kw:"why", ex:"一番短い最強ツッコミ", sc:"何もしてないのに警察に追われ始めた"},
   {cat:"なんでだよ", en:"Why though?", jp:"いや、なんで？", kw:"why though", ex:"though=でも。冷静に聞き返すツッコミ", sc:"NPCが突然殴りかかってきた"},
   {cat:"なんでだよ", en:"Why are you like this?", jp:"お前なんでそうなの？", kw:"like this", ex:"like this=こんな風に", sc:"味方NPCが毎回同じミスをする"},
@@ -529,7 +531,6 @@ const DATA = [
   {cat:"〜すな", en:"Get out of the way", jp:"どけって", kw:"out of the way", ex:"道を塞ぐ相手へ", sc:"道の真ん中でNPCが立ち止まっている"},
   {cat:"〜すな", en:"Back off", jp:"近寄るなって", kw:"back off", ex:"back off=引き下がれ", sc:"NPCがしつこく近づいてくる"},
   {cat:"かと思った", en:"I thought you were dead", jp:"死んだかと思ったわ", kw:"thought", ex:"thought=think(思う)の過去形", sc:"轢いたNPCが普通に起き上がった"},
-  {cat:"かと思った", en:"I thought I had it", jp:"いけたと思ったのに", kw:"had it", ex:"I had it=いけた・できた", sc:"ゴール直前で失敗した"},
   {cat:"かと思った", en:"I thought that was a person", jp:"人かと思ったわ", kw:"person", ex:"person=人", sc:"看板やマネキンを人と見間違えた"},
   {cat:"〇〇ゲームなの?", en:"Is this a horror game now?", jp:"これホラーゲームなの？", kw:"horror game", ex:"now=今や。ジャンル変わった？", sc:"夜の路地で急にNPCが飛び出してきた"},
   {cat:"〇〇ゲームなの?", en:"Is this a zombie game?", jp:"ゾンビゲームなの？", kw:"zombie", ex:"zombie=ゾンビ", sc:"轢いた人が何度も起き上がる"},
@@ -542,6 +543,10 @@ const DATA = [
   {cat:"相手へ", en:"Not you again", jp:"またお前かよ", kw:"again", ex:"again=また", sc:"何度も同じNPCに絡まれる"},
   {cat:"相手へ", en:"Are you serious right now?", jp:"今マジで言ってる？", kw:"serious", ex:"serious=本気", sc:"NPCが理不尽な要求をしてきた"},
   {cat:"相手へ", en:"You've got to be kidding me", jp:"ふざけんなよ", kw:"kidding", ex:"kid=冗談を言う", sc:"最悪のタイミングでトラブル発生"},
+  {cat:"相手へ", en:"Excuse me?", jp:"は？", kw:"excuse me", ex:"聞き返しのツッコミ。語尾を上げる", sc:"NPCに急に変なことを言われた"},
+  {cat:"相手へ", en:"Nobody asked.", jp:"誰も聞いてねえよ", kw:"nobody asked", ex:"nobody=誰も〜ない", sc:"NPCが勝手に長々と喋り出した"},
+  {cat:"相手へ", en:"Relax.", jp:"落ち着けって", kw:"relax", ex:"relax=落ち着く", sc:"NPCがちょっとぶつかっただけでキレてきた"},
+  {cat:"相手へ", en:"What's wrong with you?", jp:"お前どうした？", kw:"wrong with you", ex:"What is wrong with me(自分へ)の相手版", sc:"NPCが壁に向かって全力で走り続けている"},
   {cat:"自分へ", en:"Oh, that was me", jp:"あ、俺だったわ", kw:"that was me", ex:"自分が犯人だったオチ", sc:"暴走車に文句を言ったら自分の車だった"},
   {cat:"自分へ", en:"What is wrong with me?", jp:"俺どうかしてるだろ", kw:"wrong with me", ex:"自分へのツッコミ", sc:"凡ミスを連発した"},
   {cat:"自分へ", en:"Why do I keep doing this?", jp:"なんで俺これ繰り返すんだよ", kw:"keep doing", ex:"keep+ing=〜し続ける", sc:"同じ場所で何度も事故る"},
