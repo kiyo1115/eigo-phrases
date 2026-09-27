@@ -103,6 +103,13 @@
       </select>
     </div>
     <div class="set">
+      <label>最後に英語音声</label>
+      <select id="autoEn">
+        <option value="off" selected>流さない</option>
+        <option value="on">終わりぎわに流す</option>
+      </select>
+    </div>
+    <div class="set">
       <label>場面の読み上げ</label>
       <select id="speak">
         <option value="no" selected>しない</option>
@@ -235,7 +242,7 @@ const SETS = { core: DATA_CORE, tsukkomi: DATA_TSUKKOMI };
 let DATA = DATA_CORE;
 let active = new Set(DATA.map(d=>d.cat));
 let queue = [], qi = 0;
-let running = false, timer = null, rafId = null;
+let running = false, timer = null, rafId = null, enTimer = null;
 let count = 0;
 let current = null;
 
@@ -326,7 +333,24 @@ function startTimer(){
     const showAt = Math.max(300, gap - 1200);
     setTimeout(()=>{ if(running) revealAnswer(); }, showAt);
   }
-  timer = setTimeout(()=>{ if(running) nextScene(); }, gap);
+  clearTimeout(enTimer);
+  if (document.getElementById('autoEn').value === 'on' && current){
+    const est = estimateSpeechMs(current.en);
+    // 読み終わりが場面の終わりと重なるように逆算。考える時間は最低4割確保
+    const startAt = Math.max(gap * 0.4, gap - est - 250);
+    const item = current;
+    enTimer = setTimeout(()=>{ if(running && current === item) speakEn(item.en); }, startAt);
+  }
+  timer = setTimeout(()=>{ if(running) afterSpeech(nextScene); }, gap);
+}
+// 英語の読み上げ中なら終わるまで待ってから次へ(最大4秒)
+function afterSpeech(fn){
+  if (!enSpeaking) { fn(); return; }
+  const t0 = Date.now();
+  const iv = setInterval(()=>{
+    if (!running) { clearInterval(iv); return; }
+    if (!enSpeaking || Date.now() - t0 > 4000) { clearInterval(iv); fn(); }
+  }, 100);
 }
 
 let jaVoice = null;
@@ -357,19 +381,31 @@ startBtn.onclick = ()=>{
   } else {
     startBtn.textContent = '▶ 開始';
     startBtn.classList.add('main'); startBtn.classList.remove('stop');
-    clearTimeout(timer); cancelAnimationFrame(rafId);
+    clearTimeout(timer); clearTimeout(enTimer); cancelAnimationFrame(rafId);
     timerfill.style.width = '100%';
     speechSynthesis.cancel();
+    enSpeaking = false;
   }
 };
 
+const EN_RATE = 0.9;
+let enSpeaking = false;
 function speakEn(text){
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US';
   if (enVoice) u.voice = enVoice;
-  u.rate = 0.9;
+  u.rate = EN_RATE;
+  u.onend = ()=>{ enSpeaking = false; };
+  u.onerror = ()=>{ enSpeaking = false; };
   speechSynthesis.cancel();
+  enSpeaking = true;
   speechSynthesis.speak(u);
+}
+// 英文の読み上げ時間を文字数から見積もる(ms)
+function estimateSpeechMs(text){
+  const chars = text.replace(/\s+/g,' ').length;
+  const pauses = (text.match(/[.!?,]/g) || []).length;
+  return (chars * 65 + pauses * 180) / EN_RATE + 300;
 }
 function playCurrentEn(){
   if (!current) return;
