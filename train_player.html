@@ -68,7 +68,7 @@
     </div>
   </div>
 
-  <div class="counter"><span id="count">0</span> 場面</div>
+  <div class="counter"><span id="cycle">1</span>周目 ・ <span id="done">0</span> / <span id="total">0</span> ・ 合計 <span id="count">0</span> 場面</div>
 
   <div class="ctrls">
     <button class="btn main" id="startBtn">▶ 開始</button>
@@ -81,7 +81,8 @@
     <div class="set">
       <label>練習セット</label>
       <select id="setSel">
-        <option value="core" selected>優先50語</option>
+        <option value="all" selected>まとめて(全部)</option>
+        <option value="core">優先50語</option>
         <option value="tsukkomi">ツッコミ55</option>
       </select>
     </div>
@@ -238,8 +239,15 @@ const DATA_TSUKKOMI = [
   {cat:"状況へ", scene:"大騒ぎが一段落した直後", en:"Well, that happened", jp:"まあ、色々あったな"},
   {cat:"状況へ", scene:"理不尽な倒され方をした", en:"That's not fair", jp:"それはズルいだろ"},
 ];
-const SETS = { core: DATA_CORE, tsukkomi: DATA_TSUKKOMI };
-let DATA = DATA_CORE;
+const DATA_ALL = (()=>{
+  const seen = new Set(), out = [];
+  [...DATA_CORE, ...DATA_TSUKKOMI].forEach(d=>{
+    if (!seen.has(d.en)) { seen.add(d.en); out.push(d); }
+  });
+  return out;
+})();
+const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI };
+let DATA = DATA_ALL;
 let active = new Set(DATA.map(d=>d.cat));
 let queue = [], qi = 0;
 let running = false, timer = null, rafId = null, enTimer = null;
@@ -277,10 +285,18 @@ function buildChips(){
   });
 }
 
+let cycle = 1, lastShown = null;
 function rebuild(){
   queue = DATA.filter(d=>active.has(d.cat));
   shuffle(queue);
   qi = 0;
+  cycle = 1;
+  updateProgress();
+}
+function updateProgress(){
+  document.getElementById('cycle').textContent = cycle;
+  document.getElementById('done').textContent = qi;
+  document.getElementById('total').textContent = queue.length;
 }
 function shuffle(a){
   for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
@@ -309,8 +325,19 @@ function revealAnswer(){
 
 function nextScene(){
   if (queue.length === 0) rebuild();
-  if (qi >= queue.length) { shuffle(queue); qi = 0; }
-  showScene(queue[qi++]);
+  if (qi >= queue.length) {
+    // 全部出し切ったらリセットして新しい順番で2周目へ
+    shuffle(queue);
+    if (queue.length > 1 && queue[0] === lastShown) {
+      const j = 1 + Math.floor(Math.random() * (queue.length - 1));
+      [queue[0], queue[j]] = [queue[j], queue[0]];
+    }
+    qi = 0;
+    cycle++;
+  }
+  lastShown = queue[qi++];
+  showScene(lastShown);
+  updateProgress();
   startTimer();
 }
 
