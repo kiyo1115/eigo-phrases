@@ -44,6 +44,13 @@
   .chip{background:var(--panel);border:1px solid var(--amber-dim);color:var(--dim);border-radius:999px;padding:7px 13px;font-size:12px;cursor:pointer;}
   .chip.on{background:var(--amber);color:#1a1613;border-color:var(--amber);font-weight:700;}
 
+  .judge{display:none;gap:12px;justify-content:center;margin-bottom:16px;}
+  .judge button{flex:1;max-width:220px;border:none;border-radius:14px;padding:18px 10px;font-size:18px;font-weight:800;cursor:pointer;}
+  #judgeOk{background:#2f4a30;color:#b3ffb8;}
+  #judgeNg{background:#5a3030;color:#ffb3b3;}
+  .judge small{display:block;font-size:11px;font-weight:400;opacity:.7;margin-top:3px;}
+  .retry-tag{display:inline-block;margin-left:6px;background:#5a3030;color:#ffb3b3;border-radius:999px;padding:3px 10px;font-size:11px;}
+  .waiting .hint{color:var(--amber);font-weight:700;}
   .counter{text-align:center;font-size:13px;color:var(--dim);margin-bottom:10px;}
   .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--dim);line-height:1.8;}
   .note b{color:var(--amber);}
@@ -68,7 +75,12 @@
     </div>
   </div>
 
-  <div class="counter"><span id="cycle">1</span>周目 ・ <span id="done">0</span> / <span id="total">0</span> ・ 合計 <span id="count">0</span> 場面</div>
+  <div class="counter"><span id="cycle">1</span>周目 ・ <span id="done">0</span> / <span id="total">0</span> ・ 合計 <span id="count">0</span> 場面<span id="judgeStat"></span></div>
+
+  <div class="judge" id="judgeRow">
+    <button id="judgeOk">○ 言えた<small>後回しにする (キー 1)</small></button>
+    <button id="judgeNg">× 言えなかった<small>すぐまた出す (キー 2)</small></button>
+  </div>
 
   <div class="ctrls">
     <button class="btn main" id="startBtn">▶ 開始</button>
@@ -101,6 +113,13 @@
         <option value="never" selected>出さない</option>
         <option value="after">場面の最後に出す</option>
         <option value="always">常に出す</option>
+      </select>
+    </div>
+    <div class="set">
+      <label>判定モード</label>
+      <select id="judgeMode">
+        <option value="off" selected>オフ</option>
+        <option value="on">オン(○×を押す)</option>
       </select>
     </div>
     <div class="set">
@@ -286,9 +305,26 @@ function buildChips(){
 }
 
 let cycle = 1, lastShown = null;
+// 判定モード: 苦手度(言えなかった+1 / 言えた-1)をブラウザに保存
+const WEAK_KEY = 'train_weak_v1';
+let weak = {};
+try { weak = JSON.parse(localStorage.getItem(WEAK_KEY) || '{}'); } catch(e) { weak = {}; }
+function saveWeak(){ try { localStorage.setItem(WEAK_KEY, JSON.stringify(weak)); } catch(e) {} }
+let retryList = [];          // 同じ周の中ですぐ再出題するもの {item, wait}
+let okCount = 0, ngCount = 0;
+let waitingJudge = false;
+function judgeOn(){ return document.getElementById('judgeMode').value === 'on'; }
+// ランダムだけど、苦手なものほど前に来やすいシャッフル
+function biasedShuffle(arr){
+  if (!judgeOn()) { shuffle(arr); return; }
+  const keyed = arr.map(d => ({ d, k: Math.random() - Math.min(weak[d.en] || 0, 5) * 0.25 }));
+  keyed.sort((a,b)=>a.k-b.k);
+  keyed.forEach((x,i)=>arr[i]=x.d);
+}
 function rebuild(){
   queue = DATA.filter(d=>active.has(d.cat));
-  shuffle(queue);
+  biasedShuffle(queue);
+  retryList = [];
   qi = 0;
   cycle = 1;
   updateProgress();
@@ -302,10 +338,11 @@ function shuffle(a){
   for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
 }
 
-function showScene(item){
+function showScene(item, isRetry){
   current = item;
+  document.querySelector('.stage').classList.remove('waiting');
   stageInner.innerHTML =
-    '<div class="cat">'+esc(item.cat)+'</div>' +
+    '<div class="cat">'+esc(item.cat)+'</div>' + (isRetry ? '<span class="retry-tag">もう一回</span>' : '') +
     '<div class="scene">'+esc(item.scene)+'</div>' +
     '<div class="hint">'+(DATA===DATA_TSUKKOMI?'英語でツッコんでみる':'英語で何か言ってみる')+'</div>' +
     '<div class="answer" id="ansBox">' +
@@ -324,10 +361,22 @@ function revealAnswer(){
 }
 
 function nextScene(){
+  waitingJudge = false;
   if (queue.length === 0) rebuild();
+  // 「言えなかった」ものは数問あとにもう一回出す(周の数え方には影響しない)
+  retryList.forEach(r => r.wait--);
+  const due = retryList.findIndex(r => r.wait <= 0);
+  if (due !== -1) {
+    const r = retryList.splice(due, 1)[0];
+    lastShown = r.item;
+    showScene(r.item, true);
+    updateProgress();
+    startTimer();
+    return;
+  }
   if (qi >= queue.length) {
     // 全部出し切ったらリセットして新しい順番で2周目へ
-    shuffle(queue);
+    biasedShuffle(queue);
     if (queue.length > 1 && queue[0] === lastShown) {
       const j = 1 + Math.floor(Math.random() * (queue.length - 1));
       [queue[0], queue[j]] = [queue[j], queue[0]];
@@ -368,7 +417,13 @@ function startTimer(){
     const item = current;
     enTimer = setTimeout(()=>{ if(running && current === item) speakEn(item.en); }, startAt);
   }
-  timer = setTimeout(()=>{ if(running) afterSpeech(nextScene); }, gap);
+  timer = setTimeout(()=>{ if(running) afterSpeech(()=>{
+    if (judgeOn()) {
+      waitingJudge = true;
+      document.querySelector('.stage').classList.add('waiting');
+      const h = document.querySelector('.hint'); if (h) h.textContent = '言えた？ ○ か × を押してね';
+    } else nextScene();
+  }); }, gap);
 }
 // 英語の読み上げ中なら終わるまで待ってから次へ(最大4秒)
 function afterSpeech(fn){
@@ -440,6 +495,35 @@ function playCurrentEn(){
   speakEn(current.en);
 }
 document.getElementById('speakEnBtn').onclick = playCurrentEn;
+function judge(ok){
+  if (!current) return;
+  const en = current.en;
+  if (ok) {
+    weak[en] = Math.max(0, (weak[en] || 0) - 1);
+    okCount++;
+  } else {
+    weak[en] = (weak[en] || 0) + 1;
+    ngCount++;
+    // 3〜6問あとにもう一回
+    if (!retryList.some(r => r.item === current)) retryList.push({ item: current, wait: 3 + Math.floor(Math.random()*4) });
+  }
+  saveWeak();
+  document.getElementById('judgeStat').textContent = ' ・ ○' + okCount + ' ×' + ngCount;
+  clearTimeout(timer); clearTimeout(enTimer);
+  nextScene();
+}
+document.getElementById('judgeOk').onclick = ()=>judge(true);
+document.getElementById('judgeNg').onclick = ()=>judge(false);
+document.addEventListener('keydown', (ev)=>{
+  if (!judgeOn() || !current) return;
+  if (ev.key === '1') judge(true);
+  if (ev.key === '2') judge(false);
+});
+function syncJudgeUI(){
+  document.getElementById('judgeRow').style.display = judgeOn() ? 'flex' : 'none';
+}
+document.getElementById('judgeMode').onchange = ()=>{ syncJudgeUI(); if (!judgeOn() && waitingJudge && running) nextScene(); };
+syncJudgeUI();
 document.getElementById('revealBtn').onclick = revealAnswer;
 document.getElementById('showAns').onchange = (ev)=>{ if (ev.target.value === 'always') revealAnswer(); };
 document.getElementById('skipBtn').onclick = ()=>{ if(running) nextScene(); else { if(queue.length===0) rebuild(); nextScene(); } };
