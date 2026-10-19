@@ -93,9 +93,10 @@
     <div class="set">
       <label>練習セット</label>
       <select id="setSel">
-        <option value="all" selected>まとめて(全部)</option>
+        <option value="all" selected>まとめて(実況95)</option>
         <option value="core">優先50語</option>
         <option value="tsukkomi">ツッコミ55</option>
+        <option value="verb">動詞フレーズ54</option>
       </select>
     </div>
     <div class="set">
@@ -248,6 +249,62 @@ const DATA_TSUKKOMI = [
   {cat:"状況へ", scene:"大騒ぎが一段落した直後", en:"Well, that happened", jp:"まあ、色々あったな"},
   {cat:"状況へ", scene:"理不尽な倒され方をした", en:"That's not fair", jp:"それはズルいだろ"},
 ];
+const DATA_VERB = [
+  {cat:"移動・寄り道", scene:"店や建物に寄りたい", en:"Let's drop by the store.", jp:"店に寄ってこう"},
+  {cat:"移動・寄り道", scene:"ちょっとだけ中に入る", en:"I'll just pop in here.", jp:"ちょっとここ寄るわ"},
+  {cat:"移動・寄り道", scene:"来た道を戻りたい", en:"I need to go back.", jp:"戻らないと"},
+  {cat:"移動・寄り道", scene:"後でまた来る", en:"I'll come back later.", jp:"あとで戻ってくる"},
+  {cat:"移動・寄り道", scene:"とにかく家に帰りたい", en:"I just want to get home.", jp:"家に帰りたいだけなんだけど"},
+  {cat:"移動・寄り道", scene:"特に目的もなく歩く", en:"Let's go for a walk.", jp:"散歩しよう"},
+  {cat:"移動・寄り道", scene:"上の階や屋上へ行く", en:"Let's go up there.", jp:"あそこ上ろう"},
+  {cat:"移動・寄り道", scene:"建物に入る", en:"Let's go into the bank.", jp:"銀行に入ろう"},
+  {cat:"移動・寄り道", scene:"カーナビの指示に従う", en:"Turn left! Turn right!", jp:"左！右！"},
+  {cat:"移動・寄り道", scene:"バイクに乗る", en:"I'll get on the bike.", jp:"バイク乗るわ"},
+  {cat:"移動・寄り道", scene:"NPCに掴まれた", en:"Get off me!", jp:"離せ！"},
+  {cat:"移動・寄り道", scene:"逃げた奴を追っている", en:"I'm running after him!", jp:"あいつ追いかけてる"},
+  {cat:"移動・寄り道", scene:"NPCを迎えに行くミッション", en:"I need to pick him up.", jp:"あいつ迎えに行かないと"},
+  {cat:"移動・寄り道", scene:"NPCを送り届けた", en:"I'll drop you off here.", jp:"ここで降ろすね"},
+  {cat:"体の動き", scene:"キャラが転んだ", en:"I fell down!", jp:"転んだ！"},
+  {cat:"体の動き", scene:"倒れたキャラに声をかける", en:"Stand up! Come on!", jp:"立て！ほら！"},
+  {cat:"体の動き", scene:"新しい場所に着いた", en:"Let's look around.", jp:"ちょっと見て回ろう"},
+  {cat:"体の動き", scene:"歩いていて人にぶつかった", en:"I bumped into someone.", jp:"人にぶつかった"},
+  {cat:"体の動き", scene:"ミッションの前", en:"Let's warm up first.", jp:"まずは肩慣らし"},
+  {cat:"体の動き", scene:"作戦を始める前", en:"I hope this works out.", jp:"うまくいくといいけど"},
+  {cat:"服屋・身支度", scene:"服屋で服を見ている", en:"Let me try this on.", jp:"これ試着してみよう"},
+  {cat:"服屋・身支度", scene:"服を着る", en:"I'll put this on.", jp:"これ着よう"},
+  {cat:"服屋・身支度", scene:"服を脱ぐ", en:"I'll take off the jacket.", jp:"ジャケット脱ごう"},
+  {cat:"服屋・身支度", scene:"強盗の前", en:"Put on the mask.", jp:"マスクつけて"},
+  {cat:"武器・お金・物", scene:"落ちている金を拾った", en:"I picked up some money.", jp:"金拾った"},
+  {cat:"武器・お金・物", scene:"警察に囲まれた", en:"Put the gun down!", jp:"銃を下ろせ！"},
+  {cat:"武器・お金・物", scene:"武器を出す", en:"Take out the gun.", jp:"銃出して"},
+  {cat:"武器・お金・物", scene:"NPCに物を盗られた", en:"Give it back!", jp:"返せ！"},
+  {cat:"武器・お金・物", scene:"やられた相手に", en:"I'll pay you back.", jp:"借りは返すぜ"},
+  {cat:"武器・お金・物", scene:"弾が尽きた", en:"I ran out of ammo.", jp:"弾切れた"},
+  {cat:"武器・お金・物", scene:"車が故障した", en:"My car broke down.", jp:"車壊れた"},
+  {cat:"携帯・ラジオ", scene:"電話を一方的に切った", en:"I hung up on him.", jp:"電話切ってやった"},
+  {cat:"携帯・ラジオ", scene:"着信が来た", en:"I'll call you back.", jp:"かけ直すわ"},
+  {cat:"携帯・ラジオ", scene:"分からないことがある", en:"Let me look it up.", jp:"ちょっと調べる"},
+  {cat:"携帯・ラジオ", scene:"視聴者に見せたい", en:"Check this out.", jp:"これ見て"},
+  {cat:"携帯・ラジオ", scene:"好きな曲が流れた", en:"Turn up the music!", jp:"音楽上げて！"},
+  {cat:"携帯・ラジオ", scene:"ラジオがうるさい", en:"Turn it down.", jp:"音下げて"},
+  {cat:"確かめる・見つける", scene:"どうなるか分からない", en:"Let's find out.", jp:"確かめてみよう"},
+  {cat:"確かめる・見つける", scene:"たまたま良い車を見つけた", en:"I came across a cool car.", jp:"いい車見つけた"},
+  {cat:"確かめる・見つける", scene:"強盗の前", en:"Let's go over the plan.", jp:"作戦をおさらいしよう"},
+  {cat:"確かめる・見つける", scene:"新しい車や武器を手に入れた", en:"Let's try out this car.", jp:"この車試してみよう"},
+  {cat:"NPC・人", scene:"警察と鉢合わせた", en:"We ran into the cops.", jp:"警察と鉢合わせた"},
+  {cat:"NPC・人", scene:"警察が現れた", en:"The cops showed up.", jp:"警察来た"},
+  {cat:"NPC・人", scene:"待ち合わせのNPCが来ない", en:"He didn't show up.", jp:"あいつ来なかった"},
+  {cat:"NPC・人", scene:"敵対しているNPCに", en:"We don't get along.", jp:"俺ら仲良くないんで"},
+  {cat:"NPC・人", scene:"鍵のかかったドアの前", en:"Let me in!", jp:"入れてくれ！"},
+  {cat:"NPC・人", scene:"うざいNPCに", en:"I can't put up with this guy.", jp:"こいつもう無理"},
+  {cat:"状態・気持ち", scene:"何度も失敗している", en:"I'm not giving up.", jp:"諦めねえぞ"},
+  {cat:"状態・気持ち", scene:"仲間が遅い", en:"Hurry up!", jp:"急げ！"},
+  {cat:"状態・気持ち", scene:"逃走中", en:"Keep on driving.", jp:"とにかく走り続けろ"},
+  {cat:"状態・気持ち", scene:"追いかける側", en:"I need to catch up!", jp:"追いつかないと"},
+  {cat:"状態・気持ち", scene:"不気味な場所に来た", en:"This place gives off a bad vibe.", jp:"ここ嫌な雰囲気"},
+  {cat:"状態・気持ち", scene:"配信の最後", en:"I'm worn out.", jp:"疲れた"},
+  {cat:"状態・気持ち", scene:"配信の雑談", en:"I stayed up all night playing this.", jp:"徹夜でこれやってた"},
+];
 const DATA_ALL = (()=>{
   const seen = new Set(), out = [];
   [...DATA_CORE, ...DATA_TSUKKOMI].forEach(d=>{
@@ -255,7 +312,7 @@ const DATA_ALL = (()=>{
   });
   return out;
 })();
-const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI };
+const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI, verb: DATA_VERB };
 let DATA = DATA_ALL;
 let active = new Set(DATA.map(d=>d.cat));
 let queue = [], qi = 0;
@@ -334,7 +391,7 @@ function showScene(item, isRetry){
   stageInner.innerHTML =
     '<div class="cat">'+esc(item.cat)+'</div>' + (isRetry ? '<span class="retry-tag">もう一回</span>' : '') +
     '<div class="scene">'+esc(item.scene)+'</div>' +
-    '<div class="hint">'+(DATA===DATA_TSUKKOMI?'英語でツッコんでみる':'英語で何か言ってみる')+'</div>' +
+    '<div class="hint">'+(DATA===DATA_TSUKKOMI?'英語でツッコんでみる':DATA===DATA_VERB?'動詞フレーズで言ってみる':'英語で何か言ってみる')+'</div>' +
     '<div class="answer" id="ansBox">' +
       '<div class="en" style="cursor:pointer" onclick="playCurrentEn()">🔊 '+esc(item.en)+'</div>' +
       '<div class="jp">'+esc(item.jp)+'</div>' +
