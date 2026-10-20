@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チャンク帳 - 中学英語の型</title>
+<style>
+  :root{--bg:#14110f;--panel:#1c1815;--panel2:#231e1a;--amber:#ff8c2e;--amber-dim:#c4691a;--amber-deep:#7a4518;--text:#ede5d8;--text-dim:#968d7f;--line:#2e2822;--green:#4ade80;--red:#ff8080;--yellow:#ffd166;--blue:#9cc4e8;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;padding:16px 16px 60px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  a.back{color:var(--text-dim);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:12px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;}
+  .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--amber-dim);font-weight:700;}
+  h1{font-size:24px;margin:4px 0 6px;}
+  h1 span{color:var(--amber);}
+  .lead{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:14px;}
+  .lead b{color:var(--amber);}
+  .tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .tab{flex:1;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;font-weight:700;font-size:14px;cursor:pointer;color:var(--text-dim);}
+  .tab.on{border-color:var(--amber);color:var(--amber);}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+  .chip{background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;user-select:none;}
+  .chip.on{background:var(--amber);color:#1a1208;border-color:var(--amber);font-weight:700;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;}
+  .row label{font-size:11px;color:var(--text-dim);display:flex;flex-direction:column;gap:3px;}
+  select,input[type=text]{background:var(--panel);color:var(--text);border:1px solid var(--amber-deep);border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit;}
+  input[type=text]{width:100%;background:var(--bg);border-color:var(--line);font-size:15px;}
+  .stats{font-size:12px;color:var(--text-dim);margin-bottom:12px;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn.main{background:var(--amber);color:#1a1208;}
+  .btn.sub{background:var(--panel2);color:var(--text);border:1px solid var(--amber-deep);}
+  .btn.sm{padding:6px 10px;font-size:12px;}
+
+  /* 一覧 */
+  .ck{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;}
+  .ck-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;cursor:pointer;}
+  .ck-frame{font-size:19px;font-weight:800;color:var(--amber);line-height:1.35;}
+  .ck-jp{font-size:13px;color:var(--text);margin-top:2px;}
+  .ck-use{font-size:11.5px;color:var(--text-dim);margin-top:2px;}
+  .meter{display:flex;gap:3px;flex-shrink:0;margin-top:6px;}
+  .meter i{width:9px;height:9px;border-radius:50%;background:#3a322b;display:block;}
+  .meter i.ok{background:var(--green);} .meter i.mid{background:var(--yellow);} .meter i.ng{background:var(--red);}
+  .ck-body{display:none;margin-top:10px;border-top:1px dashed var(--amber-deep);padding-top:8px;}
+  .ck.open .ck-body{display:block;}
+  .ex{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);cursor:pointer;align-items:flex-start;}
+  .ex:last-child{border-bottom:none;}
+  .ex .en{font-size:16px;font-weight:700;line-height:1.4;}
+  .ex .jp{font-size:12px;color:var(--text-dim);}
+  .ex .mine{font-size:10px;color:var(--blue);border:1px solid #4a6b8a;border-radius:99px;padding:1px 6px;margin-left:4px;}
+  .ex .del{margin-left:auto;background:none;border:1px solid var(--line);color:var(--text-dim);border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0;}
+  .add-my{margin-top:10px;display:grid;gap:6px;}
+  .add-my .lbl{font-size:11px;color:var(--blue);}
+  .hl{color:var(--amber);}
+
+  /* ドリル */
+  .card{background:var(--panel);border:2px solid var(--amber-deep);border-radius:18px;padding:24px 18px;margin-bottom:12px;text-align:center;}
+  .d-cat{display:inline-block;font-size:11px;border:1px solid var(--amber-dim);color:var(--amber);border-radius:99px;padding:3px 10px;margin-bottom:12px;}
+  .d-jp{font-size:26px;font-weight:800;line-height:1.45;margin-bottom:12px;}
+  .d-hint{font-size:14px;color:var(--blue);min-height:22px;cursor:pointer;}
+  .d-ans{display:none;margin-top:16px;padding-top:14px;border-top:1px dashed var(--amber-deep);}
+  .d-ans.show{display:block;}
+  .d-en{font-size:23px;font-weight:800;color:var(--amber);cursor:pointer;line-height:1.4;}
+  .d-frame{font-size:12px;color:var(--text-dim);margin-top:6px;}
+  .ctrls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
+  .judge{display:flex;gap:8px;margin-top:12px;}
+  .judge button{flex:1;border:none;border-radius:12px;padding:14px 6px;font-size:16px;font-weight:800;cursor:pointer;}
+  .judge small{display:block;font-size:10.5px;font-weight:400;opacity:.75;margin-top:2px;}
+  #jOk{background:#2f4a30;color:#b3ffb8;} #jMid{background:#4f4420;color:#ffe9a8;} #jNg{background:#5a3030;color:#ffb3b3;}
+  .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text-dim);line-height:1.8;margin-top:14px;}
+  .note b{color:var(--amber);}
+
+  .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;text-align:center;}
+  .login-box h2{font-size:18px;margin:0 0 6px;}
+  .login-box p{font-size:12px;color:var(--text-dim);margin:0 0 20px;}
+  .login-box input{text-align:center;margin-bottom:12px;}
+  .login-box button{width:100%;background:var(--amber);border:none;color:#1a1208;font-weight:700;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
+  .login-status{font-size:11px;color:var(--text-dim);margin-top:10px;min-height:14px;}
+  .sync-badge{position:fixed;top:10px;right:10px;font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:4px 10px;z-index:10;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">チャンク帳 / 中学英語の型</div>
+  <h1>使える<span>型</span>を持つ</h1>
+  <div class="lead">
+    単語を増やすより、<b>中身を入れ替えるだけで何でも言える型</b>を持つ方が実況では強い。<br>
+    型ごとに<b>自分の例文</b>を足していくと、自分専用のチャンク帳になります。
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" data-v="list">📖 一覧</div>
+    <div class="tab" data-v="drill">⚡ ドリル</div>
+  </div>
+  <div class="chips" id="catChips"></div>
+  <div class="stats" id="stats"></div>
+
+  <!-- 一覧 -->
+  <div id="vList">
+    <div class="row">
+      <label style="flex:1">検索(日本語・英語どちらでも)
+        <input type="text" id="q" placeholder="例: しようとしてる / trying">
+      </label>
+      <button class="btn sub sm" id="openAll">全部開く</button>
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <!-- ドリル -->
+  <div id="vDrill" style="display:none">
+    <div class="row">
+      <label>出す順番
+        <select id="orderSel">
+          <option value="weak" selected>苦手を優先</option>
+          <option value="random">ランダム</option>
+          <option value="mine">自分の例文だけ</option>
+          <option value="ngonly">△×だけ</option>
+        </select>
+      </label>
+      <label>型のヒント
+        <select id="hintSel">
+          <option value="tap" selected>タップで出す</option>
+          <option value="always">最初から出す</option>
+        </select>
+      </label>
+    </div>
+    <div class="card" id="card"></div>
+    <div class="note">
+      <b>やり方</b><br>
+      ・日本語を見たら、すぐ声に出す。型が分からなければヒントをタップ<br>
+      ・答えの英語はタップで読み上げ。2回まねして言ったら次へ<br>
+      ・一覧で自分の例文を足すと、ここにも出てくる(実況で言いたかったことを入れるのが一番効く)
+    </div>
+  </div>
+</div>
+
+<script src="chunks_data.js"></script>
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'chunk';
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+let currentUser = null, saveTimer = null;
+let status = {};  // en -> {s, w, n}
+let myEx = {};    // chunkId -> [[jp,en], ...]
+
+let view = 'list';
+let activeCats = new Set(CHUNK_CATS);
+let openIds = new Set();
+let queue = [], qi = 0, current = null, retry = [];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function exsOf(c){ return c.ex.map(e=>({jp:e[0], en:e[1], mine:false})).concat((myEx[c.id]||[]).map(e=>({jp:e[0], en:e[1], mine:true}))); }
+function hlChunk(c, en){
+  try { return esc(en).replace(new RegExp(c.re.replace(/'/g,"(?:'|&#39;)"),'i'), m=>'<span class="hl">'+m+'</span>'); }
+  catch(e){ return esc(en); }
+}
+
+// ===== 共通UI =====
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  view = t.dataset.v;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===t));
+  document.getElementById('vList').style.display = view==='list'?'':'none';
+  document.getElementById('vDrill').style.display = view==='drill'?'':'none';
+  if (view==='drill') { rebuild(); next(); } else renderList();
+});
+function buildCats(){
+  const box = document.getElementById('catChips'); box.innerHTML='';
+  const all = document.createElement('div');
+  all.className = 'chip' + (activeCats.size===CHUNK_CATS.length?' on':''); all.textContent='すべて';
+  all.onclick = ()=>{ activeCats = new Set(CHUNK_CATS); refresh(); };
+  box.appendChild(all);
+  CHUNK_CATS.forEach(c=>{
+    const n = CHUNKS.filter(k=>k.cat===c).length;
+    const el = document.createElement('div');
+    el.className = 'chip'+(activeCats.has(c)?' on':''); el.textContent = c+' ('+n+')';
+    el.onclick = ()=>{
+      if (activeCats.size===CHUNK_CATS.length) activeCats = new Set([c]);
+      else if (activeCats.has(c)) { if (activeCats.size>1) activeCats.delete(c); }
+      else activeCats.add(c);
+      refresh();
+    };
+    box.appendChild(el);
+  });
+}
+function refresh(){ buildCats(); renderStats(); if (view==='list') renderList(); else { rebuild(); next(); } }
+function renderStats(){
+  let ok=0,mid=0,ng=0,total=0,mine=0;
+  CHUNKS.forEach(c=>exsOf(c).forEach(e=>{ total++; if(e.mine) mine++; const st=status[e.en]; if(!st) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else ng++; }));
+  document.getElementById('stats').innerHTML = CHUNKS.length+'チャンク ・ 例文'+total+'(うち自分の'+mine+') ・ <b style="color:var(--green)">○'+ok+'</b> <b style="color:var(--yellow)">△'+mid+'</b> <b style="color:var(--red)">×'+ng+'</b>';
+}
+
+// ===== 一覧 =====
+function renderList(){
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const box = document.getElementById('list');
+  const items = CHUNKS.filter(c=>activeCats.has(c.cat)).filter(c=>{
+    if (!q) return true;
+    const hay = [c.frame,c.jp,c.use].concat(exsOf(c).flatMap(e=>[e.jp,e.en])).join(' ').toLowerCase();
+    return hay.indexOf(q) !== -1;
+  });
+  box.innerHTML = items.map(c=>{
+    const exs = exsOf(c);
+    const meter = exs.slice(0,6).map(e=>{ const st=status[e.en]; return '<i class="'+(st?st.s:'')+'"></i>'; }).join('');
+    return '<div class="ck'+(openIds.has(c.id)?' open':'')+'" data-id="'+c.id+'">' +
+      '<div class="ck-head"><div><div class="ck-frame">'+esc(c.frame)+'</div><div class="ck-jp">'+esc(c.jp)+'</div><div class="ck-use">'+esc(c.use)+'</div></div><div class="meter">'+meter+'</div></div>' +
+      '<div class="ck-body">' +
+        exs.map((e,i)=>'<div class="ex" data-en="'+esc(e.en)+'"><span>🔊</span><div><div class="en">'+hlChunk(c,e.en)+(e.mine?'<span class="mine">自分</span>':'')+'</div><div class="jp">'+esc(e.jp)+'</div></div>'+(e.mine?'<button class="del" data-i="'+(i-c.ex.length)+'">削除</button>':'')+'</div>').join('') +
+        '<div class="add-my"><div class="lbl">＋ 自分の例文(実況で言いたかったことを入れる)</div>' +
+          '<input type="text" class="myJp" placeholder="日本語: 例) 右に曲がろうとしてる">' +
+          '<input type="text" class="myEn" placeholder="英語: 例) I\'m trying to turn right.">' +
+          '<div><button class="btn sub sm addBtn">追加</button> <span class="addMsg" style="font-size:11px;color:var(--text-dim)"></span></div>' +
+        '</div>' +
+      '</div></div>';
+  }).join('') || '<div class="stats">見つかりません</div>';
+
+  box.querySelectorAll('.ck').forEach(el=>{
+    const id = el.dataset.id, c = CHUNKS.find(k=>k.id===id);
+    el.querySelector('.ck-head').onclick = ()=>{ el.classList.toggle('open'); if (el.classList.contains('open')) openIds.add(id); else openIds.delete(id); };
+    el.querySelectorAll('.ex').forEach(x=>x.onclick = ev=>{ if (ev.target.classList.contains('del')) return; speakEn(x.dataset.en); });
+    el.querySelectorAll('.del').forEach(b=>b.onclick = ()=>{
+      if (!confirm('この例文を削除しますか？')) return;
+      myEx[id].splice(+b.dataset.i,1); scheduleSave(); renderList(); renderStats();
+    });
+    el.querySelector('.addBtn').onclick = ()=>{
+      const jp = el.querySelector('.myJp').value.trim(), en = el.querySelector('.myEn').value.trim();
+      const msg = el.querySelector('.addMsg');
+      if (!en) { msg.textContent = '英語は必須'; return; }
+      (myEx[id] = myEx[id] || []).push([jp || '(日本語なし)', en]);
+      let warn = '';
+      try { if (!new RegExp(c.re,'i').test(en)) warn = ' ※この型が入ってないかも'; } catch(e){}
+      scheduleSave(); openIds.add(id); renderList(); renderStats();
+      const m2 = document.querySelector('.ck[data-id="'+id+'"] .addMsg'); if (m2) m2.textContent = '追加しました'+warn;
+    };
+  });
+}
+document.getElementById('q').oninput = renderList;
+document.getElementById('openAll').onclick = ()=>{
+  const items = CHUNKS.filter(c=>activeCats.has(c.cat));
+  const allOpen = items.every(c=>openIds.has(c.id));
+  items.forEach(c=> allOpen ? openIds.delete(c.id) : openIds.add(c.id));
+  document.getElementById('openAll').textContent = allOpen ? '全部開く' : '全部閉じる';
+  renderList();
+};
+
+// ===== ドリル =====
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function rebuild(){
+  const order = document.getElementById('orderSel').value;
+  let arr = [];
+  CHUNKS.filter(c=>activeCats.has(c.cat)).forEach(c=>exsOf(c).forEach(e=>arr.push({c, e})));
+  if (order==='mine') arr = arr.filter(x=>x.e.mine);
+  if (order==='ngonly') arr = arr.filter(x=>status[x.e.en] && status[x.e.en].s!=='ok');
+  if (order==='weak' || order==='ngonly') {
+    arr = arr.map(x=>{ const st=status[x.e.en]; const w = st ? st.w : 1.5; return {x, k: Math.random() - Math.min(w,5)*0.3}; }).sort((a,b)=>a.k-b.k).map(o=>o.x);
+  } else shuffle(arr);
+  queue = arr; qi = 0; retry = [];
+}
+function next(){
+  retry.forEach(r=>r.wait--);
+  const due = retry.findIndex(r=>r.wait<=0);
+  if (due!==-1) { current = retry.splice(due,1)[0].item; renderCard(true); return; }
+  if (!queue.length) { current=null; renderCard(); return; }
+  if (qi>=queue.length) { rebuild(); }
+  current = queue[qi++]; renderCard(false);
+}
+function renderCard(isRetry){
+  const card = document.getElementById('card');
+  if (!current) { card.innerHTML = '<div class="d-jp" style="font-size:17px">この条件の問題がありません</div><div class="d-frame">「自分の例文だけ」は、一覧で例文を足すと出てきます</div>'; return; }
+  const {c, e} = current;
+  const always = document.getElementById('hintSel').value==='always';
+  card.innerHTML =
+    '<div class="d-cat">'+esc(c.cat)+(e.mine?' ・ 自分の例文':'')+(isRetry?' ・ もう一回':'')+'</div>' +
+    '<div class="d-jp">'+esc(e.jp)+'</div>' +
+    '<div class="d-hint" id="hint">'+(always? '型: '+esc(c.frame) : '💡 型のヒントを見る')+'</div>' +
+    '<div class="d-ans" id="ans"><div class="d-en" id="dEn">🔊 '+hlChunk(c,e.en)+'</div><div class="d-frame">'+esc(c.frame)+' = '+esc(c.jp)+'</div></div>' +
+    '<div class="ctrls"><button class="btn main" id="reveal">答えを見る</button><button class="btn sub" id="skip">スキップ →</button></div>' +
+    '<div class="judge"><button id="jOk">○ 言えた<small>(1)</small></button><button id="jMid">△ 微妙<small>(2)</small></button><button id="jNg">× 無理<small>(3)</small></button></div>';
+  document.getElementById('hint').onclick = ev=>{ ev.target.textContent = '型: '+c.frame; };
+  document.getElementById('reveal').onclick = ()=>{ document.getElementById('ans').classList.add('show'); speakEn(e.en); };
+  document.getElementById('dEn').onclick = ()=>speakEn(e.en);
+  document.getElementById('skip').onclick = next;
+  document.getElementById('jOk').onclick = ()=>judge('ok');
+  document.getElementById('jMid').onclick = ()=>judge('mid');
+  document.getElementById('jNg').onclick = ()=>judge('ng');
+}
+function judge(s){
+  if (!current) return;
+  const en = current.e.en;
+  const st = status[en] || {w:1.5, n:0};
+  st.s = s; st.n = (st.n||0)+1;
+  st.w = s==='ok' ? Math.max(0,(st.w||0)-1) : s==='mid' ? (st.w||0)+1 : (st.w||0)+2;
+  status[en] = st;
+  if (s!=='ok' && !retry.some(r=>r.item===current)) retry.push({item: current, wait: s==='ng'?3:7});
+  scheduleSave(); renderStats(); next();
+}
+document.addEventListener('keydown', ev=>{
+  if (view!=='drill' || ev.target.tagName==='INPUT') return;
+  if (ev.key==='1') judge('ok'); if (ev.key==='2') judge('mid'); if (ev.key==='3') judge('ng');
+  if (ev.key===' ' ) { ev.preventDefault(); const r=document.getElementById('reveal'); if (r) r.click(); }
+});
+document.getElementById('orderSel').onchange = ()=>{ rebuild(); next(); };
+document.getElementById('hintSel').onchange = ()=>renderCard(false);
+
+// ===== 音声 =====
+let enVoice = null;
+function loadVoices(){ const vs = speechSynthesis.getVoices(); enVoice = vs.find(v=>v.lang==='en-US') || vs.find(v=>v.lang.startsWith('en')) || null; }
+loadVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+function speakEn(t){ const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+
+// ===== 同期 =====
+function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
+function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); saveTimer=setTimeout(()=>saveAll(),600); }
+function saveAll(retryFlag){
+  if (!currentUser) return;
+  fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status:status, _myEx:myEx})})})
+  .then(r=>r.json()).then(res=>{ if(res&&res.error) throw new Error(res.error); setSyncBadge('保存済み'); })
+  .catch(()=>{ if(!retryFlag){ setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true),1500);} else setSyncBadge('⚠保存失敗 タップで再試行'); });
+}
+function loadFromServer(user){
+  return fetch(GAS_URL+'?action=load&user='+encodeURIComponent(APP_KEY+':'+user)).then(r=>r.json()).then(res=>{
+    try { const p = JSON.parse(res.data||'{}'); status = p._status||{}; myEx = p._myEx||{}; } catch(e){ status={}; myEx={}; }
+  });
+}
+function initApp(){ buildCats(); renderStats(); renderList(); }
+function startSession(user){
+  currentUser = user; localStorage.setItem(LOCAL_USER_KEY,user);
+  document.getElementById('loginStatus').textContent='読み込み中...';
+  loadFromServer(user).then(()=>{ document.getElementById('loginOverlay').style.display='none'; setSyncBadge(user+' で同期中'); initApp(); })
+    .catch(()=>{ document.getElementById('loginStatus').textContent='通信に失敗しました。もう一度お試しください。'; });
+}
+document.getElementById('loginBtn').onclick = ()=>{ const v=document.getElementById('passInput').value.trim(); if(!v){document.getElementById('loginStatus').textContent='合言葉を入力してください';return;} startSession(v); };
+document.getElementById('passInput').onkeydown = e=>{ if(e.key==='Enter') document.getElementById('loginBtn').click(); };
+document.getElementById('syncBadge').onclick = ()=>{
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗')!==-1) { saveAll(); return; }
+  if (currentUser) loadFromServer(currentUser).then(()=>{ setSyncBadge(currentUser+' で同期中(更新済み)'); refresh(); });
+};
+const savedUser = (()=>{ try { return localStorage.getItem(LOCAL_USER_KEY); } catch(e){ return null; } })();
+if (savedUser) { document.getElementById('passInput').value = savedUser; startSession(savedUser); }
+</script>
+</body>
+</html>

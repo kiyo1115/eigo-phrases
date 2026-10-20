@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>実況ふり返り - チャンク使用チェック</title>
+<style>
+  :root{--bg:#14110f;--panel:#1c1815;--panel2:#231e1a;--amber:#ff8c2e;--amber-dim:#c4691a;--amber-deep:#7a4518;--text:#ede5d8;--text-dim:#968d7f;--line:#2e2822;--green:#4ade80;--red:#ff8080;--yellow:#ffd166;--blue:#9cc4e8;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;padding:16px 16px 60px;}
+  .wrap{max-width:760px;margin:0 auto;}
+  a.back{color:var(--text-dim);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:12px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;}
+  .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--amber-dim);font-weight:700;}
+  h1{font-size:24px;margin:4px 0 6px;}
+  h1 span{color:var(--amber);}
+  .lead{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:14px;}
+  .lead b{color:var(--amber);}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px;}
+  .panel h2{font-size:14px;margin:0 0 10px;color:var(--amber);}
+  .panel h2 small{color:var(--text-dim);font-weight:400;font-size:11px;margin-left:6px;}
+  textarea,input[type=text]{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;font-family:inherit;}
+  textarea{min-height:160px;resize:vertical;line-height:1.6;}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn.main{background:var(--amber);color:#1a1208;}
+  .btn.sub{background:var(--panel2);color:var(--text);border:1px solid var(--amber-deep);}
+  .btn.rec{background:#5a3030;color:#ffb3b3;border-color:#5a3030;}
+  .msg{font-size:12px;color:var(--text-dim);margin-top:6px;}
+  .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;}
+  .num{background:var(--panel2);border-radius:10px;padding:10px;text-align:center;}
+  .num b{display:block;font-size:22px;color:var(--text);}
+  .num span{font-size:11px;color:var(--text-dim);}
+  .used{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);}
+  .used:last-child{border-bottom:none;}
+  .used .f{font-weight:700;color:var(--amber);}
+  .used .ctx{font-size:12px;color:var(--text-dim);margin-top:2px;}
+  .used .c{font-size:18px;font-weight:800;flex-shrink:0;}
+  .hl{color:var(--amber);font-weight:700;}
+  .goal-ok{color:var(--green);} .goal-ng{color:var(--red);}
+  .pill{display:inline-block;font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:4px 10px;margin:3px 4px 3px 0;}
+  .pill.hard{border-color:#6b5a1f;color:var(--yellow);}
+  .pill.unused{cursor:pointer;}
+  .pill.unused.sel{background:var(--amber);color:#1a1208;border-color:var(--amber);font-weight:700;}
+  .cat-h{font-size:11px;color:var(--text-dim);margin:8px 0 2px;}
+  .bar{height:7px;background:#2a231d;border-radius:4px;overflow:hidden;margin-top:4px;}
+  .bar i{display:block;height:100%;background:var(--amber);}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th,td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;}
+  th{color:var(--text-dim);font-weight:400;font-size:11px;}
+  td.n{text-align:right;font-variant-numeric:tabular-nums;}
+  #result{display:none;}
+  .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text-dim);line-height:1.8;}
+  .note b{color:var(--amber);}
+
+  .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;text-align:center;}
+  .login-box h2{font-size:18px;margin:0 0 6px;}
+  .login-box p{font-size:12px;color:var(--text-dim);margin:0 0 20px;}
+  .login-box input{text-align:center;margin-bottom:12px;}
+  .login-box button{width:100%;background:var(--amber);border:none;color:#1a1208;font-weight:700;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
+  .login-status{font-size:11px;color:var(--text-dim);margin-top:10px;min-height:14px;}
+  .sync-badge{position:fixed;top:10px;right:10px;font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:4px 10px;z-index:10;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">実況ふり返り / チャンク使用チェック</div>
+  <h1>実況で<span>本当に</span>言えたか</h1>
+  <div class="lead">
+    練習録画の文字起こし(Whisperの出力など)を貼ると、<b>使えたチャンク・使ってないチャンク・言いすぎの口ぐせ・中学範囲外の単語</b>を出します。<br>
+    最後に「次回使うチャンク」を3つ決めて保存 → 次のふり返りで達成チェック。
+  </div>
+
+  <div class="panel" id="goalPanel" style="display:none">
+    <h2>今回の目標チャンク<small>前回のふり返りで決めたもの</small></h2>
+    <div id="goalNow"></div>
+  </div>
+
+  <div class="panel">
+    <h2>文字起こしを貼る</h2>
+    <input type="text" id="title" placeholder="タイトル(例: 練習4本目 ミッション2)" style="margin-bottom:8px">
+    <textarea id="src" placeholder="ここに英語の文字起こしを貼る。SRTやタイムスタンプ付きでもOK(自動で消します)"></textarea>
+    <div class="btns">
+      <button class="btn main" id="analyze">分析する</button>
+      <button class="btn sub" id="micBtn">🎤 その場で話して録る</button>
+      <button class="btn sub" id="clearBtn">クリア</button>
+    </div>
+    <div class="msg" id="srcMsg"></div>
+  </div>
+
+  <div id="result">
+    <div class="panel">
+      <h2>数字</h2>
+      <div class="nums" id="nums"></div>
+    </div>
+    <div class="panel">
+      <h2>使えたチャンク<small>回数順・タップで実際の文</small></h2>
+      <div id="usedList"></div>
+    </div>
+    <div class="panel">
+      <h2>一度も使ってないチャンク<small>タップで次回の目標に(3つまで)</small></h2>
+      <div id="unusedList"></div>
+      <div class="btns"><button class="btn main" id="saveBtn">この結果と目標を保存</button></div>
+      <div class="msg" id="saveMsg"></div>
+    </div>
+    <div class="panel">
+      <h2>口ぐせ・言いすぎ<small>3回以上出た言い回し</small></h2>
+      <div id="habit"></div>
+    </div>
+    <div class="panel">
+      <h2>中学範囲外かもしれない単語<small>文の途中の固有名詞は除外。文頭の人名などは混ざることあり</small></h2>
+      <div id="hardList"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>これまでの記録</h2>
+    <div id="hist"></div>
+  </div>
+
+  <div class="note">
+    <b>使い方</b><br>
+    ・練習録画の自分の声だけを文字起こしして貼るのが理想(ゲーム音声が混ざるとNPCのセリフも数えてしまう)<br>
+    ・「使ってないチャンク」はチャンク帳で例文を練習してから、次の録画で狙って使う<br>
+    ・口ぐせは悪じゃない。ただ Oh no が30回なら、半分を別の言い方に変えると実況が締まる
+  </div>
+</div>
+
+<script src="chunks_data.js"></script>
+<script src="jh_vocab.js"></script>
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'furikaeri';
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+const DRAFT_KEY = 'furikaeri_draft_v1';
+let currentUser = null, saveTimer = null;
+let hist = [];   // {d, title, words, sents, used:{id:n}, hard:n, goals:[ids], goalHit:n}
+let goals = [];     // 次回の目標チャンクid
+let lastResult = null, pick = new Set();
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+const byId = id => CHUNKS.find(c=>c.id===id);
+
+// SRT/タイムスタンプ/番号行を除去
+function cleanText(raw){
+  return raw.split(/\r?\n/).map(l=>l
+      .replace(/\[?\d{1,2}:\d{2}(:\d{2})?([.,]\d+)?\s*(-->|–>)\s*\d{1,2}:\d{2}(:\d{2})?([.,]\d+)?\]?/g,'')
+      .replace(/^\s*\d+\s*$/,'')
+      .replace(/^\s*\[?\d{1,2}:\d{2}(:\d{2})?([.,]\d+)?\]?\s*/,'')
+    ).filter(l=>l.trim()).join(' ').replace(/\s+/g,' ').trim();
+}
+function sentencesOf(t){ return t.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean); }
+
+const FILLERS = ['oh no','oh my god','okay','ok','um','uh','like','you know','i mean','so','wait','what','come on','let\'s go','oh','yeah','bro','dude','alright','i don\'t know'];
+
+function analyze(){
+  const raw = document.getElementById('src').value;
+  const text = cleanText(raw);
+  if (!text) { document.getElementById('srcMsg').textContent = '文字起こしを貼ってください'; return; }
+  try { localStorage.setItem(DRAFT_KEY, raw); } catch(e){}
+  const sents = sentencesOf(text);
+  const tokens = text.split(/\s+/).filter(Boolean);
+  const words = tokens.map(t=>JH.normWord(t)).filter(Boolean);
+  const uniq = new Set(words);
+
+  // チャンク検出
+  const used = {};
+  const ctx = {};
+  CHUNKS.forEach(c=>{
+    let re; try { re = new RegExp(c.re,'gi'); } catch(e){ return; }
+    sents.forEach(s=>{
+      const m = s.match(re);
+      if (m) { used[c.id] = (used[c.id]||0) + m.length; (ctx[c.id] = ctx[c.id]||[]).push(s); }
+    });
+  });
+
+  // 口ぐせ: 1〜4語の言い回しの出現回数
+  const lw = text.toLowerCase().replace(/[^a-z0-9'\s]/g,' ').split(/\s+/).filter(Boolean);
+  const grams = {};
+  for (let n=1;n<=4;n++) for (let i=0;i+n<=lw.length;i++){
+    const g = lw.slice(i,i+n).join(' ');
+    grams[g] = (grams[g]||0)+1;
+  }
+  const STOP = new Set(['the','a','an','i','to','it','is','and','of','in','that','this','you','he','she','we','they','me','my','on','for','was','be','are','at','with','his','her','it\'s','i\'m','there','what\'s','don\'t','can\'t','just','not','have','do']);
+  let habits = Object.entries(grams).filter(([g,n])=>{
+    if (n < 3) return false;
+    const ws = g.split(' ');
+    if (ws.length===1) return FILLERS.includes(g);
+    if (ws.every(w=>STOP.has(w))) return false;
+    return true;
+  });
+  // 長い言い回しに含まれる短い方は、回数が同じなら消す
+  habits = habits.filter(([g,n])=>!habits.some(([g2,n2])=>g2!==g && g2.length>g.length && (' '+g2+' ').indexOf(' '+g+' ')!==-1 && n2>=n));
+  habits.sort((a,b)=>b[1]-a[1] || b[0].length-a[0].length);
+  habits = habits.slice(0,15);
+
+  // 中学範囲外(文頭以外の大文字始まりは固有名詞として除外)
+  const hard = {};
+  sents.forEach(s=>{
+    s.split(/\s+/).forEach((t,i)=>{
+      const clean = t.replace(/^[^A-Za-z0-9']+|[^A-Za-z0-9']+$/g,'');
+      if (!clean) return;
+      if (i>0 && /^[A-Z]/.test(clean) && !/^I('|$)/.test(clean)) return;
+      if (!JH.isEasy(clean)) { const w = JH.normWord(clean); hard[w] = (hard[w]||0)+1; }
+    });
+  });
+
+  lastResult = {text, sents, words, uniq, used, ctx, habits, hard};
+  pick = new Set();
+  render();
+}
+
+function render(){
+  const r = lastResult;
+  document.getElementById('result').style.display = 'block';
+  const usedIds = Object.keys(r.used);
+  const hardN = Object.values(r.hard).reduce((a,b)=>a+b,0);
+  const avg = r.sents.length ? (r.words.length / r.sents.length) : 0;
+  document.getElementById('nums').innerHTML = [
+    [r.words.length,'語'], [r.sents.length,'文'], [avg.toFixed(1),'1文の平均語数'], [r.uniq.size,'違う単語の数'],
+    [usedIds.length+' / '+CHUNKS.length,'使えたチャンク'], [hardN,'中学外かも']
+  ].map(([v,l])=>'<div class="num"><b>'+v+'</b><span>'+l+'</span></div>').join('');
+
+  // 目標の達成
+  if (goals.length) {
+    document.getElementById('goalNow').innerHTML = goals.map(id=>{ const c=byId(id); if(!c) return ''; const n=r.used[id]||0;
+      return '<div class="used"><div><div class="f">'+esc(c.frame)+'</div><div class="ctx">'+esc(c.jp)+'</div></div><div class="c '+(n?'goal-ok':'goal-ng')+'">'+(n?'○ '+n+'回':'× 0回')+'</div></div>'; }).join('');
+  }
+
+  // 使えた
+  const max = Math.max(1, ...usedIds.map(id=>r.used[id]));
+  document.getElementById('usedList').innerHTML = usedIds.length ? usedIds.sort((a,b)=>r.used[b]-r.used[a]).map(id=>{
+    const c = byId(id);
+    const ex = r.ctx[id].slice(0,3).map(s=>'・'+hlSent(c,s)).join('<br>');
+    return '<div class="used" style="cursor:pointer" onclick="this.querySelector(\'.ctx2\').style.display=this.querySelector(\'.ctx2\').style.display===\'block\'?\'none\':\'block\'"><div style="flex:1"><div class="f">'+esc(c.frame)+' <span style="color:var(--text-dim);font-weight:400;font-size:12px">'+esc(c.jp)+'</span></div><div class="bar"><i style="width:'+(r.used[id]/max*100)+'%"></i></div><div class="ctx ctx2" style="display:none;margin-top:6px">'+ex+'</div></div><div class="c">'+r.used[id]+'</div></div>';
+  }).join('') : '<div class="msg">まだ0個。まずは I\'m trying to ~ と I need to ~ から狙ってみる</div>';
+
+  // 使ってない
+  renderUnused();
+
+  // 口ぐせ
+  document.getElementById('habit').innerHTML = r.habits.length ? r.habits.map(([g,n])=>'<span class="pill">'+esc(g)+' <b>×'+n+'</b></span>').join('') : '<div class="msg">目立つ口ぐせなし</div>';
+
+  // 中学外
+  const hl = Object.entries(r.hard).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('hardList').innerHTML = hl.length ? hl.map(([w,n])=>'<span class="pill hard">'+esc(w)+(n>1?' ×'+n:'')+'</span>').join('') + '<div class="msg">言い換えドリルで、同じ意味を簡単な単語で言えるか試してみる(ゲーム用語ならOK)</div>' : '<div class="msg">全部中学英語の範囲。いいね</div>';
+  window.scrollTo({top: document.getElementById('result').offsetTop - 10, behavior:'smooth'});
+}
+function hlSent(c, s){
+  try { return esc(s).replace(new RegExp(c.re,'gi'), m=>'<span class="hl">'+m+'</span>'); } catch(e){ return esc(s); }
+}
+function renderUnused(){
+  const r = lastResult;
+  const html = CHUNK_CATS.map(cat=>{
+    const list = CHUNKS.filter(c=>c.cat===cat && !r.used[c.id]);
+    if (!list.length) return '';
+    return '<div class="cat-h">'+esc(cat)+'</div>' + list.map(c=>'<span class="pill unused'+(pick.has(c.id)?' sel':'')+'" data-id="'+c.id+'">'+esc(c.frame)+'</span>').join('');
+  }).join('');
+  const box = document.getElementById('unusedList');
+  box.innerHTML = html || '<div class="msg">全部使えてる！すごい</div>';
+  box.querySelectorAll('.unused').forEach(p=>p.onclick=()=>{
+    const id = p.dataset.id;
+    if (pick.has(id)) pick.delete(id); else if (pick.size < 3) pick.add(id);
+    renderUnused();
+  });
+}
+
+document.getElementById('analyze').onclick = analyze;
+document.getElementById('clearBtn').onclick = ()=>{ document.getElementById('src').value=''; document.getElementById('title').value=''; try{localStorage.removeItem(DRAFT_KEY);}catch(e){} };
+document.getElementById('saveBtn').onclick = ()=>{
+  if (!lastResult) return;
+  const r = lastResult;
+  const goalHit = goals.filter(id=>r.used[id]).length;
+  hist.unshift({
+    d: new Date().toISOString().slice(0,10),
+    title: document.getElementById('title').value.trim() || '(無題)',
+    words: r.words.length, sents: r.sents.length, used: r.used,
+    hard: Object.values(r.hard).reduce((a,b)=>a+b,0),
+    goals: goals.slice(), goalHit
+  });
+  hist = hist.slice(0,60);
+  goals = [...pick];
+  scheduleSave();
+  renderHistory(); renderGoals();
+  document.getElementById('saveMsg').textContent = '保存しました。' + (goals.length ? '次回の目標: ' + goals.map(id=>byId(id).frame).join(' / ') : '');
+};
+
+function renderGoals(){
+  const p = document.getElementById('goalPanel');
+  if (!goals.length) { p.style.display='none'; return; }
+  p.style.display='block';
+  document.getElementById('goalNow').innerHTML = goals.map(id=>{ const c=byId(id); return c ? '<div class="used"><div><div class="f">'+esc(c.frame)+'</div><div class="ctx">'+esc(c.jp)+' ・ 例: '+esc(c.ex[0][1])+'</div></div></div>' : ''; }).join('');
+}
+function renderHistory(){
+  const box = document.getElementById('hist');
+  if (!hist.length) { box.innerHTML = '<div class="msg">まだ記録がありません</div>'; return; }
+  // 累計でよく使うチャンク
+  const total = {};
+  hist.forEach(h=>Object.entries(h.used||{}).forEach(([id,n])=>total[id]=(total[id]||0)+n));
+  const top = Object.entries(total).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  box.innerHTML = '<table><tr><th>日付</th><th>タイトル</th><th class="n">語</th><th class="n">チャンク</th><th class="n">中学外</th><th class="n">目標</th></tr>' +
+    hist.map(h=>'<tr><td>'+esc(h.d.slice(5))+'</td><td>'+esc(h.title)+'</td><td class="n">'+h.words+'</td><td class="n">'+Object.keys(h.used||{}).length+'</td><td class="n">'+h.hard+'</td><td class="n">'+(h.goals&&h.goals.length? h.goalHit+'/'+h.goals.length : '-')+'</td></tr>').join('') +
+    '</table>' +
+    (top.length ? '<div class="cat-h" style="margin-top:12px">累計でよく使ってるチャンク</div>' + top.map(([id,n])=>'<span class="pill">'+esc(byId(id)?byId(id).frame:id)+' ×'+n+'</span>').join('') : '');
+}
+
+// ===== その場で録る(Chrome/Safariの音声認識) =====
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recOn = false;
+document.getElementById('micBtn').onclick = ()=>{
+  const btn = document.getElementById('micBtn'), msg = document.getElementById('srcMsg');
+  if (!SR) { msg.textContent = 'このブラウザは音声認識に未対応(ChromeかSafariで開いてね)'; return; }
+  if (recOn) { recOn = false; rec && rec.stop(); return; }
+  const box = document.getElementById('src');
+  rec = new SR(); rec.lang='en-US'; rec.continuous=true; rec.interimResults=false;
+  rec.onresult = e=>{
+    for (let i=e.resultIndex;i<e.results.length;i++) if (e.results[i].isFinal) {
+      let t = e.results[i][0].transcript.trim();
+      if (t && !/[.!?]$/.test(t)) t += '.';
+      box.value = (box.value ? box.value.trim()+' ' : '') + t.charAt(0).toUpperCase() + t.slice(1);
+    }
+  };
+  rec.onerror = e=>{ if (e.error!=='no-speech' && e.error!=='aborted') msg.textContent = '音声認識エラー: '+e.error; };
+  rec.onend = ()=>{ if (recOn) { try { rec.start(); } catch(err){} } else { btn.classList.remove('rec'); btn.textContent='🎤 その場で話して録る'; msg.textContent='録音を止めました。「分析する」を押してね'; } };
+  recOn = true; btn.classList.add('rec'); btn.textContent='■ 録るのをやめる'; msg.textContent='英語で話してください(止めるまで続けて書き足します)';
+  try { rec.start(); } catch(err){}
+};
+
+// ===== 同期 =====
+function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
+function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); saveTimer=setTimeout(()=>saveAll(),600); }
+function saveAll(retryFlag){
+  if (!currentUser) return;
+  fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_history:hist, _goals:goals})})})
+  .then(r=>r.json()).then(res=>{ if(res&&res.error) throw new Error(res.error); setSyncBadge('保存済み'); })
+  .catch(()=>{ if(!retryFlag){ setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true),1500);} else setSyncBadge('⚠保存失敗 タップで再試行'); });
+}
+function loadFromServer(user){
+  return fetch(GAS_URL+'?action=load&user='+encodeURIComponent(APP_KEY+':'+user)).then(r=>r.json()).then(res=>{
+    try { const p = JSON.parse(res.data||'{}'); hist = p._history||[]; goals = p._goals||[]; } catch(e){ hist=[]; goals=[]; }
+  });
+}
+function initApp(){
+  renderGoals(); renderHistory();
+  try { const d = localStorage.getItem(DRAFT_KEY); if (d && !document.getElementById('src').value) document.getElementById('src').value = d; } catch(e){}
+}
+function startSession(user){
+  currentUser = user; localStorage.setItem(LOCAL_USER_KEY,user);
+  document.getElementById('loginStatus').textContent='読み込み中...';
+  loadFromServer(user).then(()=>{ document.getElementById('loginOverlay').style.display='none'; setSyncBadge(user+' で同期中'); initApp(); })
+    .catch(()=>{ document.getElementById('loginStatus').textContent='通信に失敗しました。もう一度お試しください。'; });
+}
+document.getElementById('loginBtn').onclick = ()=>{ const v=document.getElementById('passInput').value.trim(); if(!v){document.getElementById('loginStatus').textContent='合言葉を入力してください';return;} startSession(v); };
+document.getElementById('passInput').onkeydown = e=>{ if(e.key==='Enter') document.getElementById('loginBtn').click(); };
+document.getElementById('syncBadge').onclick = ()=>{
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗')!==-1) { saveAll(); return; }
+  if (currentUser) loadFromServer(currentUser).then(()=>{ setSyncBadge(currentUser+' で同期中(更新済み)'); initApp(); });
+};
+const savedUser = (()=>{ try { return localStorage.getItem(LOCAL_USER_KEY); } catch(e){ return null; } })();
+if (savedUser) { document.getElementById('passInput').value = savedUser; startSession(savedUser); }
+</script>
+</body>
+</html>
