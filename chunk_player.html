@@ -103,6 +103,7 @@
   <div class="tabs">
     <div class="tab on" data-v="list">📖 一覧</div>
     <div class="tab" data-v="drill">⚡ ドリル</div>
+    <div class="tab" data-v="loop">🔁 聞き流し</div>
   </div>
   <div class="chips" id="catChips"></div>
   <div class="stats" id="stats"></div>
@@ -119,6 +120,8 @@
   </div>
 
   <!-- ドリル -->
+  <div id="vLoop" style="display:none"><div class="card" id="loopMount" style="text-align:left"></div></div>
+
   <div id="vDrill" style="display:none">
     <div class="row">
       <label>出す順番
@@ -141,12 +144,14 @@
       <b>やり方</b><br>
       ・日本語を見たら、すぐ声に出す。型が分からなければヒントをタップ<br>
       ・答えの英語はタップで読み上げ。2回まねして言ったら次へ<br>
-      ・一覧で自分の例文を足すと、ここにも出てくる(実況で言いたかったことを入れるのが一番効く)
+      ・一覧で自分の例文を足すと、ここにも出てくる(実況で言いたかったことを入れるのが一番効く)<br>
+    ・「聞き流し」は仕事中用。型 → 意味 → 例文 → 和訳を自動で流し続ける
     </div>
   </div>
 </div>
 
 <script src="chunks_data.js"></script>
+<script src="loop_core.js"></script>
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
 const APP_KEY = 'chunk';
@@ -173,7 +178,9 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===t));
   document.getElementById('vList').style.display = view==='list'?'':'none';
   document.getElementById('vDrill').style.display = view==='drill'?'':'none';
-  if (view==='drill') { rebuild(); next(); } else renderList();
+  document.getElementById('vLoop').style.display = view==='loop'?'':'none';
+  if (view!=='loop') loop.stop();
+  if (view==='drill') { rebuild(); next(); } else if (view==='loop') { speechSynthesis.cancel(); loop.render(); } else renderList();
 });
 function buildCats(){
   const box = document.getElementById('catChips'); box.innerHTML='';
@@ -194,7 +201,7 @@ function buildCats(){
     box.appendChild(el);
   });
 }
-function refresh(){ buildCats(); renderStats(); if (view==='list') renderList(); else { rebuild(); next(); } }
+function refresh(){ buildCats(); renderStats(); if (view==='list') renderList(); else if (view==='loop') loop.render(); else { rebuild(); next(); } }
 function renderStats(){
   let ok=0,mid=0,ng=0,total=0,mine=0;
   CHUNKS.forEach(c=>exsOf(c).forEach(e=>{ total++; if(e.mine) mine++; const st=status[e.en]; if(!st) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else ng++; }));
@@ -319,6 +326,22 @@ function loadVoices(){ const vs = speechSynthesis.getVoices(); enVoice = vs.find
 loadVoices();
 if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
 function speakEn(t){ const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+
+// ===== 聞き流し =====
+const loop = ListenLoop.create({
+  mount: document.getElementById('loopMount'), storageKey: 'chunk_loop_v1', albumName: 'チャンク帳 聞き流し',
+  targets: [['all','すべて'],['weak','△×の例文だけ'],['mine','自分の例文だけ']],
+  enVoice: ()=>enVoice,
+  getItems: t => CHUNKS.filter(c=>activeCats.has(c.cat)).map(c=>{
+    let exs = exsOf(c);
+    if (t==='mine') exs = exs.filter(e=>e.mine);
+    if (t==='weak') exs = exs.filter(e=>status[e.en] && status[e.en].s!=='ok');
+    return { title: c.frame, meaning: c.jp, cat: c.cat + ' ・ ' + c.use,
+      sayChunk: c.frame.split(' / ')[0].replace(/\(.*?\)/g,'').replace(/~/g,'').replace(/\s+/g,' ').replace(/^\s*,\s*/,'').trim(),
+      meaningSay: c.jp,
+      exs: exs.map(e=>({ en: e.en, jp: e.jp==='(日本語なし)'?'':e.jp, html: hlChunk(c, e.en) })) };
+  }).filter(x=>x.exs.length)
+});
 
 // ===== 同期 =====
 function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
