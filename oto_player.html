@@ -111,6 +111,7 @@
     <div class="tab on" data-v="learn">👂 耳ならし</div>
     <div class="tab" data-v="quiz">🎯 聞き取り</div>
     <div class="tab" data-v="dict">✍️ 書き取り</div>
+    <div class="tab" data-v="loop">🔁 聞き流し</div>
   </div>
   <div class="chips" id="catChips"></div>
   <div class="row">
@@ -136,6 +137,7 @@
   <div class="stats" id="stats"></div>
 
   <div class="card" id="card"></div>
+  <div class="card" id="loopMount" style="display:none;text-align:left"></div>
 
   <div class="note">
     <b>6つの音のパターン</b>
@@ -145,11 +147,13 @@
       ・耳ならし：音を聞いて、<b>カタカナ通りに3回まねして言う</b>。自分で言える音は聞き取れるようになる<br>
       ・聞き取り：文だけ流れる。空欄に入るかたまりを選ぶ<br>
       ・書き取り：聞こえた通りに全部打つ。抜けた所が自分の弱点<br>
+      ・聞き流し：かたまり(ゆっくり→ふつう) → カタカナ → 崩れた発音の例文 → 和訳を自動で流し続ける。仕事中用<br>
       ・ブラウザの読み上げは本物より発音がはっきりめ。<b>「映画で聞く」</b>を押すと、映画やドラマでそのかたまりを言っている場面が次々に流れる(PlayPhrase.me)
     </div>
   </div>
 </div>
 
+<script src="loop_core.js"></script>
 <script>
 // ===== パターン =====
 const PATS = {
@@ -283,7 +287,7 @@ function buildChips(){
     });
   });
 }
-function refresh(){ buildChips(); rebuild(); next(); }
+function refresh(){ buildChips(); if (view==='loop') { renderStats(); loop.render(); return; } rebuild(); next(); }
 function pool(){
   const order = document.getElementById('orderSel').value;
   return KATA.filter(k=>activeP.has(k.p) && (!weakOnly || k.weak))
@@ -314,7 +318,7 @@ function next(){
 function renderStats(){
   let ok=0,mid=0,ng=0;
   KATA.forEach(k=>{ const st=status[key(k.id)]; if(!st) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else ng++; });
-  const name = {learn:'耳ならし',quiz:'聞き取り',dict:'書き取り'}[view];
+  const name = {learn:'耳ならし',quiz:'聞き取り',dict:'書き取り',loop:'聞き流し'}[view];
   document.getElementById('stats').innerHTML = name+' ・ 全'+KATA.length+'個 ・ <b style="color:var(--green)">○'+ok+'</b> <b style="color:var(--yellow)">△'+mid+'</b> <b style="color:var(--red)">×'+ng+'</b> 未'+(KATA.length-ok-mid-ng)+' ・ 今の条件 '+queue.length+'個';
 }
 
@@ -461,7 +465,7 @@ function record(s){
   scheduleSave(); renderStats();
 }
 document.addEventListener('keydown', ev=>{
-  if (ev.target.tagName==='TEXTAREA' || ev.target.tagName==='INPUT' || !current) return;
+  if (ev.target.tagName==='TEXTAREA' || ev.target.tagName==='INPUT' || !current || view==='loop') return;
   if (view==='learn') { if(ev.key==='1'){record('ok');next();} if(ev.key==='2'){record('mid');next();} if(ev.key==='3'){record('ng');next();} }
   if (view==='quiz' && !answered && /^[1-4]$/.test(ev.key)) { const b = document.querySelectorAll('.opt')[+ev.key-1]; if (b) b.click(); }
   if (ev.key===' ') { ev.preventDefault(); const p=document.getElementById('play')||document.getElementById('pNorm'); if(p) p.click(); }
@@ -472,9 +476,13 @@ document.addEventListener('keydown', ev=>{
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   view = t.dataset.v;
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===t));
-  rebuild(); next();
+  const isLoop = view==='loop';
+  document.getElementById('card').style.display = isLoop?'none':'';
+  document.getElementById('loopMount').style.display = isLoop?'':'none';
+  document.querySelector('.row').style.display = isLoop?'none':'';
+  if (isLoop) { speechSynthesis.cancel(); renderStats(); loop.render(); } else { loop.stop(); rebuild(); next(); }
 });
-document.getElementById('orderSel').onchange = ()=>{ rebuild(); next(); };
+document.getElementById('orderSel').onchange = ()=>{ if (view==='loop') return; rebuild(); next(); };
 document.getElementById('ptList').innerHTML = Object.values(PATS).map(v=>'<div><b>'+esc(v.name)+'</b>'+esc(v.tip)+'</div>').join('');
 
 // ===== 音声 =====
@@ -498,6 +506,19 @@ function speak(t, rateOverride){
   u.rate = rateOverride || parseFloat(document.getElementById('rateSel').value);
   speechSynthesis.cancel(); speechSynthesis.speak(u);
 }
+
+// ===== 聞き流し =====
+const loop = ListenLoop.create({
+  mount: document.getElementById('loopMount'), storageKey: 'oto_loop_v1', albumName: '音のかたまり 聞き流し', slowChunk: true,
+  targets: [['all','すべて'],['notok','耳ならしで○以外'],['weak','苦手な音 of/are/were']],
+  jaOnLabel: 'カタカナと和訳も読む', jaMeaningLabel: 'カタカナだけ読む',
+  enVoice: ()=>voice,
+  getItems: t => KATA.filter(k=>activeP.has(k.p) && (!weakOnly || k.weak))
+    .filter(k=> t==='all' || (t==='weak' ? k.weak : !(status['learn:'+k.id] && status['learn:'+k.id].s==='ok')))
+    .map(k=>({ title: k.text, sub: k.snd+'（'+k.rs+'）', meaning: PATS[k.p].tip, cat: PATS[k.p].name+(k.weak?' ・ 苦手な音':''),
+      sayChunk: k.text, meaningSay: k.snd,
+      exs: k.ex.map(e=>({ en: e[0], say: e[2]||e[0], jp: e[1], html: hlChunk(k, e[0]) })) }))
+});
 
 // ===== 同期 =====
 function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
