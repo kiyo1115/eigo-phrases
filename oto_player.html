@@ -145,7 +145,7 @@
       ・耳ならし：音を聞いて、<b>カタカナ通りに3回まねして言う</b>。自分で言える音は聞き取れるようになる<br>
       ・聞き取り：文だけ流れる。空欄に入るかたまりを選ぶ<br>
       ・書き取り：聞こえた通りに全部打つ。抜けた所が自分の弱点<br>
-      ・ブラウザの読み上げは本物より発音がはっきりめ。<b>「本物の音」</b>で実際の英語話者の動画を確認すると効く
+      ・ブラウザの読み上げは本物より発音がはっきりめ。<b>「映画で聞く」</b>を押すと、映画やドラマでそのかたまりを言っている場面が次々に流れる(PlayPhrase.me)
     </div>
   </div>
 </div>
@@ -324,7 +324,7 @@ function tagsHtml(k, isRetry){
   return '<div class="tags"><span class="tag">'+esc(PATS[k.p].name)+'</span>' + (k.weak?'<span class="tag weak">苦手な音</span>':'') +
     (st?'<span class="tag st">'+({ok:'○',mid:'△',ng:'×'}[st.s])+' '+st.n+'回</span>':'<span class="tag st">未</span>') + (isRetry?'<span class="tag weak">もう一回</span>':'') + '</div>';
 }
-function realLink(k){ return 'https://youglish.com/pronounce/'+encodeURIComponent(k.text)+'/english/us'; }
+function realLink(k){ return 'https://www.playphrase.me/#/search?q='+encodeURIComponent(k.text); }
 function sayOf(ex){ return ex[2] || ex[0]; }
 
 function render(isRetry){
@@ -336,7 +336,7 @@ function render(isRetry){
       '<div class="k-text">'+esc(k.text)+'</div>' +
       '<div class="k-sound">'+esc(k.snd)+'<small>'+esc(k.rs)+'</small></div>' +
       '<div class="k-tip">'+esc(PATS[k.p].tip)+'</div>' +
-      '<div class="btns"><button class="btn sub" id="pSlow">🐢 ゆっくり</button><button class="btn main" id="pNorm">🔊 ふつう</button><a class="btn sub" href="'+realLink(k)+'" target="_blank" rel="noopener">🎬 本物の音</a></div>' +
+      '<div class="btns"><button class="btn sub" id="pSlow">🐢 ゆっくり</button><button class="btn main" id="pNorm">🔊 ふつう</button><a class="btn sub" href="'+realLink(k)+'" target="_blank" rel="noopener">🎬 映画で聞く</a></div>' +
       '<div class="exs">' + k.ex.map((e,i)=>'<div class="ex" data-i="'+i+'"><span>🔊</span><div><div class="en">'+hlChunk(k,e[0])+'</div><div class="jp">'+esc(e[1])+'</div></div></div>').join('') + '</div>' +
       '<div class="k-tip" style="color:var(--text-dim)">カタカナ通りに3回まねして言えたら ○</div>' +
       judgeHtml();
@@ -412,7 +412,7 @@ function afterHtml(k, ex){
     '<div class="jp">'+esc(ex[1])+'</div>' +
     '<div class="snd">'+esc(k.text)+' → <b>'+esc(k.snd)+'</b>（'+esc(k.rs)+'）・ '+esc(PATS[k.p].name)+'</div>' +
     '<div class="say3">聞き取れなかったら、かたまりをカタカナ通りに3回言ってからもう一度聞く</div>' +
-    '<div class="btns" style="justify-content:flex-start"><button class="btn sub" id="aChunk">🔊 かたまりだけ</button><button class="btn sub" id="aSlow">🐢 文をゆっくり</button><a class="btn sub" href="'+realLink(k)+'" target="_blank" rel="noopener">🎬 本物の音</a></div>' +
+    '<div class="btns" style="justify-content:flex-start"><button class="btn sub" id="aChunk">🔊 かたまりだけ</button><button class="btn sub" id="aSlow">🐢 文をゆっくり</button><a class="btn sub" href="'+realLink(k)+'" target="_blank" rel="noopener">🎬 映画で聞く</a></div>' +
   '</div>';
 }
 function bindAfter(k, ex){
