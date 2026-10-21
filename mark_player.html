@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markiplier語録 - 本人の頻出かたまり</title>
+<style>
+  :root{--bg:#14110f;--panel:#1c1815;--panel2:#231e1a;--amber:#ff8c2e;--amber-dim:#c4691a;--amber-deep:#7a4518;--text:#ede5d8;--text-dim:#968d7f;--line:#2e2822;--green:#4ade80;--red:#ff8080;--yellow:#ffd166;--blue:#9cc4e8;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;padding:16px 16px 60px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  a.back{color:var(--text-dim);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:12px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;}
+  .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--amber-dim);font-weight:700;}
+  h1{font-size:24px;margin:4px 0 6px;}
+  h1 span{color:var(--amber);}
+  .lead{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:12px;}
+  .lead b{color:var(--amber);}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px;}
+  .fact{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+  .fact b{display:block;font-size:20px;color:var(--amber);}
+  .fact span{font-size:11.5px;color:var(--text-dim);line-height:1.5;}
+  .cov{background:var(--panel);border:1px solid var(--amber-deep);border-radius:14px;padding:14px 16px;margin-bottom:12px;}
+  .cov-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .cov-h b{font-size:26px;color:var(--amber);}
+  .cov-h span{font-size:12px;color:var(--text-dim);}
+  .bar{height:10px;background:#2a231d;border-radius:5px;overflow:hidden;margin:8px 0;}
+  .bar i{display:block;height:100%;background:var(--amber);transition:width .3s;}
+  .next{font-size:12.5px;color:var(--text-dim);line-height:1.8;}
+  .next b{color:var(--text);}
+  .tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .tab{flex:1;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 4px;font-weight:700;font-size:13px;cursor:pointer;color:var(--text-dim);}
+  .tab.on{border-color:var(--amber);color:var(--amber);}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+  .chip{background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;user-select:none;}
+  .chip.on{background:var(--amber);color:#1a1208;border-color:var(--amber);font-weight:700;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn.main{background:var(--amber);color:#1a1208;}
+  .btn.sub{background:var(--panel2);color:var(--text);border:1px solid var(--amber-deep);}
+  .btn.sm{padding:6px 10px;font-size:12px;}
+  .btn.big{font-size:18px;padding:16px 26px;border-radius:14px;}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+  details.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;}
+  details.panel summary{cursor:pointer;font-size:13px;color:var(--amber);font-weight:700;}
+  .url-row{display:grid;gap:6px;margin-top:10px;}
+  .url-row label{font-size:11px;color:var(--text-dim);}
+  input[type=text]{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:14px;font-family:inherit;}
+  .msg{font-size:12px;color:var(--text-dim);margin-top:6px;}
+
+  .row{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+  .row.know{border-color:#2f5a35;}
+  .row.learn{border-color:var(--amber-deep);}
+  .r-head{display:flex;gap:10px;align-items:flex-start;cursor:pointer;}
+  .rank{font-size:12px;color:var(--text-dim);min-width:26px;padding-top:4px;}
+  .r-main{flex:1;min-width:0;}
+  .r-text{font-size:18px;font-weight:800;}
+  .r-jp{font-size:12.5px;color:var(--text);margin-top:1px;}
+  .r-snd{font-size:12px;color:var(--amber);margin-top:1px;}
+  .r-n{text-align:right;flex-shrink:0;}
+  .r-n b{font-size:18px;}
+  .r-n small{display:block;font-size:10px;color:var(--text-dim);}
+  .st{display:inline-block;font-size:10.5px;border-radius:99px;padding:2px 8px;margin-top:4px;border:1px solid var(--line);color:var(--text-dim);}
+  .st.know{border-color:#2f5a35;color:var(--green);}
+  .st.learn{border-color:var(--amber-dim);color:var(--amber);}
+  .st.both{border-color:#4a6b8a;color:var(--blue);margin-left:4px;}
+  .r-body{display:none;margin-top:10px;border-top:1px dashed var(--amber-deep);padding-top:8px;}
+  .row.open .r-body{display:block;}
+  .ex{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);}
+  .ex:last-of-type{border-bottom:none;}
+  .ex .en{font-size:15.5px;font-weight:700;line-height:1.45;}
+  .ex .jp{font-size:12px;color:var(--text-dim);}
+  .ex .src{font-size:10.5px;color:var(--text-dim);}
+  .ex-btns{display:flex;gap:4px;flex-shrink:0;}
+  .ib{background:var(--panel2);border:1px solid var(--amber-deep);color:var(--text);border-radius:8px;padding:6px 8px;font-size:13px;cursor:pointer;}
+  .hl{color:var(--amber);text-decoration:underline;text-underline-offset:4px;}
+  .set-btns{display:flex;gap:6px;margin-top:8px;}
+
+  .card{background:var(--panel);border:2px solid var(--amber-deep);border-radius:18px;padding:22px 18px;margin-bottom:12px;text-align:center;}
+  .c-rank{font-size:12px;color:var(--text-dim);}
+  .c-text{font-size:32px;font-weight:800;margin:6px 0 4px;}
+  .c-snd{font-size:18px;color:var(--amber);font-weight:700;}
+  .c-jp{font-size:15px;margin-top:8px;}
+  .c-ex{font-size:14px;color:var(--text-dim);margin-top:10px;line-height:1.6;}
+  .sort-btns{display:flex;gap:8px;margin-top:16px;}
+  .sort-btns button{flex:1;border:none;border-radius:12px;padding:16px 6px;font-size:16px;font-weight:800;cursor:pointer;}
+  .sort-btns small{display:block;font-size:10.5px;font-weight:400;opacity:.75;margin-top:2px;}
+  #sKnow{background:#2f4a30;color:#b3ffb8;} #sLearn{background:#5a3a1c;color:#ffd2a8;}
+  .q-sent{font-size:20px;font-weight:700;line-height:1.6;margin:10px 0 4px;}
+  .blank{display:inline-block;min-width:80px;border-bottom:3px solid var(--amber);color:var(--amber);}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+  .opt{background:var(--panel2);border:1px solid var(--amber-deep);color:var(--text);border-radius:12px;padding:14px 8px;font-size:15px;font-weight:700;cursor:pointer;}
+  .opt.right{background:#2f4a30;border-color:var(--green);color:#b3ffb8;}
+  .opt.wrong{background:#5a3030;border-color:var(--red);color:#ffb3b3;}
+  .result{margin-top:12px;font-size:15px;font-weight:800;}
+  .result.ok{color:var(--green);} .result.ng{color:var(--red);}
+  .after{display:none;margin-top:12px;background:var(--panel2);border-radius:12px;padding:12px 14px;text-align:left;}
+  .after.show{display:block;}
+  .after .full{font-size:17px;font-weight:700;line-height:1.6;}
+  .after .jp{font-size:12.5px;color:var(--text-dim);margin-top:4px;}
+  .after .snd{font-size:14px;color:var(--amber);margin-top:8px;}
+  .src-tag{font-size:11px;color:var(--text-dim);margin-top:4px;}
+  .yt-wrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;margin-bottom:10px;display:none;}
+  .yt-wrap.show{display:block;}
+  .yt-wrap > div, .yt-wrap iframe{position:absolute;inset:0;width:100%;height:100%;}
+  .yt-cover{position:absolute;left:0;right:0;bottom:0;height:22%;background:#000;display:flex;align-items:center;justify-content:center;font-size:11px;color:#666;pointer-events:none;}
+  .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text-dim);line-height:1.8;margin-top:14px;}
+  .note b{color:var(--amber);}
+
+  .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;text-align:center;}
+  .login-box h2{font-size:18px;margin:0 0 6px;}
+  .login-box p{font-size:12px;color:var(--text-dim);margin:0 0 20px;}
+  .login-box input{text-align:center;margin-bottom:12px;}
+  .login-box button{width:100%;background:var(--amber);border:none;color:#1a1208;font-weight:700;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
+  .login-status{font-size:11px;color:var(--text-dim);margin-top:10px;min-height:14px;}
+  .sync-badge{position:fixed;top:10px;right:10px;font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:4px 10px;z-index:10;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">Markiplier語録 / バイオ9 12本 + バイオ2 で確認</div>
+  <h1>本人が<span>よく言う</span>かたまり</h1>
+  <div class="lead">
+    実際の文字起こし12本(Part 1〜13、Part 8以外)から、Markiplierが何度も言うかたまりを回数順に並べました。<br>
+    <b>上から順に聞き取れるようにする</b>のが、彼の動画を理解する最短ルートです。
+  </div>
+
+  <div class="facts">
+    <div class="fact"><b>約7.6万語</b><span>12本で話された単語の数。違う単語は約4,670個</span></div>
+    <div class="fact"><b>65%</b><span>よく出る上位100語だけで全体の65%。上位300語なら81%</span></div>
+    <div class="fact"><b>58%</b><span>3語以上の文のうち、下のかたまりのどれかが入っている文の割合</span></div>
+    <div class="fact"><b>85個</b><span>7年前のバイオ2(2019年)でも同じくらい出てくるかたまり。🎮印。こっちが本物の口ぐせ</span></div>
+  </div>
+
+  <div class="cov">
+    <div class="cov-h"><span>知ってるかたまりで聞き取れる割合</span><b id="covPct">0%</b></div>
+    <div class="bar"><i id="covBar" style="width:0"></i></div>
+    <div class="next" id="nextList"></div>
+  </div>
+
+  <details class="panel" id="urlPanel">
+    <summary>動画のURLを設定(本人の声で練習できるようになる)</summary>
+    <div class="url-row">
+      <div id="urlInputs" class="url-row" style="margin-top:0"></div>
+      <div><button class="btn main sm" id="urlSave">保存</button> <span class="msg" id="urlMsg"></span></div>
+      <div class="msg">設定すると、例文の ▶ で元動画のその場面に飛び、聞き取りモードでは本人の声が流れます。未設定のときはブラウザの読み上げ音声になります。</div>
+    </div>
+  </details>
+
+  <div class="tabs">
+    <div class="tab on" data-v="list">📊 一覧</div>
+    <div class="tab" data-v="sort">🃏 仕分け</div>
+    <div class="tab" data-v="quiz">🎧 聞き取り</div>
+  </div>
+  <div class="chips" id="chips"></div>
+
+  <div id="vList"><div id="list"></div></div>
+  <div id="vSort" style="display:none"><div class="card" id="sortCard"></div></div>
+  <div id="vQuiz" style="display:none">
+    <div class="yt-wrap" id="ytWrap"><div id="yt"></div><div class="yt-cover">字幕を隠しています</div></div>
+    <div class="card" id="quizCard"></div>
+  </div>
+
+  <div class="note">
+    <b>使い方</b><br>
+    ・まず「仕分け」で、聞いて分かるものと分からないものを分ける(1個2秒でOK)<br>
+    ・一覧の上から、「覚える」にしたものを例文ごと音で覚える。音のかたまりアプリの耳ならしと同じく、カタカナ通りに3回言う<br>
+    ・「聞き取り」で、実際の文の空欄を当てる。3回続けて正解したら「知ってる」に移る<br>
+    ・最後に元の動画を字幕なしで見て、そのかたまりが耳に入ってくるか確認する<br>
+    ・自動字幕なので、例文には言いかけや聞き間違いが少し混ざっています
+  </div>
+</div>
+
+<script>
+const DATA = [{"id":"im_going_to","cat":"これからやること","text":"(I'm) going to ~ / gonna","re":"\\bgoing to\\b|\\bgonna\\b","jp":"〜するぞ / 〜しそう","snd":"ガナ","n":631,"per":[16,34,55,84,95,89,49,76,45,36,44,8],"ex":[[2,320,"This isn't going to work, is it?","これ、うまくいかないよね？"],[3,429,"I'm going to need more of those.","あれがもっと必要になるな。"],[3,1820,"I'm going to go up the stairs.","階段を上がるぞ。"]],"n2":384,"both":true},{"id":"just","cat":"よく出る一言","text":"just","re":"\\bjust\\b","jp":"ちょっと / ただ / ちょうど","snd":"ジャス","ex":[[3,1577,"I'm just going to run for it.","とりあえず走って逃げる。"],[4,198,"I'm just going to keep looking around.","とりあえずこのまま見て回る。"],[2,1492,"I just hacked into the cent's network.","今センターのネットワークをハッキングした。"]],"per":[35,31,40,53,54,78,46,89,52,40,42,14],"n":574,"n2":260,"both":true},{"id":"all_right","cat":"リアクション","text":"All right","re":"\\ball right\\b","jp":"よし / オッケー / さて","snd":"オーライ","n":497,"per":[33,43,38,49,53,57,30,68,34,39,37,16],"ex":[[3,2247,"All right, so what was I doing?","よし、で、何してたっけ？"],[1,3105,"All right, I'm going for it.","よし、行くぞ。"],[2,1928,"All right, let's see what's happening.","よし、何が起きてるか見てみよう。"]],"n2":211,"both":true},{"id":"theres","cat":"よく出るかたまり","text":"There's ~ / There was ~","re":"\\bthere's\\b|\\bthere is\\b|\\bthere was\\b|\\bthere are\\b|\\bthere were\\b","jp":"〜がある / 〜があった","snd":"ゼアズ","ex":[[3,1137,"There's also a dead body over here.","こっちにも死体がある。"],[4,918,"There's also the stairs down that way.","あっちに下りる階段もある。"],[5,530,"There was a ladder this whole time.","ずっとハシゴがあったのか。"]],"per":[15,16,22,49,37,36,35,40,56,46,30,14],"n":396,"n2":128,"both":true},{"id":"oh_my_god","cat":"リアクション","text":"Oh my god","re":"\\boh my (god|gosh)\\b","jp":"うわ、マジか","snd":"オマイガッ","n":239,"per":[10,25,16,41,31,20,27,28,21,9,10,1],"ex":[[1,2705,"Oh my god, they got bullets.","マジか、弾持ってるじゃん。"],[2,2563,"Oh my god, it worked.","うわ、うまくいった。"],[3,81,"Oh my god, I might have missed the door.","うわ、ドア見逃したかも。"]],"n2":33,"both":false},{"id":"really","cat":"よく出る一言","text":"really","re":"\\breally\\b","jp":"本当に / マジで？","snd":"リアリー","ex":[[5,144,"This guy could really take a bullet.","こいつ、本当に弾に強いな。"],[10,3203,"The children there really creeped me out.","あそこの子どもたち、本当に不気味だった。"],[13,2035,"Oh, that's really nice and very convenient.","おっ、それは本当にありがたい。"]],"per":[14,14,6,21,18,15,14,22,23,11,24,13],"n":195,"n2":88,"both":true},{"id":"i_can","cat":"これからやること","text":"I can ~","re":"\\bi can\\b(?!')","jp":"〜できる","snd":"アイクン","ex":[[3,758,"Maybe I can make a blood pick.","血のピックを作れるかも。"],[4,1144,"Okay, I can make a makeshift knife.","よし、間に合わせのナイフが作れる。"],[9,1371,"Oh, surely I can make this jump.","まあ、このジャンプはいけるだろ。"]],"per":[9,5,18,32,17,20,15,31,10,8,19,3],"n":187,"n2":83,"both":true},{"id":"wait","cat":"リアクション","text":"Wait","re":"\\bwait\\b(?! a (minute|second)| for)","jp":"待って","snd":"ウェイッ","ex":[[3,80,"Wait, did I go through that door?","待って、あのドア通ったっけ？"],[4,3763,"Wait, is it auto saving or something?","待って、オートセーブされてる？"],[12,2370,"Wait, didn't I get a new axe?","待って、新しい斧もらってなかったっけ？"]],"per":[6,10,27,28,9,19,15,19,9,6,15,8],"n":171,"n2":33,"both":false},{"id":"kind_of","cat":"考え・ぼかし","text":"kind of","re":"\\bkind of\\b","jp":"ちょっと / なんか / 〜みたいな","snd":"カインダ","n":161,"per":[16,6,5,18,11,13,16,14,20,27,12,3],"ex":[[1,543,"You could see how this looks kind of real.","これ、ちょっとリアルに見えるでしょ。"],[1,664,"That's the kind of dark I want.","こういう暗さが欲しかったんだよ。"]],"n2":16,"both":false},{"id":"got_to","cat":"これからやること","text":"I've got to / I have to ~","re":"\\b(i've |i |we )?(got to|gotta|have to)\\b","jp":"〜しなきゃ","snd":"ガラ / ハフタ","n":151,"per":[8,10,12,17,11,20,14,22,12,5,12,8],"ex":[[2,1105,"Oh, this has got to be good.","おっ、これは絶対いいやつだ。"],[3,1278,"I got to find out what's in here.","ここに何があるか確かめなきゃ。"],[3,1187,"I got to get rid of it.","これ捨てなきゃ。"]],"n2":80,"both":true},{"id":"and_then","cat":"よく出るかたまり","text":"and then","re":"\\band then\\b","jp":"それで / そしたら","snd":"アンゼン","n":148,"per":[2,3,22,17,15,21,16,20,14,7,10,1],"ex":[[3,2150,"And then that should be it.","それで終わりのはず。"],[3,2896,"And then make it to the safe room.","そしてセーフルームまで行く。"],[3,2914,"And then I can get out of here.","そしたらここから出られる。"]],"n2":51,"both":true},{"id":"i_have","cat":"よく出るかたまり","text":"I have ~ / I've got ~","re":"\\bi have\\b(?! to| been)|\\bi've got\\b(?! to)","jp":"〜を持ってる / 〜がある","snd":"アイハヴ","ex":[[2,2692,"And now I have two antique coins.","これで古いコインが2枚になった。"],[4,486,"I keep forgetting I have a flashlight.","懐中電灯持ってるのをいつも忘れる。"],[12,348,"Do I have a code for that?","それのコード持ってたっけ？"]],"per":[3,5,15,28,8,12,19,13,10,10,14,9],"n":146,"n2":123,"both":true},{"id":"i_dont_know_if","cat":"考え・ぼかし","text":"I don't know if / why ~","re":"\\bi don't know (if|why|what|how|where|who)\\b","jp":"〜かどうか分からない","snd":"アイダノウイフ","n":145,"per":[7,2,15,18,11,16,16,17,8,12,15,8],"ex":[[2,2429,"I don't know how to use it.","使い方が分からない。"],[3,2548,"I don't know if I needed that.","あれが必要だったか分からない。"],[1,2809,"I don't know where I'm going.","どこに向かってるのか分からない。"]],"n2":66,"both":true},{"id":"you_know","cat":"考え・ぼかし","text":"you know","re":"\\byou know\\b(?! what)","jp":"ほら / なんていうか","snd":"ユノウ","n":138,"per":[8,8,7,12,12,15,7,16,19,15,16,3],"ex":[[3,2242,"It's pretty damn good, you know.","かなりいいよ、ほんとに。"],[3,1930,"You know, I don't need to be there.","ほら、俺がそこにいる必要ないし。"],[3,2607,"You're not like other people, you know.","君は他の人とは違うんだよ、ね。"]],"n2":45,"both":true},{"id":"actually","cat":"よく出る一言","text":"actually","re":"\\bactually\\b","jp":"実は / 意外と","snd":"アクチュアリー","ex":[[6,1520,"Well, that actually doesn't look too bad.","まあ、意外と悪くなさそう。"],[10,2408,"Okay, so we've actually been here before.","よし、実はここ前にも来たな。"],[3,802,"There's actually a security thing on that.","実はそこにセキュリティのやつがある。"]],"per":[6,5,9,16,10,17,10,24,11,12,10,3],"n":133,"n2":32,"both":true},{"id":"i_think","cat":"考え・ぼかし","text":"I think ~","re":"\\bi think\\b","jp":"〜だと思う","snd":"アイスィンク","n":130,"per":[8,13,9,6,9,18,8,8,15,16,17,3],"ex":[[2,1091,"But I think we should move on.","でも先に進んだ方がいいと思う。"],[3,739,"I think I see ammo up there.","上に弾がある気がする。"],[1,356,"I think I can do that.","それならできると思う。"]],"n2":63,"both":true},{"id":"oh_god","cat":"リアクション","text":"Oh god","re":"\\boh,? god\\b","jp":"うわ、勘弁して","snd":"オウガッ","n":123,"per":[0,7,6,18,18,16,20,9,10,2,8,9],"ex":[[3,2487,"Oh god, that's not good.","うわ、まずい。"],[2,2305,"Oh god, no.","勘弁して、やめて。"]],"n2":27,"both":false},{"id":"uh_huh","cat":"リアクション","text":"Uh-huh / Mhm","re":"\\buh huh\\b|\\buhhuh\\b|\\bmhm\\b|\\bmm hmm\\b","jp":"うんうん / なるほど","snd":"アハ","ex":[[11,2988,"Uh-huh, you know it, buddy.","うんうん、そういうことだよ、相棒。"],[11,1090,"Uh-huh, back out to the crevasse.","うんうん、裂け目の方に戻る。"]],"per":[16,10,1,11,2,14,19,8,9,9,10,3],"n":112,"n2":11,"both":false},{"id":"right_tag","cat":"考え・ぼかし","text":"~, right?","re":"(?<!all )\\bright\\W*$","jp":"〜だよね？","snd":"ライッ？","ex":[[3,1637,"There was another door over here, right?","こっちにもう1つドアがあったよね？"],[10,3454,"They made a bunch of these, right?","これ、たくさん作ったんだよね？"],[5,489,"Wait, at least we're in it together, right?","待って、少なくとも俺らは一緒だよな？"]],"per":[5,4,7,9,8,16,3,8,12,14,10,14],"n":110,"n2":null,"both":false},{"id":"probably","cat":"考え・ぼかし","text":"probably","re":"\\bprobably\\b","jp":"たぶん","snd":"プラバリー","n":109,"per":[7,6,6,12,11,12,9,9,17,8,9,3],"ex":[[3,1628,"I probably should have done that first.","たぶん先にそれやるべきだった。"],[1,1609,"Oh, it's probably the electrical panel.","たぶん配電盤だ。"],[3,2390,"Probably something good in here.","たぶんこの中にいいものがある。"]],"n2":96,"both":true},{"id":"maybe","cat":"よく出る一言","text":"maybe","re":"\\bmaybe\\b","jp":"たぶん / もしかして","snd":"メイビー","ex":[[3,758,"Maybe I can make a blood pick.","血のピックを作れるかも。"],[5,1448,"Maybe that means that it's not openable.","もしかして開けられないってことかも。"],[10,3019,"Maybe I'll get into a new business.","新しい商売でも始めようかな。"]],"per":[6,7,6,9,4,14,13,13,17,11,8,1],"n":109,"n2":78,"both":true},{"id":"in_there","cat":"よく出るかたまり","text":"in there / in here","re":"\\bin (there|here)\\b","jp":"あの中 / この中","snd":"インゼア / インヒア","n":103,"per":[6,11,11,18,13,14,3,7,7,3,9,1],"ex":[[2,1401,"Why did I drop it in there?","なんであそこに落としたんだ？"],[3,109,"How do people normally get in here?","普通はどうやってここに入るんだ？"],[3,2487,"Okay, I'm going to get in there.","よし、あの中に入るぞ。"]],"n2":64,"both":true},{"id":"i_know","cat":"考え・ぼかし","text":"I know","re":"\\bi know\\b","jp":"分かってる / だよね","snd":"アイノウ","ex":[[4,1739,"I know there's more blood in here.","この中にもっと血があるのは分かってる。"],[5,2323,"I know an easier way to do this.","これをもっと簡単にやる方法を知ってる。"],[10,2834,"Good thing I know how keys work.","鍵の仕組みを知っててよかった。"]],"per":[9,8,3,12,10,13,8,10,6,8,8,4],"n":99,"n2":101,"both":true},{"id":"is_that","cat":"質問","text":"Is that ~?","re":"\\bis that\\b","jp":"それって〜？","snd":"イザッ","n":98,"per":[8,9,8,13,9,7,6,8,8,10,9,3],"ex":[[3,665,"Is that something I can do?","それって俺にできること？"],[3,698,"I Is that going to work?","それでうまくいくの？"],[2,619,"Is that it up there?","あれ、上にあるやつ？"]],"n2":38,"both":true},{"id":"what_the_hell","cat":"リアクション","text":"What the hell","re":"\\bwhat the (hell|heck|f|frick)\\b|\\bwhat the \\[ピー\\]","jp":"なんだよこれ / は？","snd":"ワッザヘル","n":98,"per":[4,7,9,18,11,12,7,6,13,6,5,0],"ex":[[3,440,"Also, what the hell is going on here?","それと、ここで何が起きてんだよ？"],[3,183,"What the hell, man?","なんだよ、おい？"],[3,2061,"Wait, what the hell?","待って、は？"]],"n2":12,"both":false},{"id":"i_got","cat":"これからやること","text":"I got ~ / I got it","re":"\\bi got\\b(?! to)","jp":"手に入れた / 分かった","snd":"アイガッ","n":96,"per":[3,18,7,10,5,14,9,12,7,2,7,2],"ex":[[2,1745,"Anyway, I got a big gun now.","とにかく、でかい銃を手に入れた。"],[2,2623,"I got something to show you.","見せたいものがある。"],[2,2384,"Okay, so I got a makeshift knife.","よし、間に合わせのナイフを手に入れた。"]],"n2":52,"both":true},{"id":"over_there","cat":"よく出るかたまり","text":"over there / over here","re":"\\bover (there|here)\\b","jp":"あっち / こっち","snd":"オウヴァゼア","ex":[[3,1137,"There's also a dead body over here.","こっちにも死体がある。"],[4,1421,"There was another empty injector over there.","あっちにも空の注射器があった。"],[9,1396,"Figure out how to get over there.","あっちへの行き方を考えよう。"]],"per":[1,3,8,12,12,6,11,19,5,5,13,0],"n":95,"n2":27,"both":true},{"id":"lets","cat":"これからやること","text":"Let's ~","re":"\\blet's\\b","jp":"〜しよう","snd":"レッツ","ex":[[5,635,"Let's see how many bullets I got.","弾がいくつあるか見てみよう。"],[6,903,"All right, let's go for it.","よし、突っ込もう。"],[9,1094,"All right, so let's use that.","よし、じゃあそれを使おう。"]],"per":[5,6,9,11,9,11,5,7,7,8,9,6],"n":93,"n2":83,"both":true},{"id":"i_didnt","cat":"よく出るかたまり","text":"I didn't ~","re":"\\bi didn't\\b","jp":"〜しなかった","snd":"アイディドゥン","ex":[[2,1288,"I didn't even know that could happen.","そんなことが起きるなんて知らなかった。"],[12,2185,"I didn't see a benefit to it.","それをやる意味が分からなかった。"],[13,1742,"I didn't know that's how it worked.","そういう仕組みだって知らなかった。"]],"per":[2,12,8,12,8,3,6,11,7,12,6,6],"n":93,"n2":44,"both":true},{"id":"need_to","cat":"これからやること","text":"I need to ~","re":"\\b(i|we) need to\\b","jp":"〜しないと","snd":"アイニートゥ","n":87,"per":[8,7,14,6,7,8,11,7,6,4,6,3],"ex":[[1,94,"I need to save that for myself.","それは自分のために取っておかないと。"],[1,1545,"We need to keep our voices down.","声を小さくしないと。"],[2,2520,"Okay, here's what I need to do.","よし、やるべきことはこれだ。"]],"n2":86,"both":true},{"id":"i_guess","cat":"考え・ぼかし","text":"I guess","re":"\\bi guess\\b","jp":"たぶん / まあ〜かな","snd":"アイゲス","n":86,"per":[1,5,5,10,3,7,13,19,8,7,7,1],"ex":[[1,1340,"I guess I'm out of options here.","もう打つ手がないみたいだ。"],[3,1170,"Okay, we're done, I guess.","オッケー、これで終わりかな。"],[3,1173,"I guess I could get rid of the green herb.","緑のハーブは捨ててもいいかな。"]],"n2":49,"both":true},{"id":"i_mean","cat":"考え・ぼかし","text":"I mean","re":"\\bi mean\\b","jp":"いや、つまり","snd":"アイミーン","n":83,"per":[5,1,1,9,11,8,7,12,10,8,8,3],"ex":[[2,2457,"I mean, she was right.","いや、彼女が正しかった。"],[3,1106,"I mean, there's none there.","いや、そこには何もない。"],[1,17,"I mean, if it's an option, I kind of want a consistent experience.","いや、選べるなら、統一された体験がいいんだよね。"]],"n2":15,"both":false},{"id":"the_other","cat":"よく出るかたまり","text":"the other ~","re":"\\bthe other\\b","jp":"もう一方の〜 / 他の〜","snd":"ズィアザー","ex":[[3,1324,"I hit the other guy behind you.","お前の後ろのもう1人を撃った。"],[4,2613,"Seems like the other doors are open.","他のドアは開いてるみたい。"],[11,327,"Plus I've already upgraded the other one.","それにもう1つの方はもう強化したし。"]],"per":[1,4,3,12,10,5,9,14,4,8,10,2],"n":82,"n2":18,"both":false},{"id":"i_cant","cat":"これからやること","text":"I can't ~","re":"\\bi can't\\b","jp":"〜できない","snd":"アイキャン(ト)","n":78,"per":[5,5,8,7,4,6,9,9,10,9,3,3],"ex":[[3,379,"I can't look at it, though.","でもそれは見れない。"],[2,2749,"Oh, I can't read that.","あれ読めない。"],[1,1336,"There's a door back here, but I can't open it.","奥にドアがあるけど開けられない。"]],"n2":42,"both":true},{"id":"did_i","cat":"質問","text":"Did I ~? / Did you ~?","re":"\\bdid (i|you)\\b","jp":"〜したっけ？ / 〜した？","snd":"ディライ / ディジュ","n":76,"per":[6,4,15,6,0,7,7,13,4,2,6,6],"ex":[[3,80,"Wait, did I go through that door?","待って、あのドア通ったっけ？"],[2,1320,"Did you cut off your own arm?","自分の腕を切り落としたの？"],[3,1307,"Why did you do this to me?","なんでこんなことしたんだよ？"]],"n2":53,"both":true},{"id":"i_thought","cat":"考え・ぼかし","text":"I thought ~","re":"\\bi thought\\b","jp":"〜だと思ってた","snd":"アイソー","n":74,"per":[5,9,3,4,8,9,9,9,8,4,2,4],"ex":[[1,2672,"I thought you were a zombie.","ゾンビだと思った。"],[2,2866,"I thought that was a mirror.","鏡だと思った。"],[3,1700,"It was longer than I thought.","思ったより長かった。"]],"n2":23,"both":true},{"id":"hold_on","cat":"リアクション","text":"Hold on / Wait a minute","re":"(?<!a )\\bhold on\\b|\\bwait a (minute|second)\\b","jp":"ちょっと待って","snd":"ホウルドン / ウェイラミニッ","n":74,"per":[3,5,7,4,0,5,11,7,8,12,1,11],"ex":[[2,1127,"Hey, wait a minute.","おい、ちょっと待て。"],[3,1632,"All right, hold on.","よし、ちょっと待って。"],[1,1472,"Wait a minute.","ちょっと待って。"]],"n2":14,"both":false},{"id":"oh_no","cat":"リアクション","text":"Oh no","re":"\\boh no\\b","jp":"うわ、やばい","snd":"オウノウ","n":74,"per":[3,9,2,2,1,6,7,15,5,5,15,4],"ex":[[2,14,"Oh no, my mouse sensitivity is bad.","うわ、マウス感度が悪い。"]],"n2":32,"both":true},{"id":"why_is","cat":"質問","text":"Why is ~? / Why are ~?","re":"\\bwhy (is|are|does|do|did)\\b","jp":"なんで〜なの？","snd":"ワイイズ","ex":[[1,2798,"Why are they all smiling like that?","なんであいつらみんなあんなに笑ってるんだ？"],[6,3480,"Emily, God, why is it so predictable?","エミリー、なんでこんなに読めるんだよ？"],[11,264,"My god, why is this so hard?","うわ、なんでこんなに難しいんだ？"]],"per":[5,5,10,8,5,4,10,8,6,4,7,2],"n":74,"n2":46,"both":true},{"id":"let_me","cat":"これからやること","text":"Let me ~","re":"\\blet me\\b","jp":"ちょっと〜させて","snd":"レミ","n":73,"per":[1,5,5,15,5,12,4,10,2,7,6,1],"ex":[[3,2300,"Let me see if he's going the correct way.","あいつが正しい方に行ってるか見てみよう。"],[2,3131,"Let me do my storage first and then I'll save.","先に整理させて、それからセーブする。"],[3,1118,"Let me pick it.","ちょっと開けさせて。"]],"n2":48,"both":true},{"id":"might_be","cat":"考え・ぼかし","text":"might be ~","re":"\\bmight (be|have)\\b","jp":"〜かもしれない","snd":"マイビー","n":70,"per":[2,1,4,14,3,7,6,14,7,0,8,4],"ex":[[2,162,"Might be some information here that's important or something.","大事な情報があるかもしれない。"],[1,490,"Oh, um um there might be answers inside.","中に答えがあるかもしれない。"],[3,191,"So, is this actually There might be something there.","何かあるかもしれない。"]],"n2":18,"both":true},{"id":"a_little","cat":"よく出るかたまり","text":"a little (bit)","re":"\\ba little\\b","jp":"ちょっと","snd":"アリロー","n":69,"per":[5,5,8,11,7,2,3,15,5,3,2,3],"ex":[[2,2580,"It's taking me a little bit.","ちょっと時間かかってる。"],[1,2798,"Fire rate's a little low.","連射速度がちょっと遅い。"],[3,509,"It's a little violent.","ちょっと暴力的だね。"]],"n2":26,"both":true},{"id":"oh_good","cat":"リアクション","text":"Oh good / That's good","re":"\\b(oh,? good|that's good)\\b","jp":"よかった","snd":"オウグッ","n":68,"per":[6,5,9,9,6,11,1,2,5,5,7,2],"ex":[[3,1876,"Okay, that's good to know.","よし、それは知れてよかった。"],[3,1252,"Okay, that's good.","オッケー、いいね。"],[3,2287,"That's good stuff.","いいね、これ。"]],"n2":18,"both":true},{"id":"come_on","cat":"リアクション","text":"Come on","re":"\\bcome on\\b","jp":"おいおい / 頼むよ","snd":"カモン","n":67,"per":[4,4,3,6,6,9,9,8,7,6,1,4],"ex":[[1,1886,"No, come on, man.","いや、おいおい。"],[1,1952,"Oh, come on, really?","おいおい、マジで？"],[2,2104,"Come on, guys.","頼むよ、みんな。"]],"n2":38,"both":true},{"id":"one_of","cat":"よく出るかたまり","text":"one of ~","re":"\\bone of\\b","jp":"〜の1つ","snd":"ワナヴ","n":67,"per":[1,3,5,7,7,2,13,7,8,5,6,3],"ex":[[3,1331,"Then you're going to need one of these.","じゃあ、これが1つ必要になるな。"],[3,285,"It's one of those things.","例のアレだ。"],[2,2681,"And then I'm going to do one of these.","それから、これを1つやる。"]],"n2":17,"both":true},{"id":"out_of","cat":"よく出るかたまり","text":"out of ~","re":"\\bout of\\b","jp":"〜から外へ / 〜を切らして","snd":"アウダ","n":66,"per":[4,7,6,3,2,15,4,8,5,6,3,3],"ex":[[1,1340,"I guess I'm out of options here.","もう打つ手がないな。"],[1,3066,"Okay, I'm out of here.","よし、もう行くわ。"],[1,1770,"We need to find a way out of here now.","今すぐここから出る方法を見つけないと。"]],"n2":46,"both":true},{"id":"this_way","cat":"よく出るかたまり","text":"this way / that way","re":"\\b(this|that) way\\b","jp":"こっち / あっち","snd":"ディスウェイ","ex":[[7,881,"Why would I go down this way?","なんでこっちに行くんだよ？"],[12,2350,"I'm going to go this way first.","先にこっちに行く。"],[4,2309,"Both of you come this way.","2人ともこっちに来て。"]],"per":[1,2,3,12,10,6,15,2,0,6,9,0],"n":66,"n2":34,"both":true},{"id":"i_dont_know","cat":"考え・ぼかし","text":"I don't know","re":"\\bi don't know\\b(?! (if|why|what|how|where|who))","jp":"分からない","snd":"アイダノウ","n":65,"per":[8,2,5,6,7,9,5,5,6,6,3,3],"ex":[[3,2093,"I don't know about that.","それはどうかな。"],[1,392,"I don't know.","分からない。"]],"n2":34,"both":true},{"id":"i_could","cat":"これからやること","text":"I could ~","re":"\\bi could\\b(?! have)","jp":"〜できる / 〜しようかな","snd":"アイクッ","ex":[[7,54,"Okay, I guess I could vault over.","よし、乗り越えられそうだ。"],[6,360,"Maybe I could just do that.","それやってもいいかもな。"],[6,2910,"I could just leave right now.","今すぐ出ていくこともできる。"]],"per":[1,0,5,12,5,8,3,13,3,10,4,0],"n":64,"n2":16,"both":true},{"id":"i_love","cat":"よく出るかたまり","text":"I love ~ / I like ~","re":"\\bi (love|like)\\b","jp":"〜大好き / 〜好き","snd":"アイラヴ","n":63,"per":[6,1,12,2,3,6,5,10,10,3,3,2],"ex":[[2,929,"That's what I like to see.","そういうのが見たかった。"],[1,2827,"I like that square one.","あの四角いやつ好き。"],[1,2205,"See, I like that.","ほら、そういうの好き。"]],"n2":29,"both":true},{"id":"am_i","cat":"質問","text":"Am I ~?","re":"\\bam i\\b","jp":"俺〜なの？","snd":"アマイ","n":63,"per":[2,3,8,3,5,6,4,19,5,4,3,1],"ex":[[1,1484,"What am I going to do with you?","お前をどうしようかな？"],[1,564,"Why am I even here?","なんで俺ここにいるんだ？"],[2,410,"What am I doing?","俺、何してんだ？"]],"n2":40,"both":true},{"id":"thank_you","cat":"リアクション","text":"Thank you / Thanks","re":"\\bthank you\\b|\\bthanks\\b","jp":"ありがとう","snd":"センキュー","ex":[[2,3159,"Thank you everybody so much for watching.","みんな、見てくれて本当にありがとう。"],[11,646,"Thank you for letting me get out.","出してくれてありがとう。"],[9,3250,"Well, thanks for opening that up, I guess.","まあ、開けてくれてありがとう、かな。"]],"per":[2,5,1,9,7,5,5,12,3,7,4,2],"n":62,"n2":49,"both":true},{"id":"a_lot_of","cat":"よく出るかたまり","text":"a lot of / lots of","re":"\\ba lot\\b|\\blots of\\b","jp":"たくさんの","snd":"アラダ","n":61,"per":[3,2,2,6,5,5,5,12,2,6,7,6],"ex":[[2,1402,"There are a lot of you in here.","ここにたくさんいるな。"],[1,3026,"That's a lot of blood.","すごい血の量だ。"],[2,547,"Don't make a lot of noise when you fall.","落ちる時に大きな音を立てるな。"]],"n2":48,"both":true},{"id":"thats_what","cat":"よく出るかたまり","text":"That's what ~","re":"\\bthat's what\\b","jp":"それが〜なんだよ","snd":"ザッツワッ","n":60,"per":[2,11,5,9,0,5,10,6,4,4,2,2],"ex":[[2,2677,"Yep, that's what I thought.","うん、思った通り。"],[3,1336,"That's what I'm talking about.","そうこなくっちゃ！"],[2,1093,"Okay, that's what I missed.","それを見逃してたのか。"]],"n2":27,"both":true},{"id":"i_need","cat":"これからやること","text":"I need ~ (名詞)","re":"\\bi need\\b(?! to)","jp":"〜が必要","snd":"アイニード","ex":[[4,1687,"So, I need a little more blood.","じゃあ、もうちょっと血が必要だ。"],[4,1813,"And then I need the artificial heart.","それから人工心臓が必要だ。"],[11,3563,"Okay, I don't think I need that.","よし、それは要らないと思う。"]],"per":[3,2,9,13,3,4,4,7,0,6,6,0],"n":57,"n2":55,"both":true},{"id":"i_should","cat":"これからやること","text":"I should ~","re":"\\b(i|we) should\\b(?! have)","jp":"〜した方がいい","snd":"アイシュッ","n":56,"per":[10,4,5,1,3,2,4,8,6,5,8,0],"ex":[[1,1070,"We should shoot that right now.","今すぐあれを撃つべきだ。"],[3,1574,"I should just run for it, shouldn't I?","走って逃げた方がいいよな？"],[1,1054,"We should look at this.","これ見た方がいいな。"]],"n2":9,"both":false},{"id":"whatever","cat":"考え・ぼかし","text":"whatever","re":"\\bwhatever\\b","jp":"何でもいい / まあいいや","snd":"ワレヴァー","ex":[[6,792,"You can do whatever you want.","好きなことしていいよ。"],[12,1426,"Doesn't seem likely, but whatever.","ありそうにないけど、まあいいや。"],[9,3430,"Whatever comes around the corner.","角から何が来ようと。"]],"per":[1,1,3,5,3,9,6,7,5,5,8,3],"n":56,"n2":85,"both":true},{"id":"okay_so","cat":"リアクション","text":"Okay, so ~","re":"\\bokay so\\b","jp":"よし、じゃあ / で、","snd":"オウケイソウ","ex":[[4,1658,"Okay, so that's not how it works.","よし、そういう仕組みじゃないのか。"],[6,499,"Okay, so he's not going to stop.","なるほど、あいつは止まる気がないな。"],[7,1039,"Okay, so I can't get that way.","よし、そっちには行けないのか。"]],"per":[0,1,4,8,3,7,3,12,4,4,7,0],"n":53,"n2":46,"both":true},{"id":"i_feel_like","cat":"考え・ぼかし","text":"I feel like ~","re":"\\bfeel like\\b","jp":"〜な気がする","snd":"アイフィーライク","n":52,"per":[5,2,2,3,3,4,8,14,7,3,1,0],"ex":[[1,407,"I feel like that every night.","毎晩そんな気分だよ。"],[1,1720,"Mom, I feel like I'm going to throw up.","ママ、吐きそうな気がする。"],[3,2947,"I've saved 16 times thus far, but I feel like it was necessary.","16回もセーブしたけど、必要だった気がする。"]],"n2":24,"both":true},{"id":"its_just","cat":"よく出るかたまり","text":"It's just ~","re":"\\bit's just\\b","jp":"ただの〜だよ","snd":"イッツジャス","ex":[[6,195,"It's just as easy as that, huh?","それくらい簡単なことなんだな。"],[12,578,"Oh, it's just the dude getting up.","あ、ただあいつが起き上がってるだけか。"],[6,1923,"It's just a scrap in a transfusion bag.","輸血バッグに入ったただのスクラップだ。"]],"per":[5,1,2,3,4,7,1,14,6,1,6,2],"n":52,"n2":14,"both":true},{"id":"looks_like","cat":"考え・ぼかし","text":"looks like ~ / This looks ~","re":"\\blooks? like\\b|\\bthis looks\\b","jp":"〜みたい / 〜に見える","snd":"ルックスライク","n":51,"per":[13,5,1,4,3,2,8,4,5,5,1,0],"ex":[[1,3016,"Looks like it measures vital signs.","生命反応を測るものみたい。"],[2,37,"Just looks like a screwdriver of some kind.","なんかのドライバーに見える。"],[2,1768,"This looks like it leads outside.","ここから外に出られそう。"]],"n2":11,"both":false},{"id":"not_going_to","cat":"これからやること","text":"I'm not going to ~","re":"\\b(i'm|we're|it's) not (going to|gonna)\\b","jp":"〜しないぞ","snd":"アイムナッガナ","n":51,"per":[3,5,3,5,6,2,5,8,7,2,3,2],"ex":[[1,1149,"Ooh, I'm not going to listen to that.","うわ、あれは聞かないでおく。"],[2,1631,"I'm not going to need it.","それは要らないな。"],[1,3193,"It's not going to work.","うまくいかないよ。"]],"n2":21,"both":true},{"id":"its_like","cat":"考え・ぼかし","text":"It's like ~","re":"\\bit's like\\b|\\bit was like\\b","jp":"〜みたいな感じ","snd":"イッツライク","ex":[[5,1748,"It's like it was meant for this.","まるでこのために作られたみたいだ。"],[6,3088,"It's like you're walking into a mall.","まるでショッピングモールに入るみたいだ。"],[12,1322,"It's like a bonanza over here.","こっちはまるで大当たりの山だ。"]],"per":[2,0,0,1,5,2,6,8,11,6,9,1],"n":51,"n2":8,"both":false},{"id":"anyway","cat":"よく出る一言","text":"anyway","re":"\\banyway\\b","jp":"とにかく / まあいいや","snd":"エニウェイ","ex":[[2,1745,"Anyway, I got a big gun now.","とにかく、でかい銃を手に入れた。"],[5,1336,"Well, I'm full up on blood anyway.","まあ、どうせ血はもう満タンだし。"],[3,2443,"Anyway, I'm going to go upstairs.","とにかく、上の階に行く。"]],"per":[2,6,5,4,6,6,2,6,5,6,2,1],"n":51,"n2":41,"both":true},{"id":"can_i","cat":"質問","text":"Can I ~?","re":"\\bcan i\\b","jp":"〜していい？ / 〜できる？","snd":"キャナイ","n":49,"per":[1,4,6,5,1,7,10,6,1,4,3,1],"ex":[[3,1779,"Can I make a knife?","ナイフ作れる？"],[2,2844,"Can I combine this?","これ組み合わせられる？"],[3,911,"Can I have that?","それもらっていい？"]],"n2":27,"both":true},{"id":"i_dont_think","cat":"考え・ぼかし","text":"I don't think ~","re":"\\bi don't think\\b","jp":"〜じゃないと思う","snd":"アイドンスィンク","ex":[[1,1326,"I don't think that's for me, though.","でもそれ、俺用じゃないと思う。"],[11,3563,"Okay, I don't think I need that.","よし、それは要らないと思う。"],[6,1054,"I don't think it's worth it.","それはやる価値ないと思う。"]],"per":[1,2,2,2,7,6,0,3,10,6,7,2],"n":48,"n2":19,"both":true},{"id":"be_able_to","cat":"これからやること","text":"be able to ~","re":"\\bbe able to\\b","jp":"〜できる","snd":"ビエイボートゥ","n":46,"per":[1,2,4,4,3,9,5,6,1,5,5,1],"ex":[[3,2307,"Should be able to get in here, grab that scrap, and boogie out.","ここに入って、スクラップを取って、さっさと出られるはず。"],[1,1964,"And surely I'll be able to just mosey my way out just fine.","きっとここから普通に抜け出せる。"]],"n2":6,"both":false},{"id":"where_is","cat":"質問","text":"Where's ~? / Where is ~?","re":"\\bwhere's\\b|\\bwhere is\\b|\\bwhere are\\b","jp":"〜はどこ？","snd":"ウェアズ","ex":[[9,2667,"Where is there a med inject?","回復の注射器はどこにある？"],[7,3226,"Where are all the bodies?","死体はみんなどこ？"],[4,430,"Where is this going?","これ、どこに続いてるんだ？"]],"per":[0,3,5,9,2,2,3,10,3,2,4,2],"n":45,"n2":19,"both":true},{"id":"i_want_to","cat":"これからやること","text":"I want to ~ / I don't want to ~","re":"\\b(i|i don't) want to\\b|\\bwanna\\b","jp":"〜したい / 〜したくない","snd":"アイワナ","n":44,"per":[2,6,3,15,4,2,0,5,3,1,3,0],"ex":[[1,1702,"Uh I want to report a murder.","あの、殺人事件を通報したいんですが。"],[2,121,"I don't want to read.","読みたくない。"],[2,2634,"I want to talk to you for a second.","ちょっと話がしたい。"]],"n2":20,"both":true},{"id":"should_have","cat":"これからやること","text":"should have ~","re":"\\bshould have\\b|\\bshoulda\\b","jp":"〜すればよかった","snd":"シュダ","n":44,"per":[3,2,4,7,1,9,8,4,0,2,3,1],"ex":[[1,2050,"I should have taken a bigger breath.","もっと大きく息を吸っておけばよかった。"],[3,2178,"I should have grabbed that first.","先にあれを取っておけばよかった。"],[2,838,"That was scarier than it should have been.","本来より怖かった。"]],"n2":15,"both":true},{"id":"oh_boy","cat":"リアクション","text":"Oh boy","re":"\\boh,? boy\\b","jp":"うわぁ… / やれやれ","snd":"オウボーイ","n":43,"per":[4,4,2,2,3,4,6,3,2,1,10,2],"ex":[[1,2018,"Oh boy, I'm Yeah, don't shine anything else.","うわぁ…うん、もう何も照らさないで。"]],"n2":16,"both":true},{"id":"oh_yeah","cat":"リアクション","text":"Oh yeah","re":"\\boh,? yeah\\b","jp":"おー、いいね / そうそう","snd":"オウイェア","n":42,"per":[3,6,7,2,3,8,3,2,2,3,2,1],"ex":[[3,1972,"Oh yeah, there's also a locked thing here.","そうそう、ここに鍵のかかったやつもある。"],[2,2679,"And Oh yeah, that feels good.","おー、気持ちいい。"],[3,2258,"Oh yeah, that's one.","そうそう、それが1つ目。"]],"n2":49,"both":true},{"id":"you_know_what","cat":"考え・ぼかし","text":"You know what?","re":"\\byou know what\\b","jp":"あのさ / もういいや","snd":"ユノウワッ","n":41,"per":[2,1,7,5,3,3,3,9,2,2,3,1],"ex":[[3,1466,"You know what I'm saying?","分かる？"],[1,2646,"Okay, you know what?","よし、あのさ。"],[1,611,"You know what?","あのさ。"]],"n2":14,"both":true},{"id":"or_something","cat":"考え・ぼかし","text":"~ or something","re":"\\bor something\\b","jp":"〜か何か","snd":"オーサムスィン","ex":[[4,3763,"Wait, is it auto saving or something?","待って、オートセーブか何か？"],[4,1106,"Okay, maybe that's upgrades or something.","じゃあ、それはアップグレードか何かかな。"],[6,3032,"Thought there might be a goodie or something.","何かいい物があると思ったんだけど。"]],"per":[1,1,4,4,6,8,5,2,2,5,0,3],"n":41,"n2":6,"both":false},{"id":"pretty","cat":"よく出るかたまり","text":"pretty ~ (pretty good)","re":"\\bpretty (good|sure|much|cool|bad|well|easy|big|close|fast)\\b","jp":"かなり〜","snd":"プリティ","ex":[[12,919,"Oh my god, that was pretty good.","うわ、今のかなり良かった。"],[1,2310,"Pretty sure that was his voice.","たぶんあいつの声だった。"],[6,1844,"I'm pretty sure we haven't left anything behind.","何も置いてきてないはず、たぶん。"]],"per":[4,2,2,3,4,2,7,6,2,4,5,0],"n":41,"n2":17,"both":true},{"id":"of_course","cat":"リアクション","text":"Of course","re":"\\bof course\\b","jp":"もちろん / ですよね","snd":"オヴコース","n":39,"per":[1,7,2,4,3,5,2,0,3,4,6,2],"ex":[[2,620,"Ah, of course it is.","ああ、そりゃそうだよな。"],[3,233,"YEAH, OF COURSE.","うん、もちろん。"]],"n2":0,"both":false},{"id":"i_see","cat":"リアクション","text":"I see","re":"\\bi see\\b","jp":"なるほど / 見える","snd":"アイスィー","ex":[[7,372,"I see another throwable over there.","あっちにも投げる物が見える。"],[10,1308,"Okay, I see shotgun shells there.","よし、あそこにショットガンの弾が見える。"],[3,739,"I think I see ammo up there.","上に弾が見える気がする。"]],"per":[2,1,4,3,0,7,2,6,6,5,3,0],"n":39,"n2":21,"both":true},{"id":"definitely","cat":"よく出る一言","text":"definitely","re":"\\bdefinitely\\b","jp":"絶対に / 間違いなく","snd":"デフィニトリー","ex":[[2,3118,"So, they definitely don't need to apologize.","だから、彼らは絶対に謝る必要はない。"],[1,2029,"There's definitely nothing else out there.","外には絶対もう何もない。"],[5,1957,"That definitely would have been a problem.","それは絶対に問題になってたな。"]],"per":[2,4,2,5,7,4,4,3,5,3,0,0],"n":39,"n2":18,"both":true},{"id":"that_guy","cat":"よく出るかたまり","text":"that guy / this guy","re":"\\b(that|this) guy\\b","jp":"あいつ / こいつ","snd":"ザッガイ","n":38,"per":[5,1,6,4,6,1,0,2,4,4,1,4],"ex":[[1,1974,"Oh, Ah, well, that guy was big.","いやぁ、あいつでかかったな。"],[1,2685,"Sorry, I wanted to get that guy first.","ごめん、先にあいつをやりたかった。"],[3,1063,"I see this guy.","こいつ見えてる。"]],"n2":14,"both":true},{"id":"go_back","cat":"これからやること","text":"go back","re":"\\b(go|going|went) back\\b","jp":"戻る","snd":"ゴウバック","ex":[[12,670,"So I need to go back down.","じゃあ下に戻らないと。"],[4,1165,"Oh, that means I got to go back.","あ、つまり戻らなきゃいけないのか。"],[6,2114,"Can I go back to my room now?","もう部屋に戻っていい？"]],"per":[2,0,4,9,2,6,0,5,2,2,6,0],"n":38,"n2":15,"both":true},{"id":"look_at","cat":"これからやること","text":"Look at ~","re":"\\blook at\\b","jp":"〜を見て","snd":"ルカッ","n":37,"per":[10,3,5,1,1,3,1,1,5,3,3,1],"ex":[[1,1723,"Grace, look at me.","グレース、こっち見て。"],[1,2518,"Look at him go.","あいつの動き見てよ。"],[1,3109,"Look at that power.","あの威力見てよ。"]],"n2":16,"both":true},{"id":"its_fine","cat":"よく出るかたまり","text":"It's fine / Don't worry","re":"\\bit's fine\\b|\\bdon't worry\\b","jp":"大丈夫 / 気にするな","snd":"イッツファイン","n":36,"per":[6,10,2,5,0,5,2,1,1,2,2,0],"ex":[[1,1619,"Oh, no, it's fine.","あ、いや、大丈夫。"],[2,1242,"Okay, don't worry.","オッケー、心配しないで。"],[2,2616,"Okay, it's fine.","うん、大丈夫。"]],"n2":24,"both":true},{"id":"some_kind_of","cat":"考え・ぼかし","text":"some kind of ~","re":"\\bsome kind of\\b","jp":"なんかの〜","snd":"サムカインダ","n":35,"per":[2,4,3,2,1,1,6,5,4,7,0,0],"ex":[[1,1326,"Some kind of medicine there.","なんかの薬がある。"],[2,1197,"Some kind of mass hysteria.","なんかの集団ヒステリー。"],[3,297,"Some kind of like special collectible or something.","なんか特別な収集品か何か。"]],"n2":4,"both":false},{"id":"the_same","cat":"よく出るかたまり","text":"the same ~","re":"\\bthe same\\b","jp":"同じ〜","snd":"ザセイム","n":35,"per":[4,2,1,5,2,4,2,5,2,5,0,3],"ex":[[2,2632,"It's the same power as the other.","もう1つと同じ威力だ。"],[3,334,"Yeah, I do the same thing.","うん、俺も同じことする。"],[1,477,"I heard they all have the same weird bruises.","全員同じ変なアザがあるらしい。"]],"n2":19,"both":true},{"id":"there_we_go","cat":"リアクション","text":"There we go","re":"\\bthere we go\\b","jp":"よし、できた","snd":"ゼアウィゴウ","n":34,"per":[1,1,4,5,3,3,5,3,1,6,1,1],"ex":[[3,244,"No, there we go.","いや、よし、できた。"],[2,2579,"There we go.","よし、できた。"]],"n2":34,"both":true},{"id":"thats_not_good","cat":"リアクション","text":"That's not good","re":"\\bthat's not good\\b|\\bthat is not good\\b|\\bnot good\\b","jp":"これはまずい","snd":"ザッツナッグッ","n":33,"per":[6,3,5,1,1,2,5,1,2,2,5,0],"ex":[[3,100,"Oh, that is not good.","うわ、これはまずい。"],[3,2487,"Oh god, that's not good.","うわ、それはまずい。"],[1,2454,"Yeah, that's not good.","うん、まずいね。"]],"n2":14,"both":true},{"id":"so_good","cat":"よく出るかたまり","text":"so good / really good","re":"\\b(so|really) good\\b","jp":"すごくいい","snd":"ソウグッ","n":33,"per":[8,4,2,2,1,2,0,4,4,2,3,1],"ex":[[1,503,"God, this looks so good.","うわ、これすごくきれい。"],[1,291,"Damn, it's so good.","やば、すごくいい。"],[3,1761,"Oh, I'm so good.","おー、俺うますぎ。"]],"n2":22,"both":true},{"id":"could_have","cat":"これからやること","text":"could have ~","re":"\\bcould have\\b|\\bcoulda\\b","jp":"〜できたのに","snd":"クダ","n":33,"per":[2,4,1,3,5,0,2,5,4,3,3,1],"ex":[[2,677,"Could have sworn there was more light.","もっと明るかったはずなんだけど。"],[2,1085,"I could have sworn he was watching me.","絶対あいつに見られてたと思ったのに。"],[2,1270,"You I think you could have been a bit more careful.","もっと気をつけられたんじゃない？"]],"n2":13,"both":true},{"id":"supposed_to","cat":"これからやること","text":"be supposed to ~","re":"\\bsupposed to\\b","jp":"〜することになってる / 〜のはず","snd":"サポウストゥ","ex":[[2,524,"Now, what was I supposed to do?","で、何をすればよかったんだっけ？"],[5,2474,"How am I supposed to kill you?","どうやってお前を倒せばいいんだよ？"],[9,1026,"That's not where I'm supposed to go.","そっちは行くべき場所じゃない。"]],"per":[1,3,2,1,7,4,2,5,7,1,0,0],"n":33,"n2":13,"both":true},{"id":"i_dont_have","cat":"よく出るかたまり","text":"I don't have ~","re":"\\bi don't have\\b","jp":"〜を持ってない","snd":"アイドンハヴ","ex":[[4,940,"I don't have enough bullets for that.","それには弾が足りない。"],[10,3644,"I don't have any more health items.","もう回復アイテムがない。"],[6,1400,"Oh, I don't have my knife.","あ、ナイフ持ってない。"]],"per":[2,4,6,3,2,3,1,1,4,0,5,2],"n":33,"n2":39,"both":true},{"id":"good_thing","cat":"リアクション","text":"Good thing ~","re":"\\bgood thing\\b","jp":"〜でよかった","snd":"グッスィン","n":32,"per":[2,1,5,2,1,2,5,1,6,2,4,1],"ex":[[3,104,"Okay, good thing I have this.","よし、これ持っててよかった。"],[3,206,"OH, Good thing he didn't see me, right?","あいつに見つからなくてよかった、だろ？"],[3,843,"Good thing no one heard that.","誰にも聞かれなくてよかった。"]],"n2":18,"both":true},{"id":"im_just_going_to","cat":"これからやること","text":"I'm just going to ~","re":"\\bi'm just (going to|gonna)\\b","jp":"とりあえず〜しとく","snd":"アイムジャスガナ","n":31,"per":[1,4,6,7,4,4,0,2,1,0,2,0],"ex":[[2,2787,"I'm just going to go for it.","とりあえず突っ込むわ。"],[3,1577,"I'm just going to run for it.","とりあえず走って逃げる。"],[3,2340,"But I'm just going to get more bullets.","でもとりあえず弾をもっと取っとく。"]],"n2":16,"both":true},{"id":"dont_need_to","cat":"これからやること","text":"I don't need to ~","re":"\\bdon't need to\\b","jp":"〜しなくていい","snd":"アイドンニートゥ","n":30,"per":[1,6,8,5,2,2,2,1,1,0,2,0],"ex":[[2,2777,"I don't need to be in there.","あの中に入る必要はない。"],[1,1186,"Well, we don't need to be that scared.","そこまで怖がらなくていい。"],[2,2927,"You don't need to keep commenting on it.","いちいちコメントしなくていいよ。"]],"n2":9,"both":false},{"id":"at_least","cat":"よく出るかたまり","text":"at least","re":"\\bat least\\b","jp":"少なくとも","snd":"アッリースト","ex":[[4,684,"Hey, at least it opened this up.","まあ、少なくともここは開いた。"],[6,402,"Yeah, at least the lights are on.","うん、少なくとも明かりはついてる。"],[5,489,"Wait, at least we're in it together, right?","待って、少なくとも俺らは一緒だよな？"]],"per":[2,0,2,4,4,3,1,3,4,2,2,2],"n":29,"n2":7,"both":false},{"id":"give_me","cat":"これからやること","text":"Give me ~","re":"\\bgive me\\b|\\bgimme\\b","jp":"〜をくれ","snd":"ギミ","ex":[[3,617,"Give me some blood to study.","研究用の血をくれ。"],[4,2503,"Give me a challenge this time.","今回は手応えのあるやつをくれ。"],[3,303,"When are you going to give me a lockpick?","いつになったらピックをくれるんだ？"]],"per":[2,0,8,5,2,2,2,1,0,5,1,1],"n":29,"n2":20,"both":true},{"id":"trying_to","cat":"これからやること","text":"trying to ~","re":"\\btrying to\\b","jp":"〜しようとしてる","snd":"トライントゥ","n":28,"per":[1,5,3,4,2,0,1,4,2,4,1,1],"ex":[[2,1750,"Oh, Leon, I know what you trying to tell me.","レオン、何が言いたいか分かるよ。"],[3,1557,"It's I I'm not trying to be, you know, bothersome.","うざくするつもりはないんだけど。"],[2,343,"What the [ピー] They're really trying to scare the poop out of you.","マジでビビらせようとしてくる。"]],"n2":5,"both":false},{"id":"not_sure","cat":"考え・ぼかし","text":"I'm not sure ~","re":"\\bnot sure\\b","jp":"よく分からない","snd":"ナッシュア","ex":[[10,3602,"I'm not sure anything here is actually meaningful.","ここにあるもの、本当に意味があるのかよく分からない。"],[12,865,"Not sure about these blood spatters.","この血しぶきはよく分からない。"],[3,2198,"I'm not sure.","よく分からない。"]],"per":[0,0,2,2,0,2,5,3,9,1,1,3],"n":28,"n2":3,"both":false},{"id":"must_be","cat":"考え・ぼかし","text":"must be ~","re":"\\bmust be\\b","jp":"〜に違いない","snd":"マスビー","n":27,"per":[6,0,4,2,0,1,2,2,3,3,3,1],"ex":[[3,1108,"Must be the first.","最初のやつに違いない。"],[3,1680,"And that child, she must be the final piece of the puzzle.","そしてあの子が最後のピースに違いない。"],[1,421,"Must be Latin.","ラテン語に違いない。"]],"n2":1,"both":false},{"id":"what_are_you","cat":"質問","text":"What are you ~?","re":"\\bwhat are (you|we)\\b","jp":"何してるの？","snd":"ワラユ","n":27,"per":[5,2,2,1,4,2,3,5,0,1,0,2],"ex":[[3,1524,"Hey, what are you doing, man?","おい、何してんだよ？"],[1,1757,"What are you talking about?","何の話してるの？"],[1,2733,"What are we doing here?","俺ら、ここで何してるんだ？"]],"n2":14,"both":true},{"id":"at_all","cat":"よく出るかたまり","text":"at all","re":"\\bat all\\b","jp":"全然","snd":"アロー","n":27,"per":[3,2,3,0,6,1,2,2,4,2,2,0],"ex":[[1,136,"I'm not saying anything at all.","何も言ってないよ、全然。"],[1,3265,"I haven't saved at all.","全然セーブしてない。"],[2,3175,"I didn't fail at all.","全然失敗してない。"]],"n2":16,"both":true},{"id":"here_we_go","cat":"リアクション","text":"Here we go","re":"\\bhere we go\\b","jp":"さあ行くぞ","snd":"ヒアウィゴウ","n":26,"per":[0,3,1,2,3,0,10,4,0,0,1,2],"ex":[[2,517,"Here we go, baby.","さあ行くぞ、ベイビー。"],[2,1335,"Here we go.","さあ行くぞ。"]],"n2":18,"both":true},{"id":"exactly","cat":"よく出る一言","text":"exactly","re":"\\bexactly\\b","jp":"まさに / その通り","snd":"イグザクトリー","ex":[[3,2738,"That worked exactly as I planned.","計画通りうまくいった。"],[4,1354,"OH, that's exactly what I wanted.","おっ、まさにそれが欲しかった。"],[6,2434,"I know exactly what to do about that.","それをどうすればいいか、ちゃんと分かってる。"]],"per":[0,1,1,4,3,3,3,2,4,2,2,0],"n":25,"n2":5,"both":false},{"id":"how_do_i","cat":"質問","text":"How do I ~?","re":"\\bhow do (i|you|we)\\b","jp":"どうやって〜するの？","snd":"ハウドゥアイ","n":24,"per":[2,3,5,2,0,3,2,0,1,2,4,0],"ex":[[1,1321,"So, how do I get further up?","で、どうやってもっと上に行くんだ？"],[3,1799,"How do you even turn around?","どうやって振り向くんだよ？"],[2,840,"How do I run faster?","どうやってもっと速く走るの？"]],"n2":6,"both":false},{"id":"why_would","cat":"質問","text":"Why would I ~?","re":"\\bwhy would (i|you|he|they)\\b","jp":"なんで〜するんだよ","snd":"ワイウダイ","n":24,"per":[3,1,4,3,2,3,3,0,4,0,1,0],"ex":[[1,1850,"Why would they send her here alone?","なんで彼女を1人でここに送るんだ？"],[1,1682,"Why would I ever do that?","なんで俺がそんなことするんだよ？"],[2,156,"Why would I want that?","なんでそんなもの欲しがるんだよ？"]],"n2":10,"both":true},{"id":"whats_that","cat":"質問","text":"What's that?","re":"\\bwhat's that\\b|\\bwhat is that\\b","jp":"あれ何？","snd":"ワッツザッ","ex":[[4,3593,"Oh, what is that?","うわ、あれ何？"],[9,1365,"Wait, what is that?","待って、あれ何？"],[1,1035,"What is that?","あれ何？"]],"per":[4,0,1,7,3,0,3,2,2,1,1,0],"n":24,"n2":11,"both":true},{"id":"clearly","cat":"よく出る一言","text":"clearly / obviously","re":"\\bclearly\\b|\\bobviously\\b","jp":"明らかに","snd":"クリアリー","ex":[[2,79,"You obviously don't know who I is.","お前、俺が誰だか分かってないだろ。"],[11,2043,"Clearly where they made them.","明らかにここで作ってたんだな。"],[13,664,"Spencer's paper was obviously incomplete.","スペンサーの論文は明らかに未完成だった。"]],"per":[1,4,1,2,0,1,0,4,2,3,4,2],"n":24,"n2":2,"both":false},{"id":"i_wonder","cat":"考え・ぼかし","text":"I wonder ~","re":"\\bi wonder\\b","jp":"〜かなあ","snd":"アイワンダー","ex":[[3,652,"I wonder if there's any blood over here.","こっちに血があるかな。"],[7,2138,"I wonder how that worked out.","それ、どうなったんだろう。"],[7,2311,"I wonder if I'm being stalked.","俺、つけられてるのかな。"]],"per":[1,2,2,4,2,2,3,2,3,2,0,0],"n":23,"n2":4,"both":false},{"id":"no_way","cat":"リアクション","text":"No way","re":"\\bno way\\b","jp":"ありえない / 絶対イヤ","snd":"ノウウェイ","n":22,"per":[2,4,2,0,0,5,1,0,5,1,2,0],"ex":[[3,709,"There's no way that works.","それがうまくいくわけない。"],[3,707,"There's no way.","ありえない。"]],"n2":7,"both":false},{"id":"oh_wait","cat":"リアクション","text":"Oh wait","re":"\\boh,? wait\\b","jp":"あ、待って","snd":"オウウェイ","n":17,"per":[1,0,7,2,1,2,1,0,1,2,0,0],"ex":[[1,834,"Oh, wait, it's mine.","あ、待って、俺のだ。"]],"n2":7,"both":false},{"id":"whats_going_on","cat":"質問","text":"What's going on?","re":"\\bwhat'?s going on\\b|\\bwhat is going on\\b","jp":"何が起きてるの？","snd":"ワッツゴーインオン","n":14,"per":[6,1,4,0,0,2,1,0,0,0,0,0],"ex":[[1,1554,"Tell me what's going on.","何が起きてるか教えて。"],[1,1537,"Mom, what's going on?","ママ、どうなってるの？"],[3,2063,"Hey, what's going on?","おい、何が起きてるんだ？"]],"n2":2,"both":false},{"id":"oh_well","cat":"リアクション","text":"Oh well","re":"\\boh,? well\\b","jp":"まあいいか / しょうがない","snd":"オウウェル","n":14,"per":[2,0,0,0,3,1,1,2,0,1,3,1],"ex":[[1,2210,"Oh, well, not hurry enough.","まあ、急ぎが足りなかったか。"]],"n2":10,"both":true},{"id":"what_if","cat":"考え・ぼかし","text":"What if ~?","re":"\\bwhat if\\b","jp":"〜だったらどうする？","snd":"ワリフ","n":11,"per":[1,4,2,0,0,1,1,1,0,0,1,0],"ex":[[1,1328,"What if I use a the gun?","銃を使ったらどうなる？"],[2,1476,"What if I didn't find them?","見つけられなかったらどうする？"],[3,1290,"What if we put this here and then over there?","これをここに置いて、それからあそこに置いたら？"]],"n2":3,"both":false},{"id":"good_at","cat":"よく出るかたまり","text":"good at ~","re":"\\bgood at\\b(?! all)","jp":"〜が得意","snd":"グッダッ","n":11,"per":[2,2,0,2,0,0,1,3,0,0,1,0],"ex":[[1,495,"I'm really good at my job.","俺は仕事ができるんだ。"],[2,467,"Man, I'm really good at games.","いや、俺ゲームうますぎ。"],[2,473,"Yeah, we're good at games.","うん、俺らゲームうまいよね。"]],"n2":2,"both":false},{"id":"what_do_i","cat":"質問","text":"What do I ~?","re":"\\bwhat do i\\b","jp":"何を〜すればいい？","snd":"ワドゥアイ","n":10,"per":[4,1,2,1,0,1,0,1,0,0,0,0],"ex":[[1,999,"What do I do?","どうすればいい？"],[1,3024,"What do I know?","俺に何が分かるんだよ？"],[2,2498,"What do I got?","何持ってたっけ？"]],"n2":4,"both":false},{"id":"see_you","cat":"よく出るかたまり","text":"See you in the next video / See you around","re":"\\bsee you (in|around|later|next|soon)\\b","jp":"また次の動画で / またな","snd":"スィーユー","ex":[[1,3335,"And as always, I'll see you in the next video.","それではいつも通り、また次の動画で。"],[6,2198,"Anyway, uh see you around.","じゃあ、またな。"]],"per":[1,0,1,1,1,1,1,1,1,1,0,1],"n":10,"n2":4,"both":false},{"id":"what_do_you_mean","cat":"質問","text":"What do you mean?","re":"\\bwhat do you mean\\b","jp":"どういう意味？ / は？","snd":"ワダユミーン","n":8,"per":[1,4,1,0,0,0,0,0,0,1,1,0],"ex":[[1,3302,"What do you mean?","どういう意味？"],[2,794,"What do you mean you need something to step on?","踏み台が要るってどういうこと？"]],"n2":0,"both":false},{"id":"who_is_there","cat":"質問","text":"Who's there?","re":"\\bwho'?s there\\b|\\bwho is there\\b","jp":"誰かいるの？","snd":"フーズゼア","n":7,"per":[1,3,1,0,0,0,0,1,1,0,0,0],"ex":[[1,974,"Ah, Who is there?","あ、誰かいるの？"],[2,132,"Who is there?","誰かいるの？"]],"n2":4,"both":false},{"id":"get_out_of_here","cat":"これからやること","text":"Get out of here","re":"\\bget out of here\\b|\\bget outta here\\b","jp":"ここから出よう / 出ていけ","snd":"ゲラウラヒア","n":7,"per":[0,1,1,0,0,2,0,1,1,1,0,0],"ex":[[2,1633,"Get out of here.","ここから出ていけ。"]],"n2":13,"both":true},{"id":"hey_buddy","cat":"リアクション","text":"Hey buddy / Hey, big guy","re":"\\bhey (buddy|pal|bud|man|dude|guys|big guy)\\b","jp":"よう、相棒 / よう、デカいの","snd":"ヘイバディ","ex":[[3,2081,"Hey, big guy.","よう、デカいの。"],[2,1645,"Hey dude, so nice to finally meet you, Leon.","よう、やっと会えてうれしいよ、レオン。"]],"per":[0,1,1,1,1,0,0,0,1,0,1,0],"n":6,"n2":23,"both":true},{"id":"how_you_doing","cat":"質問","text":"How you doing? / How's it going?","re":"\\bhow are you doing\\b|\\bhow you doing\\b|\\bhow's it going\\b","jp":"調子どう？ / 元気か？","snd":"ハウユドゥーイン","ex":[[2,2466,"How you doing, pal?","調子どう、相棒？"],[4,680,"How you doing, buddy?","元気か、相棒？"],[7,267,"Hey, how's it going?","よう、調子どう？"]],"per":[0,1,0,1,0,0,1,0,0,0,1,1],"n":5,"n2":38,"both":true}];
+const PARTS = [1,2,3,4,5,6,7,9,10,11,12,13];
+const pname = p => 'Part '+p;
+const CATS = ['リアクション','考え・ぼかし','これからやること','質問','よく出るかたまり','よく出る一言'];
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'mark';
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+let currentUser = null, saveTimer = null;
+let st = {};      // id -> 'know' | 'learn'
+let q = {};       // id -> {w, n, streak}
+let urls = {};   // part -> url
+let view = 'list', cat = 'all', stFilter = 'all', bothOnly = false;
+let openIds = new Set();
+const TOTAL_N = DATA.reduce((a,c)=>a+c.n,0);
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function reOf(c){ return new RegExp(c.re.replace(/ /g,' +'),'i'); }
+function norm(s){ return s.toLowerCase().replace(/[’]/g,"'"); }
+// 文中のかたまり位置(句読点を無視して照合)
+function findChunk(c, s){
+  const map=[]; let ns='';
+  for (let i=0;i<s.length;i++){ const ch=s[i].toLowerCase().replace('’',"'"); const ok=/[a-z0-9'\[\]ピー ]/.test(ch); ns += ok?ch:' '; map.push(i); }
+  const m = ns.match(reOf(c)); if (!m) return null;
+  let a = m.index, b = m.index + m[0].length;
+  while (a<b && ns[a]===' ') a++; while (b>a && ns[b-1]===' ') b--;
+  return {start:a, end:b};
+}
+function hl(c, s){ const f=findChunk(c,s); if(!f) return esc(s); return esc(s.slice(0,f.start))+'<span class="hl">'+esc(s.slice(f.start,f.end))+'</span>'+esc(s.slice(f.end)); }
+function vid(v){ const u = urls[v]||''; const m = u.match(/(?:v=|youtu\.be\/|shorts\/|live\/|embed\/)([\w-]{11})/); return m?m[1]:null; }
+function ytLink(v,t){ const id=vid(v); return id ? 'https://www.youtube.com/watch?v='+id+'&t='+Math.max(0,t-2)+'s' : null; }
+function fmt(t){ const m=Math.floor(t/60), s=t%60; return m+':'+String(s).padStart(2,'0'); }
+
+// ===== カバー率 =====
+function renderCov(){
+  const known = DATA.filter(c=>st[c.id]==='know');
+  const pct = TOTAL_N ? Math.round(known.reduce((a,c)=>a+c.n,0)/TOTAL_N*100) : 0;
+  document.getElementById('covPct').textContent = pct+'%';
+  document.getElementById('covBar').style.width = pct+'%';
+  const next = DATA.filter(c=>st[c.id]!=='know' && c.both).concat(DATA.filter(c=>st[c.id]!=='know' && !c.both)).slice(0,5);
+  const sorted = DATA.filter(c=>st[c.id]).length;
+  document.getElementById('nextList').innerHTML =
+    '知ってる '+known.length+' / '+DATA.length+'個(仕分け済み '+sorted+'個) ・ '+DATA.length+'個の出現回数 '+TOTAL_N.toLocaleString()+'回のうち、知ってるもので '+pct+'%<br>' +
+    (next.length ? '次に覚えると効くもの(🎮優先): ' + next.map(c=>'<b>'+esc(c.text)+'</b>('+c.n+'回)').join('、') : 'ぜんぶ知ってる！別シリーズの文字起こしを追加しよう');
+}
+
+// ===== 絞り込み =====
+function buildChips(){
+  const box = document.getElementById('chips'); box.innerHTML='';
+  const mk=(label,on,fn)=>{ const el=document.createElement('div'); el.className='chip'+(on?' on':''); el.textContent=label; el.onclick=fn; box.appendChild(el); };
+  if (view==='list'){
+    [['all','すべて'],['none','未仕分け'],['learn','覚える'],['know','知ってる']].forEach(([k,l])=>{
+      const n = k==='all'?DATA.length:DATA.filter(c=> k==='none' ? !st[c.id] : st[c.id]===k).length;
+      mk(l+' ('+n+')', stFilter===k, ()=>{ stFilter=k; refresh(); });
+    });
+    mk('🎮 両シリーズで多い ('+DATA.filter(c=>c.both).length+')', bothOnly, ()=>{ bothOnly=!bothOnly; refresh(); });
+  }
+  mk('全カテゴリ', cat==='all', ()=>{ cat='all'; refresh(); });
+  CATS.forEach(c=>mk(c, cat===c, ()=>{ cat=c; refresh(); }));
+}
+function refresh(){ buildChips(); renderCov(); if(view==='list') renderList(); else if(view==='sort') renderSort(); else nextQuiz(); }
+function inCat(c){ return (cat==='all' || c.cat===cat) && (!bothOnly || c.both); }
+
+// ===== 一覧 =====
+function renderList(){
+  const box = document.getElementById('list');
+  const items = DATA.map((c,i)=>({c,rank:i+1})).filter(x=>inCat(x.c)).filter(x=>{
+    const s = st[x.c.id]; return stFilter==='all' || (stFilter==='none' ? !s : s===stFilter);
+  });
+  box.innerHTML = items.map(({c,rank})=>{
+    const s = st[c.id];
+    return '<div class="row '+(s||'')+(openIds.has(c.id)?' open':'')+'" data-id="'+c.id+'">' +
+      '<div class="r-head"><div class="rank">'+rank+'</div><div class="r-main"><div class="r-text">'+esc(c.text)+'</div><div class="r-jp">'+esc(c.jp)+'</div><div class="r-snd">'+esc(c.snd)+'</div>' +
+        '<span class="st '+(s||'')+'">'+(s==='know'?'知ってる':s==='learn'?'覚える':'未仕分け')+'</span>'+(c.both?'<span class="st both">🎮 バイオ2でも多い</span>':'')+'</div>' +
+        '<div class="r-n"><b>'+c.n+'</b><small>回</small><small>'+c.per.filter(n=>n>0).length+'/'+PARTS.length+'本</small>'+(c.n2!=null?'<small>バイオ2: '+c.n2+'回</small>':'')+'</div></div>' +
+      '<div class="r-body">' + c.ex.map((e,i)=>{
+          const link = ytLink(e[0],e[1]);
+          return '<div class="ex"><div style="flex:1"><div class="en">'+hl(c,e[2])+'</div><div class="jp">'+esc(e[3])+'</div><div class="src">'+pname(e[0])+' '+fmt(e[1])+'</div></div>' +
+            '<div class="ex-btns"><button class="ib tts" data-i="'+i+'">🔊</button>'+(link?'<a class="ib" href="'+link+'" target="_blank" rel="noopener">▶</a>':'')+'</div></div>';
+        }).join('') +
+        '<div class="set-btns"><button class="btn sub sm setK">○ 知ってる</button><button class="btn sub sm setL">覚える</button><button class="btn sub sm setN">未仕分けに戻す</button></div>' +
+      '</div></div>';
+  }).join('') || '<div class="msg">この条件のかたまりはありません</div>';
+  box.querySelectorAll('.row').forEach(el=>{
+    const id = el.dataset.id, c = DATA.find(x=>x.id===id);
+    el.querySelector('.r-head').onclick = ()=>{ el.classList.toggle('open'); el.classList.contains('open') ? openIds.add(id) : openIds.delete(id); };
+    el.querySelectorAll('.tts').forEach(b=>b.onclick=()=>speak(c.ex[+b.dataset.i][2]));
+    el.querySelector('.setK').onclick=()=>setSt(id,'know');
+    el.querySelector('.setL').onclick=()=>setSt(id,'learn');
+    el.querySelector('.setN').onclick=()=>setSt(id,null);
+  });
+}
+function setSt(id, v){ if (v) st[id]=v; else delete st[id]; scheduleSave(); refresh(); }
+
+// ===== 仕分け =====
+function renderSort(){
+  const card = document.getElementById('sortCard');
+  const rest = DATA.map((c,i)=>({c,rank:i+1})).filter(x=>inCat(x.c) && !st[x.c.id]);
+  if (!rest.length) { card.innerHTML = '<div class="c-text" style="font-size:20px">仕分け完了！</div><div class="c-ex">一覧の「覚える」から、上の方を順番に覚えていこう。</div>'; return; }
+  const {c, rank} = rest[0];
+  const e = c.ex[0];
+  card.innerHTML = '<div class="c-rank">'+rank+'位 ・ '+c.n+'回 ・ 残り'+rest.length+'個</div>' +
+    '<div class="c-text">'+esc(c.text)+'</div>' +
+    '<div class="btns" style="margin-top:4px"><button class="btn sub sm" id="sPlay">🔊 聞く</button><button class="btn sub sm" id="sReveal">意味を見る</button></div>' +
+    '<div id="sAns" style="display:none"><div class="c-snd">'+esc(c.snd)+'</div><div class="c-jp">'+esc(c.jp)+'</div><div class="c-ex">'+hl(c,e[2])+'<br>'+esc(e[3])+'</div></div>' +
+    '<div class="sort-btns"><button id="sKnow">○ 聞いて分かる<small>(1)</small></button><button id="sLearn">？ 分からない・怪しい<small>(2)</small></button></div>';
+  document.getElementById('sPlay').onclick = ()=>speak(e[2]);
+  document.getElementById('sReveal').onclick = ()=>{ document.getElementById('sAns').style.display='block'; };
+  document.getElementById('sKnow').onclick = ()=>setSt(c.id,'know');
+  document.getElementById('sLearn').onclick = ()=>setSt(c.id,'learn');
+  speak(c.text.split(' / ')[0].replace(/[~?]/g,''));
+}
+
+// ===== 聞き取り =====
+let cur = null, answered = false;
+function quizPool(){
+  let p = DATA.filter(c=>inCat(c) && st[c.id]!=='know');
+  if (!p.length) p = DATA.filter(c=>inCat(c));
+  return p;
+}
+function nextQuiz(){
+  answered = false; stopYT();
+  const p = quizPool();
+  // 回数が多い・苦手なものほど出やすい
+  const weights = p.map(c=>{ const s=q[c.id]; return Math.sqrt(c.n) * (1 + (s ? s.w : 1)); });
+  let r = Math.random()*weights.reduce((a,b)=>a+b,0), i=0;
+  while (i<p.length-1 && r>weights[i]) { r-=weights[i]; i++; }
+  const c = p[i];
+  const usable = c.ex.filter(e=>findChunk(c,e[2]));
+  const e = usable[Math.floor(Math.random()*usable.length)] || c.ex[0];
+  cur = {c, e};
+  renderQuiz();
+}
+function distract(c, sent){
+  const others = DATA.filter(o=>o.id!==c.id && !reOf(o).test(norm(sent).replace(/[^a-z0-9' ]/g,' ')));
+  const same = others.filter(o=>o.cat===c.cat).sort(()=>Math.random()-.5);
+  const diff = others.filter(o=>o.cat!==c.cat).sort(()=>Math.random()-.5);
+  return same.slice(0,2).concat(diff).slice(0,3);
+}
+function optLabel(c){ return c.text.split(' / ')[0].replace(/\s*~\s*/g,' ').replace(/\?$/,'').trim(); }
+function renderQuiz(){
+  const {c, e} = cur;
+  const f = findChunk(c, e[2]);
+  const before = f ? e[2].slice(0,f.start) : '', after = f ? e[2].slice(f.end) : '';
+  const opts = [c].concat(distract(c, e[2])).sort(()=>Math.random()-.5);
+  const hasYT = !!vid(e[0]);
+  const s = q[c.id];
+  document.getElementById('quizCard').innerHTML =
+    '<div class="c-rank">'+esc(c.cat)+' ・ '+c.n+'回'+(s&&s.streak?' ・ 連続正解 '+s.streak:'')+'</div>' +
+    '<div class="q-sent">'+esc(before)+'<span class="blank" id="blank">　？　</span>'+esc(after)+'</div>' +
+    '<div class="src-tag">'+(hasYT?'🎬 本人の声 ・ ':'🔊 読み上げ ・ ')+pname(e[0])+' '+fmt(e[1])+'</div>' +
+    '<div class="btns"><button class="btn main big" id="qPlay">'+(hasYT?'▶ 本人の声で聞く':'🔊 聞く')+'</button>'+(hasYT?'<button class="btn sub" id="qTTS">🔊</button>':'')+'</div>' +
+    '<div class="opts">'+opts.map(o=>'<button class="opt" data-id="'+o.id+'">'+esc(optLabel(o))+'</button>').join('')+'</div>' +
+    '<div class="result" id="qRes"></div>' +
+    '<div class="after" id="qAfter"><div class="full">'+hl(c,e[2])+'</div><div class="jp">'+esc(e[3])+'</div><div class="snd">'+esc(c.text)+' → <b>'+esc(c.snd)+'</b> ・ '+esc(c.jp)+'</div></div>' +
+    '<div class="btns"><button class="btn sub" id="qNext">次へ →</button></div>';
+  document.getElementById('qPlay').onclick = ()=> hasYT ? playYT(e[0], e[1]) : speak(e[2]);
+  const t = document.getElementById('qTTS'); if (t) t.onclick = ()=>speak(e[2]);
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if (answered) return; answered = true;
+    const ok = b.dataset.id===c.id;
+    document.querySelectorAll('.opt').forEach(x=>{ if(x.dataset.id===c.id) x.classList.add('right'); else if(x===b) x.classList.add('wrong'); });
+    if (f) document.getElementById('blank').textContent = e[2].slice(f.start,f.end);
+    const s2 = q[c.id] || {w:1, n:0, streak:0};
+    s2.n++; s2.streak = ok ? (s2.streak||0)+1 : 0; s2.w = ok ? Math.max(0,s2.w-0.5) : s2.w+1.5;
+    q[c.id] = s2;
+    let msg = ok ? '○ 正解！' : '× 正解は「'+optLabel(c)+'」';
+    if (ok && s2.streak>=3 && st[c.id]!=='know') { st[c.id]='know'; msg += ' ・ 3連続正解で「知ってる」に移動'; renderCov(); }
+    const r = document.getElementById('qRes'); r.className='result '+(ok?'ok':'ng'); r.textContent = msg;
+    document.getElementById('qAfter').classList.add('show');
+    scheduleSave();
+  });
+  document.getElementById('qNext').onclick = nextQuiz;
+  if (!hasYT) speak(e[2]);
+}
+document.addEventListener('keydown', ev=>{
+  if (ev.target.tagName==='INPUT') return;
+  if (view==='sort'){ if(ev.key==='1'){const b=document.getElementById('sKnow'); if(b) b.click();} if(ev.key==='2'){const b=document.getElementById('sLearn'); if(b) b.click();} }
+  if (view==='quiz'){
+    if (!answered && /^[1-4]$/.test(ev.key)) { const b=document.querySelectorAll('.opt')[+ev.key-1]; if(b) b.click(); }
+    if (ev.key===' ') { ev.preventDefault(); const p=document.getElementById('qPlay'); if(p) p.click(); }
+    if (ev.key==='Enter' && answered) nextQuiz();
+  }
+});
+
+// ===== YouTube(本人の声) =====
+let ytPlayer = null, ytReady = false, ytPending = null, ytLoading = false;
+function ensureYT(cb){
+  if (ytReady) { cb(); return; }
+  ytPending = cb;
+  if (ytLoading) return; ytLoading = true;
+  window.onYouTubeIframeAPIReady = ()=>{
+    ytPlayer = new YT.Player('yt', { width:'100%', height:'100%', playerVars:{ playsinline:1, controls:1, cc_load_policy:0, rel:0 },
+      events:{ onReady:()=>{ ytReady=true; if (ytPending) { const f=ytPending; ytPending=null; f(); } } } });
+  };
+  const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+}
+function playYT(v, t){
+  const id = vid(v); if (!id) return;
+  document.getElementById('ytWrap').classList.add('show');
+  ensureYT(()=>{ ytPlayer.loadVideoById({videoId:id, startSeconds:Math.max(0,t-2), endSeconds:t+5}); });
+}
+function stopYT(){ try { if (ytPlayer && ytReady) ytPlayer.pauseVideo(); } catch(e){} }
+
+// ===== 読み上げ =====
+let enVoice = null;
+function loadVoices(){ const vs=speechSynthesis.getVoices(); enVoice = vs.find(v=>v.lang==='en-US' && /google|samantha|natural|online/i.test(v.name)) || vs.find(v=>v.lang==='en-US') || vs.find(v=>v.lang.startsWith('en')) || null; }
+loadVoices(); if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+function speak(t){ const u=new SpeechSynthesisUtterance(t.replace(/\[ピー\]/g,'')); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=1; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+
+// ===== タブ =====
+document.querySelectorAll('.tab').forEach(tb=>tb.onclick=()=>{
+  view = tb.dataset.v;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===tb));
+  ['list','sort','quiz'].forEach(v=>document.getElementById('v'+v[0].toUpperCase()+v.slice(1)).style.display = v===view?'':'none');
+  if (view!=='quiz') { stopYT(); }
+  refresh();
+});
+
+// ===== URL =====
+function fillUrls(){ document.getElementById('urlInputs').innerHTML = PARTS.map(p=>'<label>'+pname(p)+' のURL</label><input type="text" id="url'+p+'" placeholder="https://www.youtube.com/watch?v=..." value="'+esc(urls[p]||'')+'">').join(''); }
+document.getElementById('urlSave').onclick = ()=>{
+  urls = {}; PARTS.forEach(p=>{ const v=document.getElementById('url'+p).value.trim(); if (v) urls[p]=v; });
+  const ok = PARTS.filter(p=>vid(p)).length;
+  document.getElementById('urlMsg').textContent = ok+' / '+PARTS.length+'本のURLを認識しました';
+  scheduleSave(); refresh();
+};
+
+// ===== 同期 =====
+function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
+function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); saveTimer=setTimeout(()=>saveAll(),600); }
+function saveAll(retryFlag){
+  if (!currentUser) return;
+  fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_st:st, _q:q, _urls:urls})})})
+  .then(r=>r.json()).then(res=>{ if(res&&res.error) throw new Error(res.error); setSyncBadge('保存済み'); })
+  .catch(()=>{ if(!retryFlag){ setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true),1500);} else setSyncBadge('⚠保存失敗 タップで再試行'); });
+}
+function loadFromServer(user){
+  return fetch(GAS_URL+'?action=load&user='+encodeURIComponent(APP_KEY+':'+user)).then(r=>r.json()).then(res=>{
+    try { const p=JSON.parse(res.data||'{}'); st=p._st||{}; q=p._q||{}; urls=p._urls||{}; if (Array.isArray(urls)) { const o={}; urls.forEach((u,i)=>{ if(u) o[PARTS[i]]=u; }); urls=o; } } catch(e){ st={}; q={}; urls={}; }
+  });
+}
+function initApp(){ fillUrls(); if (!PARTS.some(p=>vid(p))) document.getElementById('urlPanel').open = false; refresh(); }
+function startSession(user){
+  currentUser=user; localStorage.setItem(LOCAL_USER_KEY,user);
+  document.getElementById('loginStatus').textContent='読み込み中...';
+  loadFromServer(user).then(()=>{ document.getElementById('loginOverlay').style.display='none'; setSyncBadge(user+' で同期中'); initApp(); })
+    .catch(()=>{ document.getElementById('loginStatus').textContent='通信に失敗しました。もう一度お試しください。'; });
+}
+document.getElementById('loginBtn').onclick=()=>{ const v=document.getElementById('passInput').value.trim(); if(!v){document.getElementById('loginStatus').textContent='合言葉を入力してください';return;} startSession(v); };
+document.getElementById('passInput').onkeydown=e=>{ if(e.key==='Enter') document.getElementById('loginBtn').click(); };
+document.getElementById('syncBadge').onclick=()=>{
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗')!==-1) { saveAll(); return; }
+  if (currentUser) loadFromServer(currentUser).then(()=>{ setSyncBadge(currentUser+' で同期中(更新済み)'); initApp(); });
+};
+const savedUser = (()=>{ try { return localStorage.getItem(LOCAL_USER_KEY); } catch(e){ return null; } })();
+if (savedUser) { document.getElementById('passInput').value = savedUser; startSession(savedUser); }
+</script>
+</body>
+</html>
