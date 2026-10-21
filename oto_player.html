@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音のかたまり - 聞き取り訓練</title>
+<style>
+  :root{--bg:#14110f;--panel:#1c1815;--panel2:#231e1a;--amber:#ff8c2e;--amber-dim:#c4691a;--amber-deep:#7a4518;--text:#ede5d8;--text-dim:#968d7f;--line:#2e2822;--green:#4ade80;--red:#ff8080;--yellow:#ffd166;--blue:#9cc4e8;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;padding:16px 16px 60px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  a.back{color:var(--text-dim);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:12px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;}
+  .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--amber-dim);font-weight:700;}
+  h1{font-size:24px;margin:4px 0 6px;}
+  h1 span{color:var(--amber);}
+  .lead{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:14px;}
+  .lead b{color:var(--amber);}
+  .tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .tab{flex:1;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 4px;font-weight:700;font-size:13px;cursor:pointer;color:var(--text-dim);}
+  .tab.on{border-color:var(--amber);color:var(--amber);}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+  .chip{background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;user-select:none;}
+  .chip.on{background:var(--amber);color:#1a1208;border-color:var(--amber);font-weight:700;}
+  .chip.weak{border-color:#6b2f2f;}
+  .chip.weak.on{background:var(--red);border-color:var(--red);}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;}
+  .row label{font-size:11px;color:var(--text-dim);display:flex;flex-direction:column;gap:3px;}
+  select{background:var(--panel);color:var(--text);border:1px solid var(--amber-deep);border-radius:8px;padding:6px 10px;font-size:13px;max-width:220px;}
+  .stats{font-size:12px;color:var(--text-dim);margin-bottom:12px;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn.main{background:var(--amber);color:#1a1208;}
+  .btn.sub{background:var(--panel2);color:var(--text);border:1px solid var(--amber-deep);}
+  .btn.big{font-size:18px;padding:16px 26px;border-radius:14px;}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+  a.btn{text-decoration:none;display:inline-block;}
+
+  .card{background:var(--panel);border:2px solid var(--amber-deep);border-radius:18px;padding:22px 18px;margin-bottom:12px;text-align:center;}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+  .tag{font-size:11px;border-radius:999px;padding:3px 10px;border:1px solid var(--amber-dim);color:var(--amber);}
+  .tag.weak{border-color:#6b2f2f;color:var(--red);}
+  .tag.st{border-color:var(--line);color:var(--text-dim);}
+  .k-text{font-size:32px;font-weight:800;line-height:1.3;}
+  .k-sound{font-size:24px;font-weight:800;color:var(--amber);margin-top:8px;}
+  .k-sound small{display:block;font-size:13px;color:var(--text-dim);font-weight:400;margin-top:2px;}
+  .k-tip{font-size:13px;color:var(--blue);margin-top:10px;line-height:1.6;}
+  .exs{margin-top:16px;border-top:1px dashed var(--amber-deep);padding-top:10px;text-align:left;}
+  .ex{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+  .ex:last-child{border-bottom:none;}
+  .ex .en{font-size:17px;font-weight:700;}
+  .ex .jp{font-size:12px;color:var(--text-dim);}
+  .hl{color:var(--amber);text-decoration:underline;text-underline-offset:4px;}
+  .q-sent{font-size:22px;font-weight:700;line-height:1.6;margin:10px 0 4px;}
+  .blank{display:inline-block;min-width:90px;border-bottom:3px solid var(--amber);color:var(--amber);}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+  .opt{background:var(--panel2);border:1px solid var(--amber-deep);color:var(--text);border-radius:12px;padding:14px 8px;font-size:16px;font-weight:700;cursor:pointer;}
+  .opt.right{background:#2f4a30;border-color:var(--green);color:#b3ffb8;}
+  .opt.wrong{background:#5a3030;border-color:var(--red);color:#ffb3b3;}
+  .result{margin-top:14px;font-size:15px;font-weight:800;}
+  .result.ok{color:var(--green);} .result.ng{color:var(--red);} .result.mid{color:var(--yellow);}
+  .after{display:none;margin-top:12px;background:var(--panel2);border-radius:12px;padding:12px 14px;text-align:left;}
+  .after.show{display:block;}
+  .after .full{font-size:18px;font-weight:700;line-height:1.6;}
+  .after .jp{font-size:12.5px;color:var(--text-dim);margin-top:4px;}
+  .after .snd{font-size:15px;color:var(--amber);margin-top:8px;}
+  .after .say3{font-size:12.5px;color:var(--blue);margin-top:6px;}
+  textarea{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:17px;font-family:inherit;min-height:60px;margin-top:12px;}
+  .diff{font-size:18px;line-height:1.9;margin-top:10px;text-align:left;}
+  .w-hit{color:var(--green);} .w-miss{color:var(--red);text-decoration:underline;font-weight:700;} .w-chunk{background:rgba(255,140,46,.18);border-radius:4px;padding:0 2px;}
+  .judge{display:flex;gap:8px;margin-top:14px;}
+  .judge button{flex:1;border:none;border-radius:12px;padding:14px 6px;font-size:16px;font-weight:800;cursor:pointer;}
+  .judge small{display:block;font-size:10.5px;font-weight:400;opacity:.75;margin-top:2px;}
+  #jOk{background:#2f4a30;color:#b3ffb8;} #jMid{background:#4f4420;color:#ffe9a8;} #jNg{background:#5a3030;color:#ffb3b3;}
+  .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text-dim);line-height:1.8;margin-top:14px;}
+  .note b{color:var(--amber);}
+  .pt{display:grid;gap:6px;margin-top:6px;}
+  .pt div{background:var(--panel2);border-radius:8px;padding:8px 10px;}
+  .pt b{display:inline-block;min-width:76px;}
+
+  .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;text-align:center;}
+  .login-box h2{font-size:18px;margin:0 0 6px;}
+  .login-box p{font-size:12px;color:var(--text-dim);margin:0 0 20px;}
+  .login-box input{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:15px;margin-bottom:12px;text-align:center;}
+  .login-box button{width:100%;background:var(--amber);border:none;color:#1a1208;font-weight:700;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
+  .login-status{font-size:11px;color:var(--text-dim);margin-top:10px;min-height:14px;}
+  .sync-badge{position:fixed;top:10px;right:10px;font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:4px 10px;z-index:10;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">音のかたまり / 聞き取り訓練</div>
+  <h1>単語じゃなく<span>かたまり</span>で聞く</h1>
+  <div class="lead">
+    聞こえないのは耳のせいじゃなく、<b>つながった音の形を知らない</b>から。<br>
+    かたまりの音を覚える → 自分で言う → 文の中で聞き取る、の順で耳に入れます。
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" data-v="learn">👂 耳ならし</div>
+    <div class="tab" data-v="quiz">🎯 聞き取り</div>
+    <div class="tab" data-v="dict">✍️ 書き取り</div>
+  </div>
+  <div class="chips" id="catChips"></div>
+  <div class="row">
+    <label>出す順番
+      <select id="orderSel">
+        <option value="weak" selected>苦手を優先</option>
+        <option value="random">ランダム</option>
+        <option value="new">まだやってないもの</option>
+        <option value="ngonly">△×だけ</option>
+      </select>
+    </label>
+    <label>速さ
+      <select id="rateSel">
+        <option value="0.75">ゆっくり</option>
+        <option value="1" selected>ふつう</option>
+        <option value="1.15">速い</option>
+      </select>
+    </label>
+    <label>声
+      <select id="voiceSel"></select>
+    </label>
+  </div>
+  <div class="stats" id="stats"></div>
+
+  <div class="card" id="card"></div>
+
+  <div class="note">
+    <b>6つの音のパターン</b>
+    <div class="pt" id="ptList"></div>
+    <div style="margin-top:10px">
+      <b>やり方</b><br>
+      ・耳ならし：音を聞いて、<b>カタカナ通りに3回まねして言う</b>。自分で言える音は聞き取れるようになる<br>
+      ・聞き取り：文だけ流れる。空欄に入るかたまりを選ぶ<br>
+      ・書き取り：聞こえた通りに全部打つ。抜けた所が自分の弱点<br>
+      ・ブラウザの読み上げは本物より発音がはっきりめ。<b>「本物の音」</b>で実際の英語話者の動画を確認すると効く
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== パターン =====
+const PATS = {
+  jaku:   {name:'弱形', tip:'of / are / were / to / for / can などは文の中で弱く短く「ア」っぽくなる'},
+  renketsu:{name:'つながり', tip:'子音で終わる単語＋母音で始まる単語がくっついて1語に聞こえる'},
+  datsuraku:{name:'脱落', tip:'音が消える。語尾のt・d、him / her の h がよく消える'},
+  flap:   {name:'tがラ行', tip:'母音に挟まれた t がラ行・ダ行っぽくなる(アメリカ英語)'},
+  doka:   {name:'混ざる', tip:'隣の音が混ざって別の音になる。d＋you→ジュ、t＋you→チュ'},
+  shuku:  {name:'短縮', tip:'会話でよく使う崩れた形。gonna / wanna / gotta など'}
+};
+// 苦手な音(of / are / were)は weak:true
+// text: かたまり / snd: 聞こえ方(カタカナ) / rs: 英語っぽい崩し方 / ex: [英文, 日本語, 読み上げ用(省略可)]
+const KATA = [
+  // --- 弱形 ---
+  {id:'one_of_the', p:'jaku', weak:true, text:'one of the', snd:'ワナヴァ', rs:'wuh-nuh-vuh', ex:[["He's one of the bad guys.",'あいつは悪い奴らの1人だ'],["This is one of the best cars.",'これは一番いい車の1つだ']]},
+  {id:'some_of_them', p:'jaku', weak:true, text:'some of them', snd:'サマヴェム', rs:'suh-muh-vem', ex:[["Some of them have guns.",'何人かは銃を持ってる'],["I know some of them.",'何人かは知ってる']]},
+  {id:'out_of_the', p:'jaku', weak:true, text:'out of the', snd:'アウダヴァ', rs:'ow-duh-vuh', ex:[["Get out of the car!",'車から降りろ！'],["We need to get out of the city.",'街から出ないと']]},
+  {id:'most_of', p:'jaku', weak:true, text:'most of', snd:'モウスタヴ', rs:'mohs-tuh', ex:[["I lost most of my money.",'金のほとんどを失った'],["Most of the time, I just drive.",'だいたいいつも運転してるだけ']]},
+  {id:'where_are_you', p:'jaku', weak:true, text:'where are you', snd:'ウェアラユ', rs:'weh-ruh-yuh', ex:[["Where are you going?",'どこ行くの？'],["Where are you now?",'今どこにいる？']]},
+  {id:'they_are', p:'jaku', weak:true, text:'they are', snd:'ゼイア', rs:'theyr', ex:[["They are coming for us.",'奴らがこっちに来る'],["They are not happy.",'あいつら怒ってる']]},
+  {id:'we_were', p:'jaku', weak:true, text:'we were', snd:'ウィワ', rs:'wee-wer', ex:[["We were so close!",'あと少しだったのに！'],["We were going to win.",'勝てるところだった']]},
+  {id:'you_were', p:'jaku', weak:true, text:'you were', snd:'ユワ', rs:'yuh-wer', ex:[["You were right.",'お前が正しかった'],["I thought you were dead.",'死んだと思ってた']]},
+  {id:'they_were', p:'jaku', weak:true, text:'they were', snd:'ゼイワ', rs:'they-wer', ex:[["They were waiting for me.",'奴ら待ち伏せしてた'],["I didn't know they were cops.",'あいつらが警察だって知らなかった']]},
+  {id:'to_the', p:'jaku', text:'to the', snd:'タザ', rs:'tuh-thuh', ex:[["Go to the bank.",'銀行に行け'],["Let's go back to the car.",'車に戻ろう']]},
+  {id:'for_a', p:'jaku', text:'for a', snd:'ファラ', rs:'fer-uh', ex:[["Wait for a second.",'ちょっと待って'],["Let's go for a ride.",'ドライブに行こう']]},
+  {id:'get_them', p:'jaku', text:'get them', snd:'ゲッデム', rs:'get-em', ex:[["Get them!",'やっちまえ！'],["Let's go get them.",'あいつら捕まえに行こう']]},
+  {id:'i_can', p:'jaku', text:'I can', snd:'アイクン', rs:'eye-kn', ex:[["I can do this.",'俺ならできる'],["I can see them.",'あいつらが見える']]},
+  {id:'should_have', p:'jaku', text:'should have', snd:'シュダ', rs:'shoulda', ex:[["I should have saved the game.",'セーブしとけばよかった','I shoulda saved the game.'],["You should have seen that.",'今の見せたかった']]},
+  {id:'could_have', p:'jaku', text:'could have', snd:'クダ', rs:'coulda', ex:[["I could have died.",'死ぬところだった','I coulda died.']]},
+  {id:'was_a', p:'jaku', text:'was a', snd:'ワザ', rs:'wuh-zuh', ex:[["That was a bad idea.",'あれは悪い考えだった'],["It was a trap!",'罠だった！']]},
+  {id:'at_the', p:'jaku', text:'at the', snd:'アッザ', rs:'uh-thuh', ex:[["Look at the map.",'マップ見て'],["I'm at the bank.",'今銀行にいる']]},
+  {id:'and_then', p:'jaku', text:'and then', snd:'ンゼン', rs:'n-then', ex:[["I got in the car, and then he shot me.",'車に乗ったら撃たれた']]},
+
+  // --- つながり ---
+  {id:'come_on_in', p:'renketsu', text:'come on in', snd:'カモニン', rs:'kuh-mon-in', ex:[["Come on in, guys.",'みんな入って']]},
+  {id:'pick_it_up', p:'renketsu', text:'pick it up', snd:'ピキラップ', rs:'pi-ki-dup', ex:[["Pick it up!",'拾え！'],["Can you pick it up?",'それ拾える？']]},
+  {id:'turn_it_off', p:'renketsu', text:'turn it off', snd:'ターニロフ', rs:'tur-ni-doff', ex:[["Turn it off.",'それ消して'],["Can you turn it off?",'それ止めてくれる？']]},
+  {id:'check_it_out', p:'renketsu', text:'check it out', snd:'チェキラウ', rs:'che-ki-dout', ex:[["Check it out.",'見てみて'],["Let's check it out.",'行ってみよう']]},
+  {id:'look_at_this', p:'renketsu', text:'look at this', snd:'ルカッディス', rs:'loo-ka-this', ex:[["Look at this car!",'この車見て！'],["Hey, look at this.",'ねえ、これ見て']]},
+  {id:'in_an_hour', p:'renketsu', text:'in an hour', snd:'イナナウア', rs:'i-na-nower', ex:[["I'll be there in an hour.",'1時間で着く']]},
+  {id:'take_it_easy', p:'renketsu', text:'take it easy', snd:'テイキリーズィ', rs:'tay-ki-dee-zee', ex:[["Take it easy, man.",'落ち着けって']]},
+  {id:'not_at_all', p:'renketsu', text:'not at all', snd:'ナラロー', rs:'nah-da-dall', ex:[["Not at all.",'全然']]},
+  {id:'hold_on', p:'renketsu', text:'hold on', snd:'ホウルドン', rs:'hohl-don', ex:[["Hold on a second.",'ちょっと待って'],["Hold on, what?",'待って、え？']]},
+  {id:'one_of_us', p:'renketsu', text:'one of us', snd:'ワノヴァス', rs:'wuh-nuh-vus', ex:[["One of us has to drive.",'誰か1人が運転しないと']]},
+  {id:'get_in', p:'renketsu', text:'get in', snd:'ゲリン', rs:'ge-din', ex:[["Get in the car!",'車に乗れ！'],["Let's get in.",'入ろう']]},
+
+  // --- 脱落 ---
+  {id:'tell_him', p:'datsuraku', text:'tell him', snd:'テリム', rs:'tel-im', ex:[["Tell him to stop.",'やめろって言って'],["Did you tell him?",'あいつに言った？']]},
+  {id:'give_him', p:'datsuraku', text:'give him', snd:'ギヴィム', rs:'giv-im', ex:[["Give him the money.",'あいつに金を渡せ']]},
+  {id:'ask_her', p:'datsuraku', text:'ask her', snd:'アスカー', rs:'as-ker', ex:[["Let's ask her.",'彼女に聞こう']]},
+  {id:'next_to', p:'datsuraku', text:'next to', snd:'ネクストゥ', rs:'nex-tuh', ex:[["It's next to the bank.",'銀行の隣だ']]},
+  {id:'last_time', p:'datsuraku', text:'last time', snd:'ラスタイム', rs:'las-time', ex:[["This is the last time.",'これで最後'],["Last time I died here.",'前回ここで死んだ']]},
+  {id:'just_do_it', p:'datsuraku', text:'just do it', snd:'ジャスドゥーイッ', rs:'jus-doo-it', ex:[["Just do it!",'いいからやれ！']]},
+  {id:'dont_know', p:'datsuraku', text:"don't know", snd:'ドンノウ', rs:'dunno', ex:[["I don't know.",'分からない'],["I don't know where to go.",'どこ行けばいいか分からない']]},
+  {id:'get_back', p:'datsuraku', text:'get back', snd:'ゲッバック', rs:'ge-back', ex:[["Get back here!",'戻ってこい！'],["Let's get back to the car.",'車に戻ろう']]},
+  {id:'bad_guy', p:'datsuraku', text:'bad guy', snd:'バッガイ', rs:'ba-guy', ex:[["He's a bad guy.",'あいつは悪い奴だ']]},
+  {id:'what_time', p:'datsuraku', text:'what time', snd:'ワッタイム', rs:'wuh-time', ex:[["What time is it?",'今何時？']]},
+  {id:'sit_down', p:'datsuraku', text:'sit down', snd:'シッダウン', rs:'si-down', ex:[["Sit down!",'座れ！']]},
+  {id:'and_i', p:'datsuraku', text:'and I', snd:'アナイ', rs:'uh-nai', ex:[["You and I are going to the bank.",'お前と俺で銀行に行く']]},
+
+  // --- tがラ行 ---
+  {id:'get_a', p:'flap', text:'get a', snd:'ゲラ', rs:'ge-duh', ex:[["Let's get a car.",'車を手に入れよう'],["I need to get a gun.",'銃を手に入れないと']]},
+  {id:'what_are_you', p:'flap', weak:true, text:'what are you', snd:'ワラユ', rs:'wuh-duh-yuh', ex:[["What are you doing?",'何してんの？'],["What are you talking about?",'何の話？']]},
+  {id:'a_lot_of', p:'flap', weak:true, text:'a lot of', snd:'アラダ', rs:'uh-lah-duh', ex:[["There are a lot of cops.",'警察が多い'],["I have a lot of money.",'金はたくさんある']]},
+  {id:'got_it', p:'flap', text:'got it', snd:'ガリッ', rs:'gah-dit', ex:[["Got it!",'了解！'],["I got it.",'分かった']]},
+  {id:'put_it', p:'flap', text:'put it', snd:'プリッ', rs:'poo-dit', ex:[["Put it down!",'それを置け！'],["Put it in the car.",'車に入れて']]},
+  {id:'shut_up', p:'flap', text:'shut up', snd:'シャラップ', rs:'shuh-dup', ex:[["Shut up!",'黙れ！']]},
+  {id:'wait_a_minute', p:'flap', text:'wait a minute', snd:'ウェイラミニッ', rs:'way-duh-mi-nit', ex:[["Wait a minute.",'ちょっと待って']]},
+  {id:'a_little', p:'flap', text:'a little', snd:'アリロー', rs:'uh-li-dl', ex:[["Just a little.",'ちょっとだけ'],["I'm a little lost.",'ちょっと迷ってる']]},
+  {id:'better', p:'flap', text:'better', snd:'ベラー', rs:'beh-der', ex:[["That's better.",'その方がいい'],["You better run.",'逃げた方がいいぞ']]},
+  {id:'water', p:'flap', text:'water', snd:'ワラー', rs:'wah-der', ex:[["The car is in the water!",'車が水に落ちた！']]},
+  {id:'let_it_go', p:'flap', text:'let it go', snd:'レリゴー', rs:'leh-di-go', ex:[["Just let it go.",'もう忘れろ']]},
+  {id:'what_about', p:'flap', text:'what about', snd:'ワラバウ', rs:'wuh-duh-bout', ex:[["What about him?",'あいつはどうする？'],["What about the money?",'金はどうする？']]},
+  {id:'get_out', p:'flap', text:'get out', snd:'ゲラウ', rs:'ge-dout', ex:[["Get out!",'出ていけ！'],["I need to get out.",'出ないと']]},
+
+  // --- 混ざる ---
+  {id:'did_you', p:'doka', text:'did you', snd:'ディジュ', rs:'di-juh', ex:[["Did you see that?",'今の見た？'],["Did you hear him?",'あいつの声聞こえた？']]},
+  {id:'would_you', p:'doka', text:'would you', snd:'ウッジュ', rs:'woo-juh', ex:[["Would you stop?",'やめてくれない？']]},
+  {id:'could_you', p:'doka', text:'could you', snd:'クッジュ', rs:'koo-juh', ex:[["Could you help me?",'手伝ってくれる？']]},
+  {id:'dont_you', p:'doka', text:"don't you", snd:'ドンチュ', rs:'dohn-chuh', ex:[["Why don't you help me?",'手伝ってくれよ']]},
+  {id:'what_do_you', p:'doka', text:'what do you', snd:'ワダヤ', rs:'wuh-duh-yuh', ex:[["What do you want?",'何が欲しいんだ？'],["What do you think?",'どう思う？']]},
+  {id:'got_you', p:'doka', text:'got you', snd:'ガッチャ', rs:'gotcha', ex:[["Got you!",'捕まえた！','Gotcha!'],["I got you.",'任せろ']]},
+  {id:'meet_you', p:'doka', text:'meet you', snd:'ミーチュ', rs:'mee-chuh', ex:[["Nice to meet you.",'はじめまして']]},
+  {id:'last_year', p:'doka', text:'last year', snd:'ラスチア', rs:'las-cheer', ex:[["I played this last year.",'去年これやった']]},
+  {id:'let_you', p:'doka', text:'let you', snd:'レッチュ', rs:'leh-chuh', ex:[["I won't let you go.",'逃がさないぞ']]},
+
+  // --- 短縮 ---
+  {id:'going_to', p:'shuku', text:'going to', snd:'ガナ', rs:'gonna', ex:[["I'm going to lose them.",'あいつらをまいてやる',"I'm gonna lose them."],["It's going to rain.",'雨が降りそう',"It's gonna rain."]]},
+  {id:'want_to', p:'shuku', text:'want to', snd:'ワナ', rs:'wanna', ex:[["I want to go home.",'家に帰りたい','I wanna go home.'],["Do you want to drive?",'運転したい？','Do you wanna drive?']]},
+  {id:'got_to', p:'shuku', text:'got to', snd:'ガラ', rs:'gotta', ex:[["I've got to go.",'行かなきゃ',"I've gotta go."],["We got to hurry.",'急がないと','We gotta hurry.']]},
+  {id:'have_to', p:'shuku', text:'have to', snd:'ハフタ', rs:'hafta', ex:[["I have to win this.",'これは勝たないと'],["You have to see this.",'これは見て']]},
+  {id:'kind_of', p:'shuku', weak:true, text:'kind of', snd:'カインダ', rs:'kinda', ex:[["It's kind of hard.",'ちょっと難しい',"It's kinda hard."]]},
+  {id:'out_of', p:'shuku', weak:true, text:'out of', snd:'アウダ', rs:'outta', ex:[["Get out of here!",'ここから出ていけ！','Get outta here!']]},
+  {id:'let_me', p:'shuku', text:'let me', snd:'レミ', rs:'lemme', ex:[["Let me see.",'見せて','Lemme see.'],["Let me try.",'やらせて','Lemme try.']]},
+  {id:'give_me', p:'shuku', text:'give me', snd:'ギミ', rs:'gimme', ex:[["Give me that!",'それよこせ！','Gimme that!'],["Give me a second.",'ちょっと待って','Gimme a second.']]},
+  {id:'because', p:'shuku', text:'because', snd:'カズ', rs:"'cause", ex:[["I'm running because the cops are here.",'警察が来たから逃げてる',"I'm running 'cause the cops are here."]]},
+];
+
+// ===== 状態 =====
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'oto';
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+const VOICE_KEY = 'oto_voice_v1';
+let currentUser = null, saveTimer = null;
+let status = {};   // key -> {s, w, n}  key = mode + ':' + id
+let view = 'learn';
+let activeP = new Set(Object.keys(PATS)), weakOnly = false;
+let queue = [], qi = 0, current = null, retry = [];
+let answered = false;
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function reEsc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function chunkRe(k){ return new RegExp('\\b'+reEsc(k.text).replace(/'/g,"['’]")+'\\b','i'); }
+function hlChunk(k, en){ const m = en.match(chunkRe(k)); if (!m) return esc(en); const i=m.index; return esc(en.slice(0,i))+'<span class="hl">'+esc(m[0])+'</span>'+esc(en.slice(i+m[0].length)); }
+function key(id){ return view + ':' + id; }
+
+// ===== 絞り込み =====
+function buildChips(){
+  const box = document.getElementById('catChips'); box.innerHTML='';
+  const mk = (label, on, fn, cls) => { const el=document.createElement('div'); el.className='chip'+(cls?' '+cls:'')+(on?' on':''); el.textContent=label; el.onclick=fn; box.appendChild(el); };
+  const allOn = !weakOnly && activeP.size===Object.keys(PATS).length;
+  mk('すべて', allOn, ()=>{ weakOnly=false; activeP=new Set(Object.keys(PATS)); refresh(); });
+  mk('苦手な音 of/are/were ('+KATA.filter(k=>k.weak).length+')', weakOnly, ()=>{ weakOnly=!weakOnly; refresh(); }, 'weak');
+  Object.entries(PATS).forEach(([p,v])=>{
+    const n = KATA.filter(k=>k.p===p).length;
+    mk(v.name+' ('+n+')', !allOn && !weakOnly && activeP.has(p), ()=>{
+      if (allOn || weakOnly) { weakOnly=false; activeP=new Set([p]); }
+      else if (activeP.has(p)) { if (activeP.size>1) activeP.delete(p); }
+      else activeP.add(p);
+      refresh();
+    });
+  });
+}
+function refresh(){ buildChips(); rebuild(); next(); }
+function pool(){
+  const order = document.getElementById('orderSel').value;
+  return KATA.filter(k=>activeP.has(k.p) && (!weakOnly || k.weak))
+    .filter(k=> order!=='ngonly' || (status[key(k.id)] && status[key(k.id)].s!=='ok'));
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function rebuild(){
+  const order = document.getElementById('orderSel').value;
+  let arr = pool();
+  if (order==='weak' || order==='ngonly') arr = arr.map(k=>{ const st=status[key(k.id)]; const w = st ? st.w : (k.weak ? 2.5 : 1.5); return {k, r: Math.random() - Math.min(w,5)*0.3}; }).sort((a,b)=>a.r-b.r).map(x=>x.k);
+  else if (order==='new') arr = shuffle(arr.filter(k=>!status[key(k.id)])).concat(shuffle(arr.filter(k=>status[key(k.id)])));
+  else shuffle(arr);
+  queue = arr; qi = 0; retry = [];
+  renderStats();
+}
+function next(){
+  speechSynthesis.cancel();
+  answered = false;
+  retry.forEach(r=>r.wait--);
+  const due = retry.findIndex(r=>r.wait<=0);
+  if (due!==-1) { current = retry.splice(due,1)[0].item; render(true); return; }
+  if (!queue.length) { current=null; render(); return; }
+  if (qi>=queue.length) rebuild();
+  const k = queue[qi++];
+  current = {k, ex: k.ex[Math.floor(Math.random()*k.ex.length)]};
+  render(false);
+}
+function renderStats(){
+  let ok=0,mid=0,ng=0;
+  KATA.forEach(k=>{ const st=status[key(k.id)]; if(!st) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else ng++; });
+  const name = {learn:'耳ならし',quiz:'聞き取り',dict:'書き取り'}[view];
+  document.getElementById('stats').innerHTML = name+' ・ 全'+KATA.length+'個 ・ <b style="color:var(--green)">○'+ok+'</b> <b style="color:var(--yellow)">△'+mid+'</b> <b style="color:var(--red)">×'+ng+'</b> 未'+(KATA.length-ok-mid-ng)+' ・ 今の条件 '+queue.length+'個';
+}
+
+// ===== 描画 =====
+function tagsHtml(k, isRetry){
+  const st = status[key(k.id)];
+  return '<div class="tags"><span class="tag">'+esc(PATS[k.p].name)+'</span>' + (k.weak?'<span class="tag weak">苦手な音</span>':'') +
+    (st?'<span class="tag st">'+({ok:'○',mid:'△',ng:'×'}[st.s])+' '+st.n+'回</span>':'<span class="tag st">未</span>') + (isRetry?'<span class="tag weak">もう一回</span>':'') + '</div>';
+}
+function realLink(k){ return 'https://youglish.com/pronounce/'+encodeURIComponent(k.text)+'/english/us'; }
+function sayOf(ex){ return ex[2] || ex[0]; }
+
+function render(isRetry){
+  const card = document.getElementById('card');
+  if (!current) { card.innerHTML = '<div class="k-text" style="font-size:18px">この条件のかたまりがありません</div><div class="k-tip">パターンや出す順番を変えてみてください</div>'; return; }
+  const {k, ex} = current;
+  if (view==='learn') {
+    card.innerHTML = tagsHtml(k,isRetry) +
+      '<div class="k-text">'+esc(k.text)+'</div>' +
+      '<div class="k-sound">'+esc(k.snd)+'<small>'+esc(k.rs)+'</small></div>' +
+      '<div class="k-tip">'+esc(PATS[k.p].tip)+'</div>' +
+      '<div class="btns"><button class="btn sub" id="pSlow">🐢 ゆっくり</button><button class="btn main" id="pNorm">🔊 ふつう</button><a class="btn sub" href="'+realLink(k)+'" target="_blank" rel="noopener">🎬 本物の音</a></div>' +
+      '<div class="exs">' + k.ex.map((e,i)=>'<div class="ex" data-i="'+i+'"><span>🔊</span><div><div class="en">'+hlChunk(k,e[0])+'</div><div class="jp">'+esc(e[1])+'</div></div></div>').join('') + '</div>' +
+      '<div class="k-tip" style="color:var(--text-dim)">カタカナ通りに3回まねして言えたら ○</div>' +
+      judgeHtml();
+    document.getElementById('pSlow').onclick = ()=>speak(k.text, 0.6);
+    document.getElementById('pNorm').onclick = ()=>speak(k.text);
+    card.querySelectorAll('.ex').forEach(el=>el.onclick=()=>speak(sayOf(k.ex[+el.dataset.i])));
+    bindJudge();
+    speak(k.text);
+  }
+  else if (view==='quiz') {
+    const m = ex[0].match(chunkRe(k));
+    const before = ex[0].slice(0, m.index), after = ex[0].slice(m.index + m[0].length);
+    const opts = shuffle([k].concat(distractors(k, ex[0])));
+    card.innerHTML = tagsHtml(k,isRetry) +
+      '<div class="k-tip" style="margin-top:0;color:var(--text-dim)">聞こえたかたまりを選ぶ</div>' +
+      '<div class="q-sent">'+esc(before)+'<span class="blank" id="blank">　？　</span>'+esc(after)+'</div>' +
+      '<div class="btns"><button class="btn main big" id="play">🔊 聞く</button><button class="btn sub" id="playSlow">🐢</button></div>' +
+      '<div class="opts">'+opts.map(o=>'<button class="opt" data-id="'+o.id+'">'+esc(o.text)+'</button>').join('')+'</div>' +
+      '<div class="result" id="res"></div>' + afterHtml(k, ex) +
+      '<div class="btns"><button class="btn sub" id="nextBtn">次へ →</button></div>';
+    document.getElementById('play').onclick = ()=>speak(sayOf(ex));
+    document.getElementById('playSlow').onclick = ()=>speak(sayOf(ex), 0.7);
+    card.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if (answered) return; answered = true;
+      const ok = b.dataset.id===k.id;
+      card.querySelectorAll('.opt').forEach(x=>{ if (x.dataset.id===k.id) x.classList.add('right'); else if (x===b) x.classList.add('wrong'); });
+      document.getElementById('blank').textContent = m[0];
+      const r = document.getElementById('res'); r.className = 'result '+(ok?'ok':'ng'); r.textContent = ok ? '○ 正解！' : '× 正解は「'+k.text+'」';
+      document.getElementById('after').classList.add('show');
+      bindAfter(k, ex);
+      record(ok?'ok':'ng');
+    });
+    document.getElementById('nextBtn').onclick = ()=>{ if (!answered) record('ng'); next(); };
+    speak(sayOf(ex));
+  }
+  else {
+    card.innerHTML = tagsHtml(k,isRetry) +
+      '<div class="k-tip" style="margin-top:0;color:var(--text-dim)">聞こえた英文を全部打つ(大文字・記号は気にしなくてOK)</div>' +
+      '<div class="btns"><button class="btn main big" id="play">🔊 聞く</button><button class="btn sub" id="playSlow">🐢</button></div>' +
+      '<textarea id="dIn" placeholder="聞こえた通りに入力" autocapitalize="off" autocomplete="off" spellcheck="false"></textarea>' +
+      '<div class="btns"><button class="btn main" id="checkBtn">答え合わせ</button><button class="btn sub" id="giveUp">分からない</button></div>' +
+      '<div class="diff" id="diff"></div><div class="result" id="res"></div>' + afterHtml(k, ex) +
+      '<div class="btns"><button class="btn sub" id="nextBtn">次へ →</button></div>';
+    document.getElementById('play').onclick = ()=>speak(sayOf(ex));
+    document.getElementById('playSlow').onclick = ()=>speak(sayOf(ex), 0.7);
+    const check = (giveUp)=>{
+      if (answered) return; answered = true;
+      const d = dictDiff(giveUp ? '' : document.getElementById('dIn').value, ex[0], k);
+      document.getElementById('diff').innerHTML = d.html;
+      const s = d.chunkHit && d.rate>=0.999 ? 'ok' : (d.rate>=0.7 ? 'mid' : 'ng');
+      const r = document.getElementById('res'); r.className = 'result '+s;
+      r.textContent = (s==='ok'?'○ 完璧！':s==='mid'?'△ おしい':'× もう一回')+' ・ '+Math.round(d.rate*100)+'% ・ かたまり「'+k.text+'」'+(d.chunkHit?'聞き取れた':'聞き取れず');
+      document.getElementById('after').classList.add('show');
+      bindAfter(k, ex);
+      record(s);
+    };
+    document.getElementById('checkBtn').onclick = ()=>check(false);
+    document.getElementById('giveUp').onclick = ()=>check(true);
+    document.getElementById('dIn').onkeydown = e=>{ if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); if (answered) next(); else check(false); } };
+    document.getElementById('nextBtn').onclick = ()=>{ if (!answered) record('ng'); next(); };
+    speak(sayOf(ex));
+  }
+}
+function judgeHtml(){ return '<div class="judge"><button id="jOk">○ 言えた<small>(1)</small></button><button id="jMid">△ 微妙<small>(2)</small></button><button id="jNg">× まだ<small>(3)</small></button></div>'; }
+function bindJudge(){
+  document.getElementById('jOk').onclick=()=>{ record('ok'); next(); };
+  document.getElementById('jMid').onclick=()=>{ record('mid'); next(); };
+  document.getElementById('jNg').onclick=()=>{ record('ng'); next(); };
+}
+function afterHtml(k, ex){
+  return '<div class="after" id="after">' +
+    '<div class="full">'+hlChunk(k, ex[0])+'</div>' +
+    '<div class="jp">'+esc(ex[1])+'</div>' +
+    '<div class="snd">'+esc(k.text)+' → <b>'+esc(k.snd)+'</b>（'+esc(k.rs)+'）・ '+esc(PATS[k.p].name)+'</div>' +
+    '<div class="say3">聞き取れなかったら、かたまりをカタカナ通りに3回言ってからもう一度聞く</div>' +
+    '<div class="btns" style="justify-content:flex-start"><button class="btn sub" id="aChunk">🔊 かたまりだけ</button><button class="btn sub" id="aSlow">🐢 文をゆっくり</button><a class="btn sub" href="'+realLink(k)+'" target="_blank" rel="noopener">🎬 本物の音</a></div>' +
+  '</div>';
+}
+function bindAfter(k, ex){
+  document.getElementById('aChunk').onclick = ()=>speak(k.text, 0.8);
+  document.getElementById('aSlow').onclick = ()=>speak(sayOf(ex), 0.7);
+}
+function distractors(k, sentence){
+  const others = KATA.filter(o=>o.id!==k.id && o.text.toLowerCase()!==k.text.toLowerCase() && !chunkRe(o).test(sentence));
+  const same = shuffle(others.filter(o=>o.p===k.p)), diff = shuffle(others.filter(o=>o.p!==k.p));
+  return same.slice(0,2).concat(diff).slice(0,3);
+}
+
+// ===== 書き取りの比較 =====
+const EXPAND = {"gonna":"going to","wanna":"want to","gotta":"got to","hafta":"have to","kinda":"kind of","outta":"out of","lemme":"let me","gimme":"give me","gotcha":"got you","dunno":"don't know","'cause":"because","cause":"because","cuz":"because","shoulda":"should have","coulda":"could have","woulda":"would have","ya":"you","im":"i am","dont":"do not","didnt":"did not","cant":"can not","wont":"will not","thats":"that is","whats":"what is","youre":"you are","theyre":"they are","ive":"i have","lets":"let us","isnt":"is not","wasnt":"was not","werent":"were not","doesnt":"does not","couldnt":"could not","shouldnt":"should not","'em":"them","em":"them","ok":"okay"};
+const CONTR = {"i'm":"i am","you're":"you are","we're":"we are","they're":"they are","he's":"he is","she's":"she is","it's":"it is","that's":"that is","there's":"there is","what's":"what is","let's":"let us","i've":"i have","you've":"you have","we've":"we have","i'll":"i will","you'll":"you will","we'll":"we will","i'd":"i would","don't":"do not","doesn't":"does not","didn't":"did not","can't":"can not","cannot":"can not","won't":"will not","isn't":"is not","aren't":"are not","wasn't":"was not","weren't":"were not","shouldn't":"should not","couldn't":"could not","he'll":"he will"};
+function normTokens(s){
+  let t = s.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9'\s]/g,' ').split(/\s+/).filter(Boolean);
+  t = t.flatMap(w=> (EXPAND[w]||w).split(' ')).flatMap(w=> (CONTR[w]||w).split(' '));
+  return t;
+}
+function dictDiff(input, answer, k){
+  const a = normTokens(answer), b = normTokens(input);
+  // LCS
+  const n=a.length, m=b.length, dp=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=n-1;i>=0;i--) for(let j=m-1;j>=0;j--) dp[i][j] = a[i]===b[j] ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  const hit = new Array(n).fill(false);
+  let i=0,j=0; while(i<n&&j<m){ if(a[i]===b[j]){hit[i]=true;i++;j++;} else if(dp[i+1][j]>=dp[i][j+1]) i++; else j++; }
+  // かたまりの位置(正解トークン列の中)
+  const c = normTokens(k.text);
+  let ci=-1; for(let x=0;x+c.length<=n;x++){ if(c.every((w,y)=>a[x+y]===w)){ci=x;break;} }
+  const inChunk = x => ci>=0 && x>=ci && x<ci+c.length;
+  const chunkHit = ci<0 ? true : c.every((w,y)=>hit[ci+y]);
+  const html = a.map((w,x)=>'<span class="'+(hit[x]?'w-hit':'w-miss')+(inChunk(x)?' w-chunk':'')+'">'+esc(w)+'</span>').join(' ');
+  return {html, rate: n ? hit.filter(Boolean).length/n : 1, chunkHit};
+}
+
+// ===== 記録 =====
+function record(s){
+  const {k} = current;
+  const kk = key(k.id);
+  const st = status[kk] || {w: k.weak?2.5:1.5, n:0};
+  st.s = s; st.n=(st.n||0)+1;
+  st.w = s==='ok' ? Math.max(0,(st.w||0)-1) : s==='mid' ? (st.w||0)+1 : (st.w||0)+2;
+  status[kk] = st;
+  if (s!=='ok' && !retry.some(r=>r.item.k===k)) retry.push({item: {k, ex: current.ex}, wait: s==='ng'?3:6});
+  scheduleSave(); renderStats();
+}
+document.addEventListener('keydown', ev=>{
+  if (ev.target.tagName==='TEXTAREA' || ev.target.tagName==='INPUT' || !current) return;
+  if (view==='learn') { if(ev.key==='1'){record('ok');next();} if(ev.key==='2'){record('mid');next();} if(ev.key==='3'){record('ng');next();} }
+  if (view==='quiz' && !answered && /^[1-4]$/.test(ev.key)) { const b = document.querySelectorAll('.opt')[+ev.key-1]; if (b) b.click(); }
+  if (ev.key===' ') { ev.preventDefault(); const p=document.getElementById('play')||document.getElementById('pNorm'); if(p) p.click(); }
+  if (ev.key==='Enter' && answered) next();
+});
+
+// ===== タブ・設定 =====
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  view = t.dataset.v;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===t));
+  rebuild(); next();
+});
+document.getElementById('orderSel').onchange = ()=>{ rebuild(); next(); };
+document.getElementById('ptList').innerHTML = Object.values(PATS).map(v=>'<div><b>'+esc(v.name)+'</b>'+esc(v.tip)+'</div>').join('');
+
+// ===== 音声 =====
+let voices = [], voice = null;
+function loadVoices(){
+  voices = speechSynthesis.getVoices().filter(v=>v.lang && v.lang.toLowerCase().startsWith('en'));
+  const sel = document.getElementById('voiceSel');
+  let saved = null; try { saved = localStorage.getItem(VOICE_KEY); } catch(e){}
+  const pref = v => (v.lang==='en-US'?2:0) + (/google|samantha|natural|online|aria|jenny|guy/i.test(v.name)?1:0);
+  voices.sort((a,b)=>pref(b)-pref(a));
+  sel.innerHTML = voices.length ? voices.map((v,i)=>'<option value="'+i+'">'+esc(v.name)+' ('+v.lang+')</option>').join('') : '<option>(英語の声なし)</option>';
+  let idx = voices.findIndex(v=>v.name===saved); if (idx<0) idx = 0;
+  sel.value = String(idx); voice = voices[idx] || null;
+}
+loadVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+document.getElementById('voiceSel').onchange = e=>{ voice = voices[+e.target.value] || null; try { localStorage.setItem(VOICE_KEY, voice ? voice.name : ''); } catch(err){} if (current) speak(current.k.text); };
+function speak(t, rateOverride){
+  const u = new SpeechSynthesisUtterance(t);
+  u.lang = 'en-US'; if (voice) u.voice = voice;
+  u.rate = rateOverride || parseFloat(document.getElementById('rateSel').value);
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+
+// ===== 同期 =====
+function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
+function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); saveTimer=setTimeout(()=>saveAll(),600); }
+function saveAll(retryFlag){
+  if (!currentUser) return;
+  fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status:status})})})
+  .then(r=>r.json()).then(res=>{ if(res&&res.error) throw new Error(res.error); setSyncBadge('保存済み'); })
+  .catch(()=>{ if(!retryFlag){ setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true),1500);} else setSyncBadge('⚠保存失敗 タップで再試行'); });
+}
+function loadFromServer(user){
+  return fetch(GAS_URL+'?action=load&user='+encodeURIComponent(APP_KEY+':'+user)).then(r=>r.json()).then(res=>{
+    try { const p = JSON.parse(res.data||'{}'); status = p._status||{}; } catch(e){ status={}; }
+  });
+}
+function initApp(){ buildChips(); rebuild(); next(); }
+function startSession(user){
+  currentUser = user; localStorage.setItem(LOCAL_USER_KEY,user);
+  document.getElementById('loginStatus').textContent='読み込み中...';
+  loadFromServer(user).then(()=>{ document.getElementById('loginOverlay').style.display='none'; setSyncBadge(user+' で同期中'); initApp(); })
+    .catch(()=>{ document.getElementById('loginStatus').textContent='通信に失敗しました。もう一度お試しください。'; });
+}
+document.getElementById('loginBtn').onclick = ()=>{ const v=document.getElementById('passInput').value.trim(); if(!v){document.getElementById('loginStatus').textContent='合言葉を入力してください';return;} startSession(v); };
+document.getElementById('passInput').onkeydown = e=>{ if(e.key==='Enter') document.getElementById('loginBtn').click(); };
+document.getElementById('syncBadge').onclick = ()=>{
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗')!==-1) { saveAll(); return; }
+  if (currentUser) loadFromServer(currentUser).then(()=>{ setSyncBadge(currentUser+' で同期中(更新済み)'); renderStats(); });
+};
+const savedUser = (()=>{ try { return localStorage.getItem(LOCAL_USER_KEY); } catch(e){ return null; } })();
+if (savedUser) { document.getElementById('passInput').value = savedUser; startSession(savedUser); }
+</script>
+</body>
+</html>
