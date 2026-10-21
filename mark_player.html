@@ -103,6 +103,14 @@
   .yt-wrap > div, .yt-wrap iframe{position:absolute;inset:0;width:100%;height:100%;}
   .yt-cover{position:absolute;left:0;right:0;bottom:0;height:22%;background:#000;display:flex;align-items:center;justify-content:center;font-size:11px;color:#666;pointer-events:none;}
   .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text-dim);line-height:1.8;margin-top:14px;}
+  .loop-set{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px;}
+  .loop-set label{font-size:11px;color:var(--text-dim);display:flex;flex-direction:column;gap:3px;text-align:left;}
+  .loop-set select{background:var(--panel2);color:var(--text);border:1px solid var(--amber-deep);border-radius:8px;padding:6px 8px;font-size:13px;}
+  .loop-exs{margin-top:12px;text-align:left;}
+  .loop-ex{padding:8px 10px;border-radius:10px;margin-bottom:6px;border:1px solid transparent;}
+  .loop-ex.on{border-color:var(--amber);background:rgba(255,140,46,.08);}
+  .loop-ex .en{font-size:16px;font-weight:700;line-height:1.45;}
+  .loop-ex .jp{font-size:12px;color:var(--text-dim);}
   .note b{color:var(--amber);}
 
   .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
@@ -162,6 +170,7 @@
     <div class="tab on" data-v="list">📊 一覧</div>
     <div class="tab" data-v="sort">🃏 仕分け</div>
     <div class="tab" data-v="quiz">🎧 聞き取り</div>
+    <div class="tab" data-v="loop">🔁 聞き流し</div>
   </div>
   <div class="chips" id="chips"></div>
 
@@ -172,11 +181,14 @@
     <div class="card" id="quizCard"></div>
   </div>
 
+  <div id="vLoop" style="display:none"><div class="card" id="loopCard"></div></div>
+
   <div class="note">
     <b>使い方</b><br>
     ・まず「仕分け」で、聞いて分かるものと分からないものを分ける(1個2秒でOK)<br>
     ・一覧の上から、「覚える」にしたものを例文ごと音で覚える。音のかたまりアプリの耳ならしと同じく、カタカナ通りに3回言う<br>
     ・「聞き取り」で、実際の文の空欄を当てる。3回続けて正解したら「知ってる」に移る<br>
+    ・「聞き流し」は仕事中用。熟語 → 意味 → 例文 → 和訳を自動で流し続ける。PCのChromeならタブを裏にしても止まらない(スマホは画面を消すと止まることがある)<br>
     ・最後に元の動画を字幕なしで見て、そのかたまりが耳に入ってくるか確認する<br>
     ・自動字幕なので、例文には言いかけや聞き間違いが少し混ざっています
   </div>
@@ -242,7 +254,7 @@ function buildChips(){
   mk('全カテゴリ', cat==='all', ()=>{ cat='all'; refresh(); });
   CATS.filter(c=>DATA.some(x=>x.cat===c)).forEach(c=>mk(c, cat===c, ()=>{ cat=c; refresh(); }));
 }
-function refresh(){ buildChips(); renderCov(); if(view==='list') renderList(); else if(view==='sort') renderSort(); else nextQuiz(); }
+function refresh(){ buildChips(); renderCov(); if(view==='list') renderList(); else if(view==='sort') renderSort(); else if(view==='loop') renderLoop(); else nextQuiz(); }
 function inCat(c){ return (cat==='all' || c.cat===cat) && (!bothOnly || c.both); }
 
 // ===== 一覧 =====
@@ -392,12 +404,131 @@ function loadVoices(){ const vs=speechSynthesis.getVoices(); enVoice = vs.find(v
 loadVoices(); if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
 function speak(t){ const u=new SpeechSynthesisUtterance(t.replace(/\[ピー\]/g,'')); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=1; speechSynthesis.cancel(); speechSynthesis.speak(u); }
 
+// ===== 聞き流し =====
+const LOOP_KEY = 'mark_loop_v1';
+const LOOP_DEF = { target:'notknow', order:'freq', ja:'on', exN:'2', rep:'2', rate:'1', gap:'1500' };
+let loopSet = Object.assign({}, LOOP_DEF);
+try { Object.assign(loopSet, JSON.parse(localStorage.getItem(LOOP_KEY)||'{}')); } catch(e){}
+let loopOn = false, loopList = [], loopIdx = 0, loopToken = 0, jaVoice = null, keepAlive = null;
+function loadJaVoice(){ const vs=speechSynthesis.getVoices(); jaVoice = vs.find(v=>v.lang==='ja-JP' && /google|kyoko|o-ren|nanami|online/i.test(v.name)) || vs.find(v=>v.lang==='ja-JP') || vs.find(v=>v.lang && v.lang.startsWith('ja')) || null; }
+loadJaVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', loadJaVoice);
+function chunkSay(c){ return c.text.split(' / ')[0].replace(/[()]/g,'').replace(/~/g,'').replace(/\s+/g,' ').replace(/^\s*,\s*/,'').trim(); }
+function sayAsync(text, lang, rate){
+  return new Promise(res=>{
+    const t = (text||'').replace(/\[ピー\]/g,'').trim(); if (!t) { res(); return; }
+    const u = new SpeechSynthesisUtterance(t); u.lang = lang;
+    if (lang==='ja-JP' && jaVoice) u.voice = jaVoice; if (lang==='en-US' && enVoice) u.voice = enVoice;
+    u.rate = rate;
+    let done = false; const fin = ()=>{ if(!done){ done=true; res(); } };
+    u.onend = fin; u.onerror = fin;
+    // onend が来ないブラウザ対策: 文字数から最長時間を見積もって打ち切る
+    setTimeout(fin, 2500 + t.length * (lang==='ja-JP'?260:120) / rate);
+    speechSynthesis.speak(u);
+  });
+}
+const wait = ms => new Promise(r=>setTimeout(r, ms));
+// 画面を隠しても止まらないように、聞こえない音を鳴らし続ける(ブラウザの省電力で間が伸びるのを防ぐ)
+function startKeepAlive(){
+  try {
+    if (keepAlive) return;
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator(); const g = ctx.createGain();
+    g.gain.value = 0.0005; osc.frequency.value = 30; osc.connect(g); g.connect(ctx.destination); osc.start();
+    keepAlive = ctx;
+  } catch(e){}
+}
+function stopKeepAlive(){ try { if (keepAlive) keepAlive.close(); } catch(e){} keepAlive = null; }
+function buildLoopList(){
+  let p = DATA.filter(c=>inCat(c));
+  const t = loopSet.target;
+  if (t==='learn') p = p.filter(c=>st[c.id]==='learn');
+  else if (t==='notknow') p = p.filter(c=>st[c.id]!=='know');
+  else if (t==='both') p = p.filter(c=>c.both && st[c.id]!=='know');
+  if (loopSet.order==='random') p = p.slice().sort(()=>Math.random()-.5);
+  loopList = p;
+  if (loopIdx >= loopList.length) loopIdx = 0;
+}
+function loopSel(id, label, opts){
+  return '<label>'+label+'<select data-k="'+id+'">'+opts.map(([v,l])=>'<option value="'+v+'"'+(loopSet[id]===v?' selected':'')+'>'+l+'</option>').join('')+'</select></label>';
+}
+function renderLoop(){
+  buildLoopList();
+  const box = document.getElementById('loopCard');
+  const c = loopList[loopIdx];
+  box.innerHTML =
+    '<div class="loop-set">' +
+      loopSel('target','対象',[['notknow','知ってる以外'],['learn','覚えるだけ'],['both','🎮印(知ってる以外)'],['all','すべて']]) +
+      loopSel('order','順番',[['freq','回数が多い順'],['random','ランダム']]) +
+      loopSel('ja','日本語',[['on','意味と和訳も読む'],['meaning','意味だけ読む'],['off','英語だけ']]) +
+      loopSel('exN','例文',[['1','1つ'],['2','2つ'],['3','3つ']]) +
+      loopSel('rep','例文の回数',[['1','1回'],['2','2回'],['3','3回']]) +
+      loopSel('rate','速さ',[['0.8','ゆっくり'],['1','ふつう'],['1.15','速い']]) +
+      loopSel('gap','間',[['800','短い'],['1500','ふつう'],['3000','長い(まねして言う)']]) +
+    '</div>' +
+    '<div class="loop-now" id="loopNow">' + (c ? loopNowHtml(c, -1) : '<div class="c-ex">対象の熟語がありません。対象やカテゴリを変えてください</div>') + '</div>' +
+    '<div class="btns"><button class="btn sub" id="lPrev">⏮</button><button class="btn main big" id="lPlay">'+(loopOn?'⏸ 一時停止':'▶ 聞き流し開始')+'</button><button class="btn sub" id="lNext">⏭</button></div>' +
+    '<div class="btns"><button class="btn sub sm" id="lKnow">○ これは知ってる(外す)</button></div>' +
+    '<div class="c-ex" style="text-align:center">'+(loopList.length? (loopIdx+1)+' / '+loopList.length+'個 ・ 1周 約'+Math.max(1,Math.round(loopList.length*estSec()/60))+'分' : '')+'</div>';
+  box.querySelectorAll('select').forEach(s=>s.onchange=()=>{
+    loopSet[s.dataset.k]=s.value; try{ localStorage.setItem(LOOP_KEY, JSON.stringify(loopSet)); }catch(e){}
+    if (s.dataset.k==='target' || s.dataset.k==='order') { loopIdx=0; restartLoopIfOn(); } else renderLoop();
+  });
+  document.getElementById('lPlay').onclick = ()=> loopOn ? stopLoop() : startLoop();
+  document.getElementById('lNext').onclick = ()=>{ loopIdx = (loopIdx+1) % Math.max(1,loopList.length); restartLoopIfOn(); };
+  document.getElementById('lPrev').onclick = ()=>{ loopIdx = (loopIdx-1+loopList.length) % Math.max(1,loopList.length); restartLoopIfOn(); };
+  document.getElementById('lKnow').onclick = ()=>{ const cc=loopList[loopIdx]; if(!cc) return; st[cc.id]='know'; scheduleSave(); renderCov(); restartLoopIfOn(); };
+}
+function estSec(){ const ex=+loopSet.exN, rep=+loopSet.rep, ja=loopSet.ja; return (2 + (ja!=='off'?2:0) + ex*(rep*2.2 + (ja==='on'?2:0)) + (+loopSet.gap/1000)*(1+ex)) / (+loopSet.rate); }
+function loopNowHtml(c, exI){
+  const exs = c.ex.slice(0, +loopSet.exN);
+  return '<div class="c-rank">'+esc(c.cat)+' ・ '+c.n+'回'+(c.both?' ・ 🎮':'')+'</div>' +
+    '<div class="c-text">'+esc(c.text)+'</div><div class="c-snd">'+esc(c.snd)+'</div><div class="c-jp">'+esc(c.jp)+'</div>' +
+    '<div class="loop-exs">'+exs.map((e,i)=>'<div class="loop-ex'+(i===exI?' on':'')+'"><div class="en">'+hl(c,e[2])+'</div><div class="jp">'+esc(e[3])+'</div></div>').join('')+'</div>';
+}
+function restartLoopIfOn(){ if (loopOn) { stopLoop(true); startLoop(); } else renderLoop(); }
+function startLoop(){
+  buildLoopList(); if (!loopList.length) { renderLoop(); return; }
+  loopOn = true; startKeepAlive(); speechSynthesis.cancel(); renderLoop();
+  const my = ++loopToken;
+  (async ()=>{
+    while (loopOn && my===loopToken) {
+      const c = loopList[loopIdx]; if (!c) break;
+      const rate = +loopSet.rate, gap = +loopSet.gap;
+      const now = document.getElementById('loopNow'); if (now) now.innerHTML = loopNowHtml(c, -1);
+      if ('mediaSession' in navigator) { try { navigator.mediaSession.metadata = new MediaMetadata({ title: c.text, artist: c.jp, album: 'Markiplier語録 聞き流し' }); } catch(e){} }
+      await sayAsync(chunkSay(c), 'en-US', rate*0.9); if (my!==loopToken) return;
+      if (loopSet.ja!=='off') { await wait(300); await sayAsync(c.jp.replace(/〜/g,'').replace(/ \/ /g,'、'), 'ja-JP', 1.1); if (my!==loopToken) return; }
+      await wait(gap); if (my!==loopToken) return;
+      const exs = c.ex.slice(0, +loopSet.exN);
+      for (let i=0;i<exs.length;i++){
+        const n2 = document.getElementById('loopNow'); if (n2) n2.innerHTML = loopNowHtml(c, i);
+        for (let r=0;r<+loopSet.rep;r++){ await sayAsync(exs[i][2], 'en-US', rate); if (my!==loopToken) return; await wait(r<+loopSet.rep-1 ? Math.min(gap,1200) : 400); }
+        if (loopSet.ja==='on') { await sayAsync(exs[i][3], 'ja-JP', 1.15); if (my!==loopToken) return; }
+        await wait(gap); if (my!==loopToken) return;
+      }
+      buildLoopList();
+      loopIdx = (loopIdx+1) % Math.max(1,loopList.length);
+      const cnt = document.querySelector('#loopCard .c-ex:last-child'); if (cnt) cnt.textContent = (loopIdx+1)+' / '+loopList.length+'個';
+    }
+  })();
+}
+function stopLoop(silent){ loopOn = false; loopToken++; speechSynthesis.cancel(); stopKeepAlive(); if (!silent) renderLoop(); }
+if ('mediaSession' in navigator) {
+  try {
+    navigator.mediaSession.setActionHandler('play', ()=>{ if(!loopOn) startLoop(); });
+    navigator.mediaSession.setActionHandler('pause', ()=>{ if(loopOn) stopLoop(); });
+    navigator.mediaSession.setActionHandler('nexttrack', ()=>{ loopIdx=(loopIdx+1)%Math.max(1,loopList.length); restartLoopIfOn(); });
+    navigator.mediaSession.setActionHandler('previoustrack', ()=>{ loopIdx=(loopIdx-1+loopList.length)%Math.max(1,loopList.length); restartLoopIfOn(); });
+  } catch(e){}
+}
+
 // ===== タブ =====
 document.querySelectorAll('.tab').forEach(tb=>tb.onclick=()=>{
   view = tb.dataset.v;
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===tb));
-  ['list','sort','quiz'].forEach(v=>document.getElementById('v'+v[0].toUpperCase()+v.slice(1)).style.display = v===view?'':'none');
+  ['list','sort','quiz','loop'].forEach(v=>document.getElementById('v'+v[0].toUpperCase()+v.slice(1)).style.display = v===view?'':'none');
   if (view!=='quiz') { stopYT(); }
+  if (view!=='loop' && loopOn) { stopLoop(true); }
   refresh();
 });
 
