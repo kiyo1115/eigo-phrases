@@ -28,7 +28,16 @@
   .next{font-size:12.5px;color:var(--text-dim);line-height:1.8;}
   .next b{color:var(--text);}
   .tabs{display:flex;gap:6px;margin-bottom:12px;}
-  .tab{flex:1;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 4px;font-weight:700;font-size:13px;cursor:pointer;color:var(--text-dim);}
+  .tab{flex:1;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 2px;font-weight:700;font-size:12.5px;cursor:pointer;color:var(--text-dim);white-space:nowrap;}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
+  .tags .st{margin-top:0;}
+  .l-exs{margin-top:14px;border-top:1px dashed var(--amber-deep);padding-top:6px;text-align:left;}
+  .judge{display:flex;gap:8px;margin-top:12px;}
+  .judge button{flex:1;border:none;border-radius:12px;padding:14px 6px;font-size:16px;font-weight:800;cursor:pointer;}
+  .judge small{display:block;font-size:10.5px;font-weight:400;opacity:.75;margin-top:2px;}
+  #lnOk{background:#2f4a30;color:#b3ffb8;} #lnMid{background:#4f4420;color:#ffe9a8;} #lnNg{background:#5a3030;color:#ffb3b3;}
+  .l-nav{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+  a.btn{text-decoration:none;display:inline-block;}
   .tab.on{border-color:var(--amber);color:var(--amber);}
   .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
   .chip{background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;user-select:none;}
@@ -168,6 +177,7 @@
 
   <div class="tabs">
     <div class="tab on" data-v="list">📊 一覧</div>
+    <div class="tab" data-v="learn">👂 覚える</div>
     <div class="tab" data-v="sort">🃏 仕分け</div>
     <div class="tab" data-v="quiz">🎧 聞き取り</div>
     <div class="tab" data-v="loop">🔁 聞き流し</div>
@@ -175,6 +185,7 @@
   <div class="chips" id="chips"></div>
 
   <div id="vList"><div id="list"></div></div>
+  <div id="vLearn" style="display:none"><div class="card" id="learnCard"></div></div>
   <div id="vSort" style="display:none"><div class="card" id="sortCard"></div></div>
   <div id="vQuiz" style="display:none">
     <div class="yt-wrap" id="ytWrap"><div id="yt"></div><div class="yt-cover">字幕を隠しています</div></div>
@@ -186,7 +197,7 @@
   <div class="note">
     <b>使い方</b><br>
     ・まず「仕分け」で、聞いて分かるものと分からないものを分ける(1個2秒でOK)<br>
-    ・一覧の上から、「覚える」にしたものを例文ごと音で覚える。音のかたまりアプリの耳ならしと同じく、カタカナ通りに3回言う<br>
+    ・「覚える」タブで1枚ずつ、音・意味・例文を確認する(🎮印から順に出る)。🎬で映画のセリフ、▶で本人の声も聞ける。音のかたまりアプリの耳ならしと同じく、カタカナ通りに3回言う<br>
     ・「聞き取り」で、実際の文の空欄を当てる。3回続けて正解したら「知ってる」に移る<br>
     ・「聞き流し」は仕事中用。熟語 → 意味 → 例文 → 和訳を自動で流し続ける。PCのChromeならタブを裏にしても止まらない(スマホは画面を消すと止まることがある)<br>
     ・最後に元の動画を字幕なしで見て、そのかたまりが耳に入ってくるか確認する<br>
@@ -254,7 +265,7 @@ function buildChips(){
   mk('全カテゴリ', cat==='all', ()=>{ cat='all'; refresh(); });
   CATS.filter(c=>DATA.some(x=>x.cat===c)).forEach(c=>mk(c, cat===c, ()=>{ cat=c; refresh(); }));
 }
-function refresh(){ buildChips(); renderCov(); if(view==='list') renderList(); else if(view==='sort') renderSort(); else if(view==='loop') renderLoop(); else nextQuiz(); }
+function refresh(){ buildChips(); renderCov(); if(view==='list') renderList(); else if(view==='learn') { learnBuild(); lHist=[]; learnNext(); } else if(view==='sort') renderSort(); else if(view==='loop') renderLoop(); else nextQuiz(); }
 function inCat(c){ return (cat==='all' || c.cat===cat) && (!bothOnly || c.both); }
 
 // ===== 一覧 =====
@@ -274,7 +285,7 @@ function renderList(){
           return '<div class="ex"><div style="flex:1"><div class="en">'+hl(c,e[2])+'</div><div class="jp">'+esc(e[3])+'</div><div class="src">'+pname(e[0])+' '+fmt(e[1])+'</div></div>' +
             '<div class="ex-btns"><button class="ib tts" data-i="'+i+'">🔊</button>'+(link?'<a class="ib" href="'+link+'" target="_blank" rel="noopener">▶</a>':'')+'</div></div>';
         }).join('') +
-        '<div class="set-btns"><button class="btn sub sm setK">○ 知ってる</button><button class="btn sub sm setL">覚える</button><button class="btn sub sm setN">未仕分けに戻す</button></div>' +
+        '<div class="set-btns"><a class="btn sub sm" href="'+ppLink(c)+'" target="_blank" rel="noopener">🎬 映画で聞く</a><button class="btn sub sm setK">○ 知ってる</button><button class="btn sub sm setL">覚える</button><button class="btn sub sm setN">未仕分けに戻す</button></div>' +
       '</div></div>';
   }).join('') || '<div class="msg">この条件のかたまりはありません</div>';
   box.querySelectorAll('.row').forEach(el=>{
@@ -348,7 +359,7 @@ function renderQuiz(){
     '<div class="btns"><button class="btn main big" id="qPlay">'+(hasYT?'▶ 本人の声で聞く':'🔊 聞く')+'</button>'+(hasYT?'<button class="btn sub" id="qTTS">🔊</button>':'')+'</div>' +
     '<div class="opts">'+opts.map(o=>'<button class="opt" data-id="'+o.id+'">'+esc(optLabel(o))+'</button>').join('')+'</div>' +
     '<div class="result" id="qRes"></div>' +
-    '<div class="after" id="qAfter"><div class="full">'+hl(c,e[2])+'</div><div class="jp">'+esc(e[3])+'</div><div class="snd">'+esc(c.text)+' → <b>'+esc(c.snd)+'</b> ・ '+esc(c.jp)+'</div></div>' +
+    '<div class="after" id="qAfter"><div class="full">'+hl(c,e[2])+'</div><div class="jp">'+esc(e[3])+'</div><div class="snd">'+esc(c.text)+' → <b>'+esc(c.snd)+'</b> ・ '+esc(c.jp)+'</div><div style="margin-top:8px"><a class="btn sub sm" href="'+ppLink(c)+'" target="_blank" rel="noopener">🎬 映画で聞く</a></div></div>' +
     '<div class="btns"><button class="btn sub" id="qNext">次へ →</button></div>';
   document.getElementById('qPlay').onclick = ()=> hasYT ? playYT(e[0], e[1]) : speak(e[2]);
   const t = document.getElementById('qTTS'); if (t) t.onclick = ()=>speak(e[2]);
@@ -371,6 +382,7 @@ function renderQuiz(){
 }
 document.addEventListener('keydown', ev=>{
   if (ev.target.tagName==='INPUT') return;
+  if (view==='learn' && lCur){ if(ev.key==='1') learnJudge('ok'); if(ev.key==='2') learnJudge('mid'); if(ev.key==='3') learnJudge('ng'); if(ev.key===' '){ ev.preventDefault(); speak(chunkSay(lCur)); } }
   if (view==='sort'){ if(ev.key==='1'){const b=document.getElementById('sKnow'); if(b) b.click();} if(ev.key==='2'){const b=document.getElementById('sLearn'); if(b) b.click();} }
   if (view==='quiz'){
     if (!answered && /^[1-4]$/.test(ev.key)) { const b=document.querySelectorAll('.opt')[+ev.key-1]; if(b) b.click(); }
@@ -402,7 +414,7 @@ function stopYT(){ try { if (ytPlayer && ytReady) ytPlayer.pauseVideo(); } catch
 let enVoice = null;
 function loadVoices(){ const vs=speechSynthesis.getVoices(); enVoice = vs.find(v=>v.lang==='en-US' && /google|samantha|natural|online/i.test(v.name)) || vs.find(v=>v.lang==='en-US') || vs.find(v=>v.lang.startsWith('en')) || null; }
 loadVoices(); if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
-function speak(t){ const u=new SpeechSynthesisUtterance(t.replace(/\[ピー\]/g,'')); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=1; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+function speak(t, rate){ const u=new SpeechSynthesisUtterance(t.replace(/\[ピー\]/g,'')); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=rate||1; speechSynthesis.cancel(); speechSynthesis.speak(u); }
 
 // ===== 聞き流し =====
 const LOOP_KEY = 'mark_loop_v1';
@@ -522,11 +534,73 @@ if ('mediaSession' in navigator) {
   } catch(e){}
 }
 
+// ===== 覚える(カード) =====
+function ppLink(c){ return 'https://www.playphrase.me/#/search?q='+encodeURIComponent(chunkSay(c).replace(/[?!.]/g,'').trim()); }
+let lQueue = [], lIdx = 0, lCur = null, lRetry = [], lHist = [];
+function learnBuild(){
+  const p = DATA.filter(c=>inCat(c) && st[c.id]!=='know');
+  lQueue = p.filter(c=>c.both).concat(p.filter(c=>!c.both));
+  lIdx = 0; lRetry = [];
+}
+function learnNext(){
+  lRetry.forEach(r=>r.wait--);
+  const due = lRetry.findIndex(r=>r.wait<=0);
+  if (due!==-1) { lCur = lRetry.splice(due,1)[0].c; lCur._retry = true; }
+  else {
+    if (lIdx >= lQueue.length) learnBuild();
+    lCur = lQueue[lIdx++] || null; if (lCur) lCur._retry = false;
+  }
+  if (lCur) lHist.push(lCur);
+  renderLearn();
+}
+function renderLearn(){
+  const card = document.getElementById('learnCard');
+  if (!lCur) { card.innerHTML = '<div class="c-text" style="font-size:20px">覚える熟語がありません</div><div class="c-ex">全部「知ってる」になったか、カテゴリの絞り込みで0個になっています。</div>'; return; }
+  const c = lCur, s = st[c.id], q2 = q[c.id];
+  const yt0 = c.ex.map(e=>ytLink(e[0],e[1])).find(x=>x);
+  card.innerHTML =
+    '<div class="tags"><span class="st">'+esc(c.cat)+'</span>'+(c.both?'<span class="st both">🎮 バイオ2でも多い</span>':'')+
+      '<span class="st '+(s||'')+'">'+(s==='learn'?'覚える':'未仕分け')+'</span>'+(c._retry?'<span class="st learn">もう一回</span>':'')+'<span class="st">'+c.n+'回</span></div>' +
+    '<div class="c-text">'+esc(c.text)+'</div>' +
+    '<div class="c-snd">'+esc(c.snd)+'</div>' +
+    '<div class="c-jp">意味：'+esc(c.jp)+'</div>' +
+    '<div class="btns"><button class="btn sub" id="lnSlow">🐢 ゆっくり</button><button class="btn main" id="lnNorm">🔊 ふつう</button>' +
+      '<a class="btn sub" href="'+ppLink(c)+'" target="_blank" rel="noopener">🎬 映画で聞く</a>' +
+      (yt0?'<a class="btn sub" href="'+yt0+'" target="_blank" rel="noopener">▶ 本人の声</a>':'') + '</div>' +
+    '<div class="l-exs">' + c.ex.map((e,i)=>{
+        const link = ytLink(e[0],e[1]);
+        return '<div class="ex"><div style="flex:1"><div class="en">'+hl(c,e[2])+'</div><div class="jp">'+esc(e[3])+'</div><div class="src">'+pname(e[0])+' '+fmt(e[1])+'</div></div>' +
+          '<div class="ex-btns"><button class="ib ltts" data-i="'+i+'">🔊</button>'+(link?'<a class="ib" href="'+link+'" target="_blank" rel="noopener">▶</a>':'')+'</div></div>';
+      }).join('') + '</div>' +
+    '<div class="c-ex" style="text-align:center">カタカナ通りに3回まねして言えて、意味も分かったら ○</div>' +
+    '<div class="judge"><button id="lnOk">○ 知ってる<small>(1)</small></button><button id="lnMid">△ 微妙<small>(2)</small></button><button id="lnNg">× まだ<small>(3)</small></button></div>' +
+    '<div class="l-nav"><button class="btn sub sm" id="lnPrev">← 前</button><span class="c-ex">残り '+Math.max(0,lQueue.length-lIdx)+'個'+(lRetry.length?' ・ もう一回待ち '+lRetry.length+'個':'')+'</span><button class="btn sub sm" id="lnSkip">スキップ →</button></div>';
+  document.getElementById('lnSlow').onclick = ()=>speak(chunkSay(c), 0.65);
+  document.getElementById('lnNorm').onclick = ()=>speak(chunkSay(c));
+  card.querySelectorAll('.ltts').forEach(b=>b.onclick=()=>speak(c.ex[+b.dataset.i][2]));
+  document.getElementById('lnOk').onclick = ()=>learnJudge('ok');
+  document.getElementById('lnMid').onclick = ()=>learnJudge('mid');
+  document.getElementById('lnNg').onclick = ()=>learnJudge('ng');
+  document.getElementById('lnSkip').onclick = learnNext;
+  document.getElementById('lnPrev').onclick = ()=>{ if (lHist.length>1) { lHist.pop(); lCur = lHist[lHist.length-1]; renderLearn(); } };
+  speak(chunkSay(c));
+}
+function learnJudge(r){
+  const c = lCur; if (!c) return;
+  const s2 = q[c.id] || {w:1, n:0, streak:0};
+  if (r==='ok') { st[c.id]='know'; }
+  else {
+    st[c.id]='learn'; s2.w += (r==='ng'?1.5:0.8); s2.streak = 0;
+    if (!lRetry.some(x=>x.c===c)) lRetry.push({c, wait: r==='ng'?3:6});
+  }
+  q[c.id] = s2; scheduleSave(); renderCov(); learnNext();
+}
+
 // ===== タブ =====
 document.querySelectorAll('.tab').forEach(tb=>tb.onclick=()=>{
   view = tb.dataset.v;
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===tb));
-  ['list','sort','quiz','loop'].forEach(v=>document.getElementById('v'+v[0].toUpperCase()+v.slice(1)).style.display = v===view?'':'none');
+  ['list','learn','sort','quiz','loop'].forEach(v=>document.getElementById('v'+v[0].toUpperCase()+v.slice(1)).style.display = v===view?'':'none');
   if (view!=='quiz') { stopYT(); }
   if (view!=='loop' && loopOn) { stopLoop(true); }
   refresh();
