@@ -42,6 +42,7 @@
   .k-text{font-size:32px;font-weight:800;line-height:1.3;}
   .k-sound{font-size:24px;font-weight:800;color:var(--amber);margin-top:8px;}
   .k-sound small{display:block;font-size:13px;color:var(--text-dim);font-weight:400;margin-top:2px;}
+  .k-mean{font-size:16px;margin-top:8px;}
   .k-tip{font-size:13px;color:var(--blue);margin-top:10px;line-height:1.6;}
   .exs{margin-top:16px;border-top:1px dashed var(--amber-deep);padding-top:10px;text-align:left;}
   .ex{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;}
@@ -252,6 +253,9 @@ const KATA = [
   {id:'because', p:'shuku', text:'because', snd:'カズ', rs:"'cause", ex:[["I'm running because the cops are here.",'警察が来たから逃げてる',"I'm running 'cause the cops are here."]]},
 ];
 
+const MEAN = {"one_of_the": "〜のうちの1つ(1人)", "some_of_them": "あいつらの何人か / そのうちいくつか", "out_of_the": "〜から外へ", "most_of": "〜のほとんど", "where_are_you": "どこに〜？(Where are you going? = どこ行くの)", "they_are": "あいつらは〜だ / 〜している", "we_were": "俺たちは〜だった", "you_were": "お前は〜だった", "they_were": "あいつらは〜だった", "to_the": "〜へ(場所に向かって)", "for_a": "〜の間 / 〜しに(for a second = ちょっとの間)", "get_them": "あいつらを捕まえる・やっつける", "i_can": "俺は〜できる(can は弱く「クン」。can't は強く「キャン」)", "should_have": "〜すればよかった(後悔)", "could_have": "〜できたのに / 〜するところだった", "was_a": "それは〜だった", "at_the": "〜で(場所) / 〜を(look at the 〜)", "and_then": "そしたら / それから(順番をつなぐ)", "come_on_in": "どうぞ入って", "pick_it_up": "それを拾う", "turn_it_off": "それを消す・止める", "check_it_out": "見てみる / ほら見て", "look_at_this": "これ見て", "in_an_hour": "1時間後に", "take_it_easy": "落ち着け / 無理するな", "not_at_all": "全然(〜ない)", "hold_on": "ちょっと待って", "one_of_us": "俺たちのうち1人", "get_in": "中に入る / 車に乗る", "tell_him": "あいつに言う", "give_him": "あいつに渡す", "ask_her": "彼女に聞く", "next_to": "〜の隣に", "last_time": "前回 / これが最後", "just_do_it": "いいからやれ", "dont_know": "知らない / 分からない", "get_back": "戻る", "bad_guy": "悪い奴 / 敵", "what_time": "何時", "sit_down": "座る", "and_i": "〜と俺", "get_a": "〜を手に入れる", "what_are_you": "何を〜してるの？", "a_lot_of": "たくさんの", "got_it": "分かった / 取った", "put_it": "それを置く・入れる", "shut_up": "黙れ", "wait_a_minute": "ちょっと待って", "a_little": "少し", "better": "より良い / 〜した方がいい(You better 〜)", "water": "水", "let_it_go": "もう忘れろ / 放っておけ", "what_about": "〜はどうする？ / 〜はどう？", "get_out": "出ていけ / 外に出る", "did_you": "〜した？", "would_you": "〜してくれない？", "could_you": "〜してもらえる？", "dont_you": "〜しないの？(Why don't you 〜 = 〜しなよ)", "what_do_you": "何を〜する？", "got_you": "捕まえた / 任せろ", "meet_you": "会う(Nice to meet you = はじめまして)", "last_year": "去年", "let_you": "お前に〜させる(I won't let you = させない)", "going_to": "〜するつもり / 〜しそう", "want_to": "〜したい", "got_to": "〜しなきゃ", "have_to": "〜しなければならない", "kind_of": "ちょっと / なんか", "out_of": "〜から外へ / 〜を切らして", "let_me": "〜させて", "give_me": "〜をくれ", "because": "なぜなら / 〜だから"};
+KATA.forEach(k=>{ k.m = MEAN[k.id] || ''; });
+
 // ===== 状態 =====
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
 const APP_KEY = 'oto';
@@ -339,6 +343,7 @@ function render(isRetry){
     card.innerHTML = tagsHtml(k,isRetry) +
       '<div class="k-text">'+esc(k.text)+'</div>' +
       '<div class="k-sound">'+esc(k.snd)+'<small>'+esc(k.rs)+'</small></div>' +
+      '<div class="k-mean">意味：'+esc(k.m)+'</div>' +
       '<div class="k-tip">'+esc(PATS[k.p].tip)+'</div>' +
       '<div class="btns"><button class="btn sub" id="pSlow">🐢 ゆっくり</button><button class="btn main" id="pNorm">🔊 ふつう</button><a class="btn sub" href="'+realLink(k)+'" target="_blank" rel="noopener">🎬 映画で聞く</a></div>' +
       '<div class="exs">' + k.ex.map((e,i)=>'<div class="ex" data-i="'+i+'"><span>🔊</span><div><div class="en">'+hlChunk(k,e[0])+'</div><div class="jp">'+esc(e[1])+'</div></div></div>').join('') + '</div>' +
@@ -415,6 +420,7 @@ function afterHtml(k, ex){
     '<div class="full">'+hlChunk(k, ex[0])+'</div>' +
     '<div class="jp">'+esc(ex[1])+'</div>' +
     '<div class="snd">'+esc(k.text)+' → <b>'+esc(k.snd)+'</b>（'+esc(k.rs)+'）・ '+esc(PATS[k.p].name)+'</div>' +
+    '<div class="jp" style="margin-top:4px">意味：'+esc(k.m)+'</div>' +
     '<div class="say3">聞き取れなかったら、かたまりをカタカナ通りに3回言ってからもう一度聞く</div>' +
     '<div class="btns" style="justify-content:flex-start"><button class="btn sub" id="aChunk">🔊 かたまりだけ</button><button class="btn sub" id="aSlow">🐢 文をゆっくり</button><a class="btn sub" href="'+realLink(k)+'" target="_blank" rel="noopener">🎬 映画で聞く</a></div>' +
   '</div>';
@@ -515,8 +521,8 @@ const loop = ListenLoop.create({
   enVoice: ()=>voice,
   getItems: t => KATA.filter(k=>activeP.has(k.p) && (!weakOnly || k.weak))
     .filter(k=> t==='all' || (t==='weak' ? k.weak : !(status['learn:'+k.id] && status['learn:'+k.id].s==='ok')))
-    .map(k=>({ title: k.text, sub: k.snd+'（'+k.rs+'）', meaning: PATS[k.p].tip, cat: PATS[k.p].name+(k.weak?' ・ 苦手な音':''),
-      sayChunk: k.text, meaningSay: k.snd,
+    .map(k=>({ title: k.text, sub: k.snd+'（'+k.rs+'）', meaning: k.m, cat: PATS[k.p].name+(k.weak?' ・ 苦手な音':''),
+      sayChunk: k.text, meaningSay: k.snd+'。'+k.m.replace(/\(.*?\)/g,''),
       exs: k.ex.map(e=>({ en: e[0], say: e[2]||e[0], jp: e[1], html: hlChunk(k, e[0]) })) }))
 });
 
