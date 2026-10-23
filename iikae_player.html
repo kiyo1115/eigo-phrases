@@ -1,48 +1,656 @@
-kouji2026 で同期中
-← トップに戻る
-言い換えドリル / 中学英語で言う
-難しい単語を使わず言う
-状況と「言いたいこと」が出ます。辞書に載ってる難しい単語を探さずに、簡単な日本語に噛み砕いてから中学英語で言う練習。
-知らない単語は who / that / which / where で説明すればOK。
-言い換えの型
-すべて
-出す順番
-苦手を優先
-噛み砕きステップ
-あり(じっくり)
-全74問 ・ ○15 △4 ×1 未54 ・ 今の条件 74問
-関係代名詞
-型: ？(タップでヒント)
-○ 言えた (7回)
-状況
-建物に入ったら、天井のカメラに気づいた
-言いたいこと
-「監視カメラがある」
-この単語を英語で探さない。中学英語で言うと？
-STEP 1 ・ 簡単な日本語に噛み砕く(頭の中でもOK)
-例: もうできることがない
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>言い換えドリル - 中学英語で言う</title>
+<style>
+  :root{--bg:#14110f;--panel:#1c1815;--panel2:#231e1a;--amber:#ff8c2e;--amber-dim:#c4691a;--amber-deep:#7a4518;--text:#ede5d8;--text-dim:#968d7f;--line:#2e2822;--green:#4ade80;--red:#ff8080;--yellow:#ffd166;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;padding:16px 16px 60px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  a.back{color:var(--text-dim);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:12px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;}
+  a.back:hover{color:var(--amber);border-color:var(--amber-dim);}
+  .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--amber-dim);font-weight:700;}
+  h1{font-size:24px;margin:4px 0 6px;}
+  h1 span{color:var(--amber);}
+  .lead{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:14px;}
+  .lead b{color:var(--amber);}
 
-噛み砕き例を見る
-STEP 2 ・ 中学英語で言う(声 or 入力)
-英語を入力 or 🎤で話す
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+  .chip{background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;user-select:none;}
+  .chip.on{background:var(--amber);color:#1a1208;border-color:var(--amber);font-weight:700;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .row label{font-size:11px;color:var(--text-dim);display:flex;flex-direction:column;gap:3px;}
+  select{background:var(--panel);color:var(--text);border:1px solid var(--amber-deep);border-radius:8px;padding:6px 10px;font-size:13px;}
+  .stats{font-size:12px;color:var(--text-dim);margin-bottom:12px;}
+  .stats b{color:var(--text);}
 
-🎤 話す
-語彙チェック
-言い方を見る
-○ 言えた
-後回し (1)
-△ 微妙
-また出す (2)
-× 無理
-すぐ出す (3)
-← 前
-スキップ →
-＋ マイお題を追加(実況や日常で言えなかったこと)
-コツ(言い換えの型)
-・文で説明：1語の名詞を探さず、状況を文で言う
-・not＋反対：「理不尽」→ not fair、「萎えた」→ not fun
-・2文に分ける：「油断した」→ I thought I was safe. I was wrong.
-・気持ち・結果で言う：原因の単語より、どう感じたか・どうなったか
-・関係代名詞で説明：知らない物や人は「〜する人/物」で言う
-　the man who saw it / the thing that you use when… / a place where…
-・黄色になった単語は中学範囲外かも。言い換えられないか考える
+  .card{background:var(--panel);border:2px solid var(--amber-deep);border-radius:18px;padding:22px 18px;margin-bottom:14px;}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .tag{font-size:11px;border-radius:999px;padding:3px 10px;border:1px solid var(--amber-dim);color:var(--amber);}
+  .tag.kata{border-color:#4a6b8a;color:#9cc4e8;}
+  .tag.st-ok{border-color:#2f5a35;color:var(--green);}
+  .tag.st-mid{border-color:#6b5a1f;color:var(--yellow);}
+  .tag.st-ng{border-color:#6b2f2f;color:var(--red);}
+  .scene-label{font-size:11px;color:var(--text-dim);letter-spacing:.1em;}
+  .scene{font-size:16px;line-height:1.6;margin:2px 0 14px;}
+  .say{font-size:28px;font-weight:800;line-height:1.4;margin:2px 0 6px;}
+  .say small{display:block;font-size:12px;color:var(--text-dim);font-weight:400;margin-top:4px;}
+
+  .step{border-top:1px dashed var(--amber-deep);padding-top:14px;margin-top:14px;}
+  .step-h{font-size:12px;color:var(--amber-dim);font-weight:700;margin-bottom:8px;}
+  textarea,input[type=text]{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;font-family:inherit;}
+  textarea{min-height:52px;resize:vertical;}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn.main{background:var(--amber);color:#1a1208;}
+  .btn.sub{background:var(--panel2);color:var(--text);border:1px solid var(--amber-deep);}
+  .btn.mic.rec{background:#5a3030;color:#ffb3b3;border-color:#5a3030;}
+  .reveal{display:none;margin-top:10px;background:var(--panel2);border-radius:10px;padding:12px 14px;}
+  .reveal.show{display:block;}
+  .simple{font-size:17px;line-height:1.6;}
+  .checked{margin-top:10px;font-size:18px;line-height:1.8;}
+  .w-ok{color:var(--text);}
+  .w-hard{color:#1a1208;background:var(--yellow);border-radius:4px;padding:0 3px;}
+  .check-msg{font-size:12px;color:var(--text-dim);margin-top:4px;}
+  .model{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+  .model:last-of-type{border-bottom:none;}
+  .model .en{font-size:20px;font-weight:700;color:var(--amber);line-height:1.4;}
+  .model .sp{font-size:16px;opacity:.8;}
+  .model .en{flex:1;}
+  .model .pp{flex-shrink:0;align-self:center;font-size:12px;font-weight:700;color:var(--text);text-decoration:none;background:var(--panel2);border:1px solid var(--amber-deep);border-radius:8px;padding:6px 8px;white-space:nowrap;}
+  .rel{color:#9cc4e8;text-decoration:underline;text-underline-offset:4px;}
+  .hard-line{font-size:12.5px;color:var(--text-dim);margin-top:10px;}
+  .hard-line s{color:var(--red);}
+  .tip{font-size:12.5px;color:#9cc4e8;margin-top:6px;line-height:1.6;}
+
+  .judge{display:flex;gap:8px;margin-top:14px;}
+  .judge button{flex:1;border:none;border-radius:12px;padding:14px 6px;font-size:16px;font-weight:800;cursor:pointer;}
+  .judge small{display:block;font-size:10.5px;font-weight:400;opacity:.75;margin-top:2px;}
+  #jOk{background:#2f4a30;color:#b3ffb8;}
+  #jMid{background:#4f4420;color:#ffe9a8;}
+  #jNg{background:#5a3030;color:#ffb3b3;}
+  .nav{display:flex;gap:8px;justify-content:space-between;margin-top:10px;}
+
+  details.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;}
+  details.panel summary{cursor:pointer;font-size:13px;color:var(--amber);font-weight:700;}
+  .form-grid{display:grid;gap:8px;margin-top:10px;}
+  .form-grid .lbl{font-size:11px;color:var(--text-dim);}
+  .mine-list{margin-top:10px;font-size:13px;}
+  .mine-item{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);}
+  .mine-item button{background:none;border:1px solid var(--line);color:var(--text-dim);border-radius:6px;font-size:11px;cursor:pointer;}
+  .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text-dim);line-height:1.8;}
+  .note b{color:var(--amber);}
+
+  .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;text-align:center;}
+  .login-box h2{font-size:18px;margin:0 0 6px;}
+  .login-box p{font-size:12px;color:var(--text-dim);margin:0 0 20px;}
+  .login-box input{text-align:center;margin-bottom:12px;}
+  .login-box button{width:100%;background:var(--amber);border:none;color:#1a1208;font-weight:700;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
+  .login-status{font-size:11px;color:var(--text-dim);margin-top:10px;min-height:14px;}
+  .sync-badge{position:fixed;top:10px;right:10px;font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:4px 10px;z-index:10;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">言い換えドリル / 中学英語で言う</div>
+  <h1>難しい単語を<span>使わず</span>言う</h1>
+  <div class="lead">
+    状況と「言いたいこと」が出ます。辞書に載ってる難しい単語を探さずに、<b>簡単な日本語に噛み砕いてから</b>中学英語で言う練習。<br>
+    知らない単語は <b>who / that / which / where</b> で説明すればOK。
+  </div>
+
+  <div class="chips" id="catChips"></div>
+  <div class="row">
+    <label>言い換えの型
+      <select id="kataSel"></select>
+    </label>
+    <label>出す順番
+      <select id="orderSel">
+        <option value="weak" selected>苦手を優先</option>
+        <option value="random">ランダム</option>
+        <option value="new">まだやってない問題から</option>
+        <option value="ngonly">△×だけ</option>
+      </select>
+    </label>
+    <label>噛み砕きステップ
+      <select id="stepSel">
+        <option value="on" selected>あり(じっくり)</option>
+        <option value="off">なし(すぐ英語)</option>
+      </select>
+    </label>
+  </div>
+  <div class="stats" id="stats"></div>
+
+  <div class="card" id="card"></div>
+
+  <details class="panel" id="minePanel">
+    <summary>＋ マイお題を追加(実況や日常で言えなかったこと)</summary>
+    <div class="form-grid">
+      <div class="lbl">状況</div>
+      <input type="text" id="fScene" placeholder="例: 配信中に回線が落ちた">
+      <div class="lbl">言いたいこと(日本語)</div>
+      <input type="text" id="fSay" placeholder="例: 回線が不安定です">
+      <div class="lbl">噛み砕いた日本語(空でもOK)</div>
+      <input type="text" id="fSimple" placeholder="例: インターネットの調子が悪い">
+      <div class="lbl">自分なりの英語(空でもOK・あとで足せる)</div>
+      <input type="text" id="fEn" placeholder="例: My internet is not working well.">
+      <div class="btns"><button class="btn main" id="fAdd">追加する</button></div>
+      <div class="check-msg" id="fMsg"></div>
+    </div>
+    <div class="mine-list" id="mineList"></div>
+  </details>
+
+  <div class="note">
+    <b>コツ(言い換えの型)</b><br>
+    ・<b>文で説明</b>：1語の名詞を探さず、状況を文で言う<br>
+    ・<b>not＋反対</b>：「理不尽」→ not fair、「萎えた」→ not fun<br>
+    ・<b>2文に分ける</b>：「油断した」→ I thought I was safe. I was wrong.<br>
+    ・<b>気持ち・結果で言う</b>：原因の単語より、どう感じたか・どうなったか<br>
+    ・<b>関係代名詞で説明</b>：知らない物や人は「〜する人/物」で言う<br>
+    　the man <span class="rel">who</span> saw it / the thing <span class="rel">that</span> you use when… / a place <span class="rel">where</span>…<br>
+    ・黄色になった単語は中学範囲外かも。言い換えられないか考える
+  </div>
+</div>
+
+<script>
+// ===== 言い換えの型 =====
+const KATA = {
+  bun:  '文で説明',
+  hantai:'not＋反対',
+  wake: '2文に分ける',
+  kimochi:'気持ち・結果で言う',
+  gutai:'具体的に言う',
+  rel:  '関係代名詞で説明'
+};
+
+// ===== お題(オリジナル) =====
+// scene: 状況 / say: 言いたいこと / simple: 噛み砕き / en: 中学英語の言い方 / hard: つい探してしまう難しい言い方 / kata / tip
+const DATA = [
+  // --- 実況リアクション ---
+  {cat:'実況リアクション', scene:'敵に囲まれて、弾もない。どうしようもない', say:'詰んだ', simple:'もうできることがない', en:["There's nothing I can do.","It's over for me."], hard:'hopeless situation', kata:'bun'},
+  {cat:'実況リアクション', scene:'簡単な操作をミスして、ミッション失敗', say:'やらかした', simple:'大きなミスをした', en:["I made a big mistake.","I did something really stupid."], hard:'blunder', kata:'bun'},
+  {cat:'実況リアクション', scene:'もう敵はいないと思って歩いてたら撃たれた', say:'油断した', simple:'安全だと思っていた。でも違った', en:["I thought I was safe. I was wrong.","I wasn't careful."], hard:'let my guard down', kata:'wake'},
+  {cat:'実況リアクション', scene:'ただの通行人がいきなり銃を出してきた', say:'想定外すぎる', simple:'こうなるとは思わなかった', en:["I didn't think that would happen.","I didn't see that coming."], hard:'unexpected', kata:'bun'},
+  {cat:'実況リアクション', scene:'何もしてないのに警察に撃たれた', say:'理不尽すぎる', simple:'これはフェアじゃない', en:["That's not fair!","I didn't do anything wrong!"], hard:'unreasonable', kata:'hantai'},
+  {cat:'実況リアクション', scene:'車がギリギリ横をかすめていった', say:'神回避', simple:'もう少しで当たるところだった', en:["That was so close!","It almost hit me!"], hard:'miraculous dodge', kata:'kimochi'},
+  {cat:'実況リアクション', scene:'あと1秒でゴールだったのに時間切れ', say:'惜しい！', simple:'もう少しでできた', en:["So close!","I almost did it!"], hard:'near miss', kata:'kimochi'},
+  {cat:'実況リアクション', scene:'考えた作戦がそのまま全部うまくいった', say:'計画通り', simple:'思った通りにいった', en:["It went just like I planned.","Everything is going well."], hard:'according to plan', kata:'bun'},
+  {cat:'実況リアクション', scene:'静かすぎる路地に入った。何か出てきそう', say:'嫌な予感がする', simple:'何か悪いことが起きそう', en:["Something bad is going to happen.","I don't like this."], hard:'ominous', kata:'bun'},
+  {cat:'実況リアクション', scene:'ミッションは失敗したけど、なぜか大金が手に入った', say:'結果オーライ', simple:'計画とは違ったけど、うまくいった', en:["That's not what I planned, but it worked!","It worked out in the end."], hard:"all's well that ends well", kata:'wake'},
+  {cat:'実況リアクション', scene:'連続でうまくいって無茶したら即死した', say:'調子に乗った', simple:'うまくいってたから、やりすぎた', en:["Things were going well, so I did too much.","I got too excited."], hard:'overconfident', kata:'wake'},
+  {cat:'実況リアクション', scene:'同じミッションで5回連続で死んだ', say:'運が悪すぎる', simple:'今日はラッキーじゃない', en:["I'm not lucky today.","Why does this always happen to me?"], hard:'unfortunate', kata:'hantai'},
+
+  // --- 状況説明 ---
+  {cat:'状況説明', scene:'信号無視したらパトカーが集まってきた', say:'手配度が上がった', simple:'警察が自分を追ってくる', en:["The police are coming after me.","Now the cops want me."], hard:'wanted level increased', kata:'bun'},
+  {cat:'状況説明', scene:'撃とうとしたらカチッと音がしただけ', say:'弾切れだ', simple:'もう撃てない', en:["My gun is empty!","I can't shoot anymore!"], hard:'out of ammunition', kata:'kimochi'},
+  {cat:'状況説明', scene:'四方八方から敵が来た', say:'囲まれた', simple:'周りじゅう敵だらけ', en:["They're all around me!","There are bad guys everywhere!"], hard:'surrounded', kata:'bun'},
+  {cat:'状況説明', scene:'ミッションの制限時間が残り少ない', say:'時間がない', simple:'急がないといけない', en:["I don't have much time.","I need to hurry!"], hard:'running out of time', kata:'bun'},
+  {cat:'状況説明', scene:'いつもの道が工事で通れない', say:'回り道しよう', simple:'別の道で行く', en:["Let's take a different road.","I'll go another way."], hard:'detour', kata:'bun'},
+  {cat:'状況説明', scene:'マップを開いたら目的地がはるか遠く', say:'目的地が遠すぎる', simple:'行く場所が本当に遠い', en:["It's so far away.","This is going to take a long time."], hard:'destination', kata:'bun'},
+  {cat:'状況説明', scene:'借りた車がまっすぐ走らない', say:'車が言うこと聞かない', simple:'この車をうまく運転できない', en:["I can't drive this car well.","This car won't go where I want."], hard:'hard to control', kata:'bun'},
+  {cat:'状況説明', scene:'警察が近くを探している。見つかりたくない', say:'隠れてやり過ごそう', simple:'隠れて、いなくなるのを待つ', en:["Let's hide and wait.","I'll stay here until they leave."], hard:'lie low', kata:'wake'},
+  {cat:'状況説明', scene:'正面から行ったら全滅した', say:'作戦変更', simple:'違うやり方を試す', en:["Let's try something different.","New plan."], hard:'change of strategy', kata:'bun'},
+  {cat:'状況説明', scene:'体力ゲージが真っ赤', say:'体力がやばい', simple:'もうすぐ死にそう', en:["I'm almost dead!","One more hit and I'm done!"], hard:'critical health', kata:'kimochi'},
+
+  // --- 気持ち ---
+  {cat:'気持ち', scene:'ラスト1秒で逆転負けした', say:'悔しい！', simple:'勝ちたかった。すごく嫌な気持ち', en:["I really wanted to win!","That makes me so angry!"], hard:'frustrated', kata:'kimochi'},
+  {cat:'気持ち', scene:'警察に追われて、どっちに逃げるか決められない', say:'焦ってる', simple:'急がなきゃって思って、落ち着けない', en:["I can't think!","I need to calm down!"], hard:'panicking', kata:'kimochi'},
+  {cat:'気持ち', scene:'カーチェイスが始まって楽しくなってきた', say:'テンション上がってきた', simple:'楽しくなってきた', en:["This is getting fun!","I'm so excited!"], hard:'hyped up', kata:'kimochi'},
+  {cat:'気持ち', scene:'同じところで何度も失敗して、もうやりたくない', say:'萎えた', simple:'もう楽しくない', en:["This is not fun anymore.","I don't want to play anymore."], hard:'lost my motivation', kata:'hantai'},
+  {cat:'気持ち', scene:'銀行強盗の直前。手が震えてる', say:'ドキドキする', simple:'心臓が速い。怖いけど楽しみ', en:["My heart is beating so fast!","I'm scared, but I'm excited."], hard:'thrilling', kata:'kimochi'},
+  {cat:'気持ち', scene:'やっと警察をまいた', say:'ホッとした', simple:'もう大丈夫。よかった', en:["I'm safe now. Good.","Okay, I can relax now."], hard:'relieved', kata:'kimochi'},
+  {cat:'気持ち', scene:'ミッションはクリアしたけど、何かスッキリしない', say:'もやもやする', simple:'何か変だけど、うまく言えない', en:["Something is wrong, but I don't know what.","I don't feel good about this."], hard:'uneasy', kata:'wake'},
+  {cat:'気持ち', scene:'事故で通行人を轢いてしまった', say:'罪悪感がある', simple:'悪いことをしたと思う', en:["I feel bad about that.","I'm sorry, I didn't mean to do that."], hard:'guilty', kata:'kimochi'},
+  {cat:'気持ち', scene:'昔のGTAと同じ曲がラジオで流れた', say:'懐かしい！', simple:'昔のことを思い出す', en:["I remember this song!","I played this a long time ago."], hard:'nostalgic', kata:'gutai'},
+  {cat:'気持ち', scene:'仲間キャラが最後に助けに来てくれた', say:'感動した', simple:'心が動いた。泣きそう', en:["That was so good. I want to cry.","That really touched my heart."], hard:'deeply moved', kata:'kimochi'},
+
+  // --- 説明・意見 ---
+  {cat:'説明・意見', scene:'毎回歩いて移動してたら日が暮れた', say:'効率が悪い', simple:'時間がかかりすぎる', en:["This takes too much time.","There's a faster way."], hard:'inefficient', kata:'bun'},
+  {cat:'説明・意見', scene:'安い車なのにめちゃくちゃ速い', say:'コスパがいい', simple:'安いのに、すごくいい', en:["It's cheap, but it's really good.","Not expensive, but really fast."], hard:'cost-effective', kata:'wake'},
+  {cat:'説明・意見', scene:'長々と説明したあと、まとめたい', say:'要するに', simple:'短く言うと', en:["In short,","So here's the point:"], hard:'to summarize', kata:'bun'},
+  {cat:'説明・意見', scene:'敵の拠点に入る直前', say:'慎重にいこう', simple:'ゆっくり、気をつけて行こう', en:["Let's go slowly and be careful.","Don't make any noise."], hard:'cautious', kata:'gutai'},
+  {cat:'説明・意見', scene:'橋から車ごとジャンプする', say:'一か八かだ', simple:'うまくいくか分からないけど、やってみる', en:["I don't know if this will work, but let's try!","Let's hope this works!"], hard:"it's a gamble", kata:'wake'},
+  {cat:'説明・意見', scene:'視聴者にこのゲームを勧める', say:'初心者向けだよ', simple:'始めたばかりの人にもやさしい', en:["It's good for people who just started.","It's easy for new players."], hard:'beginner-friendly', kata:'rel'},
+  {cat:'説明・意見', scene:'簡単そうなミニゲームにハマった', say:'奥が深い', simple:'簡単に見えるけど、学ぶことが多い', en:["It looks easy, but there's a lot to learn.","Easy to start, hard to be good at."], hard:'profound', kata:'wake'},
+  {cat:'説明・意見', scene:'このゲームのラストについて話す', say:'賛否両論ある', simple:'好きな人もいれば、嫌いな人もいる', en:["Some people love it, and some people hate it."], hard:'controversial', kata:'gutai'},
+  {cat:'説明・意見', scene:'自分の意見を言い始める', say:'個人的には', simple:'自分の考えでは', en:["I think...","For me,"], hard:'personally', kata:'bun'},
+  {cat:'説明・意見', scene:'本音をぶっちゃける', say:'正直に言うと', simple:'本当のことを言うと', en:["To tell the truth,","I'll be honest."], hard:'frankly', kata:'bun'},
+
+  // --- 日常・雑談 ---
+  {cat:'日常・雑談', scene:'配信の冒頭、眠そうにしてる理由', say:'寝不足です', simple:'あまり寝てない', en:["I didn't sleep much.","I'm so sleepy today."], hard:'sleep-deprived', kata:'bun'},
+  {cat:'日常・雑談', scene:'最近忙しい理由を話す', say:'締め切りに追われてる', simple:'すぐ終わらせないといけない仕事がある', en:["I have work that I have to finish soon.","I'm really busy with work."], hard:'deadline', kata:'rel'},
+  {cat:'日常・雑談', scene:'自分の性格を説明する', say:'人見知りです', simple:'知らない人と話すのが苦手', en:["I'm not good at talking to new people.","I'm a little shy."], hard:'introverted', kata:'hantai'},
+  {cat:'日常・雑談', scene:'部屋の掃除をしなきゃいけない', say:'面倒くさい', simple:'やりたくない。大変そう', en:["I don't want to do it.","That's too much work."], hard:'troublesome', kata:'kimochi'},
+  {cat:'日常・雑談', scene:'しばらく会ってなかった友達と話す', say:'久しぶり！', simple:'長いあいだ会ってなかった', en:["Long time no see!","I haven't seen you for a long time."], hard:"it's been ages", kata:'bun'},
+  {cat:'日常・雑談', scene:'筋トレを始めたけど続かない', say:'三日坊主です', simple:'始めても、すぐやめてしまう', en:["I start things, but I stop soon.","I always give up after a few days."], hard:"can't stick to anything", kata:'wake'},
+  {cat:'日常・雑談', scene:'どっちの車を買うか決められない', say:'迷ってる', simple:'どっちがいいか分からない', en:["I can't decide.","I don't know which one is better."], hard:'hesitating', kata:'bun'},
+  {cat:'日常・雑談', scene:'作業に煮詰まって外を歩く', say:'気分転換', simple:'ちょっと違うことをして、気持ちを変える', en:["I need a break.","Let's do something different for a while."], hard:'refresh', kata:'bun'},
+  {cat:'日常・雑談', scene:'海外旅行から帰ってきて、夜に眠れない', say:'時差ボケです', simple:'体の時計がまだ向こうの時間', en:["My body still thinks it's day.","I can't sleep at night."], hard:'jet lag', kata:'gutai'},
+  {cat:'日常・雑談', scene:'買ったまま読んでない本が山積み', say:'積読がやばい', simple:'買った本を読んでない', en:["I buy books, but I don't read them.","I have so many books that I haven't read."], hard:'pile of unread books', kata:'rel'},
+
+  // --- 配信・自己紹介 ---
+  {cat:'配信・自己紹介', scene:'英語がたどたどしいのを先に断っておく', say:'英語は勉強中です', simple:'まだ英語を勉強している', en:["I'm still learning English.","My English is not good yet."], hard:'currently studying', kata:'hantai'},
+  {cat:'配信・自己紹介', scene:'NPCのセリフが速すぎた', say:'聞き取れなかった', simple:'何を言ったか分からなかった', en:["I didn't catch that.","I don't know what he said."], hard:"couldn't make it out", kata:'bun'},
+  {cat:'配信・自己紹介', scene:'仕事を聞かれた', say:'動画編集をしています', simple:'動画を作る仕事をしている', en:["I make videos for work.","My job is making videos."], hard:'video editor', kata:'bun'},
+  {cat:'配信・自己紹介', scene:'翻訳チャンネルのことを話す', say:'翻訳の仕事もしています', simple:'英語の動画を日本語にしている', en:["I also change English videos into Japanese.","I put Japanese words on English videos."], hard:'translate', kata:'gutai'},
+  {cat:'配信・自己紹介', scene:'このゲームを初めて遊ぶ配信', say:'初見プレイです', simple:'これをやるのは初めて', en:["This is my first time playing this.","I've never played this before."], hard:'blind playthrough', kata:'bun'},
+  {cat:'配信・自己紹介', scene:'視聴者のコメントを読んだ', say:'コメントありがとう', simple:'書いてくれてありがとう', en:["Thank you for writing to me!","Thanks for the comment!"], hard:'I appreciate your comment', kata:'bun'},
+  {cat:'配信・自己紹介', scene:'視聴者がこの先の展開を書きそう', say:'ネタバレしないで！', simple:'この先のことを言わないで', en:["Please don't tell me what happens!","Don't tell me the story!"], hard:'no spoilers', kata:'bun'},
+  {cat:'配信・自己紹介', scene:'配信を締める', say:'今日はここまで', simple:'今日はこれで終わり', en:["That's all for today.","Let's stop here for today."], hard:"let's wrap it up", kata:'bun'},
+
+  // --- 関係代名詞で説明 ---
+  {cat:'関係代名詞', scene:'車が燃えている。あの赤い消すやつが欲しい', say:'消火器どこ？', simple:'火を消すときに使う物はどこ？', en:["Where's the thing that you use when there's a fire?","I need the red thing that stops fire!"], hard:'fire extinguisher', kata:'rel', tip:'the thing that you use when ... は「名前が分からない道具」全部に使える'},
+  {cat:'関係代名詞', scene:'銀行強盗を見ていた人がいる', say:'目撃者がいる！', simple:'それを見ていた人がいる', en:["There's a man who saw everything!","Someone who saw it is still here!"], hard:'witness', kata:'rel', tip:'the man who + 動詞の過去形 で「〜した人」'},
+  {cat:'関係代名詞', scene:'一緒に強盗した仲間が捕まった', say:'共犯者が捕まった', simple:'手伝ってくれた奴が捕まった', en:["The guy who helped me got caught.","My friend who did it with me is in trouble."], hard:'accomplice', kata:'rel'},
+  {cat:'関係代名詞', scene:'追われているので、身を隠せる場所に行きたい', say:'隠れ家に行こう', simple:'誰にも見つからない場所に行こう', en:["Let's go to a place where nobody can find us.","I know a place where we can hide."], hard:'hideout', kata:'rel', tip:'場所は a place where + 文'},
+  {cat:'関係代名詞', scene:'警察にタレ込んだ奴がいるらしい', say:'密告者がいる', simple:'警察に話した人がいる', en:["Someone told the police.","There's a guy who talked to the cops."], hard:'informant', kata:'rel'},
+  {cat:'関係代名詞', scene:'この仕事を頼んできたNPCの話をする', say:'依頼人に電話しよう', simple:'この仕事をくれた人に電話しよう', en:["Let's call the man who gave me this job.","I'll call the guy who wants this done."], hard:'client', kata:'rel'},
+  {cat:'関係代名詞', scene:'ケガ人がいる。病院に運ぶ車を呼びたい', say:'救急車を呼んで！', simple:'病院に連れていってくれる車を呼んで', en:["Call the car that takes people to the hospital!","We need a car that can take him to the hospital!"], hard:'ambulance', kata:'rel'},
+  {cat:'関係代名詞', scene:'建物に入ったら、天井のカメラに気づいた', say:'監視カメラがある', simple:'こっちを見てるカメラがある', en:["There's a camera that's watching us.","That camera can see everything we do."], hard:'security camera', kata:'rel'},
+  {cat:'関係代名詞', scene:'このゲームで一番好きなキャラを紹介する', say:'推しキャラはこいつ', simple:'一番好きなキャラはこいつ', en:["This is the character that I like the most.","He's the one who I like best."], hard:'my favorite character', kata:'rel', tip:'the character (that) I like は that を省略しても言える'},
+  {cat:'関係代名詞', scene:'昨日の配信で起きたことを話す', say:'昨日のアレ覚えてる？', simple:'昨日起きたことを覚えてる？', en:["Do you remember what happened yesterday?","You know the thing that happened yesterday?"], hard:'the incident', kata:'rel', tip:'what happened = 起きたこと。the thing that と同じ意味'},
+  {cat:'関係代名詞', scene:'さっきの指示がよく分からなかった', say:'今の指示の意味が分からない', simple:'彼が言ったことが分からない', en:["I don't understand what he said.","What he wants me to do is not clear."], hard:'instructions', kata:'rel'},
+  {cat:'関係代名詞', scene:'先輩に誘われてゲームを始めた話', say:'先輩に誘われて', simple:'自分より年上の友達が誘ってくれた', en:["A friend who is older than me asked me to play.","My older friend told me to try it."], hard:'senior / mentor', kata:'rel'},
+  {cat:'関係代名詞', scene:'行きたい店の名前を忘れた', say:'あの店の名前なんだっけ', simple:'前に行った店。名前を忘れた', en:["What's the name of the shop that we went to last time?","I forgot the name of the place where we ate."], hard:'(店名を思い出そうとする)', kata:'rel'},
+  {cat:'関係代名詞', scene:'変な格好のNPCを指さす', say:'あの変な人見て', simple:'あそこにいる帽子の男を見て', en:["Look at the man who is wearing that big hat!","Who is that guy that's dancing in the street?"], hard:'eccentric', kata:'rel', tip:'the man who is + ing で「〜している人」'},
+];
+
+// ===== 中学英語の語彙リスト(+ 実況でよく使う基本語) =====
+const JH_WORDS = `a an the i me my mine myself you your yours yourself he him his himself she her hers herself it its itself we us our ours ourselves they them their theirs themselves
+this that these those what who whom whose which when where why how there here
+and but or so because if than as then also too very really just only even still already yet again not no yes ok okay please thank thanks sorry hello hi bye goodbye oh wow well hey ah uh um yeah yep nope huh hmm phew
+am is are was were be been being do does did done doing have has had having will would can could shall should may might must
+in on at to from for of with without about into onto over under up down out off around through across along between behind before after during until till since near by like against inside outside above below beside past away back
+go goes going went gone come came get got gotten make made take took taken give gave given put see saw seen look watch hear heard listen say said tell told talk speak spoke spoken ask answer call know knew known think thought feel felt want need like love hate try use find found lose lost win won keep kept let help start begin began begun stop finish end open close turn run ran walk drive drove driven ride rode ridden fly flew flown swim swam jump sit sat stand stood stay leave left arrive move carry bring brought buy bought sell sold pay paid cost spend spent save eat ate eaten drink drank cook sleep slept wake woke live die kill hit catch caught throw threw thrown push pull break broke broken fix build built change choose chose chosen decide wait hope wish mean meant understand understood learn study teach taught read write wrote written draw drew drawn sing sang sung play work show shown send sent meet met join follow lead led plan practice remember forget forgot forgotten believe worry care miss happen fall fell fallen grow grew grown wear wore worn hold held hurt hide hid hidden enjoy laugh cry smile shout
+agree borrow lend clean climb collect cut dance enter explain fill invite kick knock notice order pass pick plant pray prepare protect rain relax rest return share shut snow solve sound spell store surprise touch travel visit wash waste hurry guess lie act add allow become became cover continue create cross drop exercise face fail feed fight fought hang imagine improve introduce lay laid marry mind mix own paint point raise reach receive reply report rise roll rush search seem set shake shine sign smell taste trust train type warn wonder beat calm count dream excite kid matter place speed test
+time day night morning afternoon evening today tomorrow yesterday week month year minute hour second moment life world people person man woman men women boy girl child children kid friend family father mother dad mom brother sister parent baby name thing way place home house room school class teacher student work job money car bus train bike road street city town country map game video music movie song book story picture photo phone computer internet team plan idea question answer problem reason mistake chance luck fun trouble hand head eye face body heart mind voice word language english japanese japan america vietnam world water food lunch dinner breakfast rice bread coffee tea milk shop store bank hospital park station door window wall floor table chair bed box bag key ticket point part side top bottom front middle left right lot bit kind type sort number fire light sky sun rain snow wind weather tree flower dog cat animal bird fish sea river mountain island beach health power news message letter email hat guy guys player one ones thing something anything everything nothing someone anyone everyone nobody somebody anybody everybody noise sound end road gun cop cops police mission comment character camera shoot shot stream video videos minute hit memory memories truth noise
+good bad great nice fine big small little long short high low tall old new young early late fast slow easy hard difficult busy free happy sad angry tired sleepy hungry sick hot cold warm cool right wrong true sure ready same different important interesting boring exciting excited bored scared afraid funny strange beautiful cute pretty kind friendly quiet loud dark bright full empty clean dirty cheap expensive rich poor safe dangerous careful strong weak heavy lucky perfect real best better worse worst last next first third every each all some any many much more most few less least other another enough only own whole alone together able shy stupid crazy cool red blue green black white yellow clear wrong okay alive dead favorite famous popular special terrible awesome amazing fair far honest
+now then soon later never always often sometimes usually ever almost maybe perhaps probably actually suddenly finally slowly quickly carefully easily somewhere anywhere everywhere nowhere none o'clock anymore ago once twice yet while
+one two three four five six seven eight nine ten eleven twelve hundred thousand
+everything`.split(/\s+/).filter(Boolean);
+const JH = new Set(JH_WORDS);
+const IRREG = {children:'child',men:'man',women:'woman',people:'person',better:'good',best:'good',worse:'bad',worst:'bad'};
+
+function baseForms(w){
+  const c = [w];
+  if (IRREG[w]) c.push(IRREG[w]);
+  const add = s => { if (s && s.length >= 2) c.push(s); };
+  if (w.endsWith('ies')) add(w.slice(0,-3)+'y');
+  if (w.endsWith('es')) add(w.slice(0,-2));
+  if (w.endsWith('s')) add(w.slice(0,-1));
+  if (w.endsWith('ied')) add(w.slice(0,-3)+'y');
+  if (w.endsWith('ed')) { add(w.slice(0,-2)); add(w.slice(0,-1)); const s=w.slice(0,-2); if (/(.)\1$/.test(s)) add(s.slice(0,-1)); }
+  if (w.endsWith('ing')) { const s=w.slice(0,-3); add(s); add(s+'e'); if (/(.)\1$/.test(s)) add(s.slice(0,-1)); }
+  if (w.endsWith('er')) { const s=w.slice(0,-2); add(s); add(s+'e'); if (/(.)\1$/.test(s)) add(s.slice(0,-1)); if (s.endsWith('i')) add(s.slice(0,-1)+'y'); }
+  if (w.endsWith('est')) { const s=w.slice(0,-3); add(s); add(s+'e'); if (/(.)\1$/.test(s)) add(s.slice(0,-1)); if (s.endsWith('i')) add(s.slice(0,-1)+'y'); }
+  if (w.endsWith('ly')) { add(w.slice(0,-2)); if (w.endsWith('ily')) add(w.slice(0,-3)+'y'); }
+  return c;
+}
+function normWord(raw){
+  let w = raw.toLowerCase().replace(/[’‘]/g,"'").replace(/^[^a-z0-9']+|[^a-z0-9']+$/g,'');
+  if (!w) return '';
+  if (w === "won't") return 'will';
+  if (w === "can't") return 'can';
+  if (w === "let's") return 'let';
+  w = w.replace(/n't$/,'').replace(/'(s|re|ve|ll|d|m)$/,'');
+  return w;
+}
+function isEasy(raw){
+  const w = normWord(raw);
+  if (!w) return true;
+  if (/^[0-9]+$/.test(w)) return true;
+  return baseForms(w).some(f => JH.has(f));
+}
+// 英文 → HTML(中学外っぽい単語を黄色に)
+function checkHtml(text){
+  const parts = text.split(/(\s+)/);
+  let hard = [];
+  const html = parts.map(p=>{
+    if (/^\s+$/.test(p) || !p) return p;
+    if (isEasy(p)) return '<span class="w-ok">'+esc(p)+'</span>';
+    hard.push(normWord(p));
+    return '<span class="w-hard">'+esc(p)+'</span>';
+  }).join('');
+  return {html, hard};
+}
+// PlayPhrase.me 用: 文が長いとヒットしにくいので、最初の区切りまで・最大6語にする(関係代名詞の文はそのかたまりだけ)
+function ppLink(en, isRel){
+  const clean = t => t.replace(/[^A-Za-z0-9' ]/g,' ').replace(/\s+/g,' ').trim();
+  const parts = en.split(/[,.!?:]/).map(clean).filter(Boolean);
+  // 最初の3語以上の区切りを使う(「Okay,」「I'm sorry,」のような短い前置きは飛ばす)
+  let q = parts.find(x=>x.split(' ').length>=3) || parts.sort((a,b)=>b.length-a.length)[0] || clean(en);
+  // 関係代名詞の問題は「the man who」「a place where」など、そのかたまりで探す
+  if (isRel) { const rel = q.match(/\b[\w']+ [\w']+ (who|that|which|where|what)\b/i); if (rel && q.split(' ').length > 5) q = rel[0]; }
+  let w = q.split(' ');
+  if (w.length > 7) w = w.slice(0,7);
+  while (w.length > 3 && /^(to|a|an|the|of|for|and|but|so|at|in|on|with|my|your|this|that)$/i.test(w[w.length-1])) w.pop();
+  return 'https://www.playphrase.me/#/search?q='+encodeURIComponent(w.join(' '));
+}
+function relHighlight(en){
+  return esc(en).replace(/\b(who|that|which|where|what)\b/gi, '<span class="rel">$1</span>');
+}
+
+// ===== 状態 =====
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'iikae';
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+let currentUser = null;
+let status = {};   // key(say) -> {s:'ok'|'mid'|'ng', w:苦手度, n:回数, t:最終}
+let mine = [];     // マイお題
+let saveTimer = null;
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function keyOf(it){ return (it.mine ? 'm:' : '') + it.say + '|' + it.scene; }
+function allItems(){
+  return DATA.concat(mine.map(m=>({cat:'マイお題', scene:m.scene, say:m.say, simple:m.simple||'', en:m.en?[m.en]:[], hard:'', kata:'', mine:true, id:m.id})));
+}
+
+let activeCats = null;
+let kata = 'all';
+let queue = [], qi = 0, current = null;
+let retry = [];
+
+function buildCats(){
+  const items = allItems();
+  const cats = [...new Set(items.map(d=>d.cat))];
+  if (!activeCats) activeCats = new Set(cats);
+  cats.forEach(c=>{ if(!activeCats.has(c) && c==='マイお題' && mine.length===1) activeCats.add(c); });
+  const box = document.getElementById('catChips');
+  box.innerHTML = '';
+  const all = document.createElement('div');
+  all.className = 'chip' + (cats.every(c=>activeCats.has(c)) ? ' on':'');
+  all.textContent = 'すべて';
+  all.onclick = ()=>{ activeCats = new Set(cats); buildCats(); rebuild(); next(); };
+  box.appendChild(all);
+  cats.forEach(c=>{
+    const n = items.filter(d=>d.cat===c).length;
+    const el = document.createElement('div');
+    el.className = 'chip' + (activeCats.has(c)?' on':'');
+    el.textContent = c+' ('+n+')';
+    el.onclick = ()=>{
+      if (cats.every(x=>activeCats.has(x))) activeCats = new Set([c]);
+      else if (activeCats.has(c)) { if (activeCats.size>1) activeCats.delete(c); }
+      else activeCats.add(c);
+      buildCats(); rebuild(); next();
+    };
+    box.appendChild(el);
+  });
+}
+function buildKata(){
+  const sel = document.getElementById('kataSel');
+  sel.innerHTML = '<option value="all">すべて</option>' + Object.entries(KATA).map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('');
+  sel.value = kata;
+  sel.onchange = ()=>{ kata = sel.value; rebuild(); next(); };
+}
+function pool(){
+  const order = document.getElementById('orderSel').value;
+  return allItems().filter(d=>activeCats.has(d.cat) && (kata==='all' || d.kata===kata))
+    .filter(d=> order!=='ngonly' || (status[keyOf(d)] && status[keyOf(d)].s !== 'ok'));
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function rebuild(){
+  const order = document.getElementById('orderSel').value;
+  let arr = pool();
+  if (order === 'weak' || order === 'ngonly') {
+    arr = arr.map(d=>{ const st=status[keyOf(d)]; const w = st ? st.w : 1.5; return {d, k: Math.random() - Math.min(w,5)*0.3}; })
+             .sort((a,b)=>a.k-b.k).map(x=>x.d);
+  } else if (order === 'new') {
+    const fresh = shuffle(arr.filter(d=>!status[keyOf(d)]));
+    const seen = shuffle(arr.filter(d=>status[keyOf(d)]));
+    arr = fresh.concat(seen);
+  } else shuffle(arr);
+  queue = arr; qi = 0; retry = [];
+  renderStats();
+}
+function next(){
+  retry.forEach(r=>r.wait--);
+  const due = retry.findIndex(r=>r.wait<=0);
+  if (due !== -1) { current = retry.splice(due,1)[0].item; render(true); return; }
+  if (!queue.length) { current = null; render(); return; }
+  if (qi >= queue.length) { rebuild(); if (!queue.length) { current=null; render(); return; } }
+  current = queue[qi++];
+  render(false);
+}
+function prev(){
+  if (qi >= 2) { qi -= 2; current = queue[qi++]; render(false); }
+}
+
+function stTag(it){
+  const st = status[keyOf(it)];
+  if (!st) return '<span class="tag">未</span>';
+  const m = {ok:['st-ok','○ 言えた'], mid:['st-mid','△ 微妙'], ng:['st-ng','× 無理']}[st.s];
+  return '<span class="tag '+m[0]+'">'+m[1]+' ('+st.n+'回)</span>';
+}
+function render(isRetry){
+  const card = document.getElementById('card');
+  if (!current) {
+    card.innerHTML = '<div class="say" style="font-size:18px">この条件の問題がありません</div><div class="scene">カテゴリや型、出す順番を変えてみてください。</div>';
+    return;
+  }
+  const it = current;
+  const stepOn = document.getElementById('stepSel').value === 'on';
+  const models = it.en.length
+    ? it.en.map((e,i)=>'<div class="model" data-i="'+i+'"><span class="sp">🔊</span><span class="en">'+(it.kata==='rel'?relHighlight(e):esc(e))+'</span><a class="pp" href="'+ppLink(e, it.kata==='rel')+'" target="_blank" rel="noopener" title="映画やドラマで聞く">🎬 映画で聞く</a></div>').join('')
+    : '<div class="check-msg">まだ英語が登録されていません。言えた英語を下で保存できます。</div>';
+  card.innerHTML =
+    '<div class="tags"><span class="tag">'+esc(it.cat)+'</span>' +
+      (it.kata ? '<span class="tag kata" id="kataTag" style="cursor:pointer">型: ？(タップでヒント)</span>' : '') +
+      stTag(it) + (isRetry?'<span class="tag st-ng">もう一回</span>':'') + '</div>' +
+    '<div class="scene-label">状況</div>' +
+    '<div class="scene">'+esc(it.scene)+'</div>' +
+    '<div class="scene-label">言いたいこと</div>' +
+    '<div class="say">「'+esc(it.say)+'」<small>この単語を英語で探さない。中学英語で言うと？</small></div>' +
+
+    (stepOn ?
+    '<div class="step"><div class="step-h">STEP 1 ・ 簡単な日本語に噛み砕く(頭の中でもOK)</div>' +
+      '<textarea id="mySimple" placeholder="例: もうできることがない"></textarea>' +
+      '<div class="btns"><button class="btn sub" id="showSimple">噛み砕き例を見る</button></div>' +
+      '<div class="reveal" id="simpleBox"><div class="simple">'+esc(it.simple || '(未登録)')+'</div></div>' +
+    '</div>' : '') +
+
+    '<div class="step"><div class="step-h">'+(stepOn?'STEP 2 ・ ':'')+'中学英語で言う(声 or 入力)</div>' +
+      '<textarea id="myEn" placeholder="英語を入力 or 🎤で話す"></textarea>' +
+      '<div class="btns">' +
+        '<button class="btn sub mic" id="micBtn">🎤 話す</button>' +
+        '<button class="btn sub" id="checkBtn">語彙チェック</button>' +
+        '<button class="btn main" id="showModel">言い方を見る</button>' +
+      '</div>' +
+      '<div class="checked" id="checked"></div>' +
+      '<div class="check-msg" id="checkMsg"></div>' +
+      '<div class="reveal" id="modelBox">' + models +
+        (it.hard ? '<div class="hard-line">つい探しがちな言い方: <s>'+esc(it.hard)+'</s> → 知らなくても言える</div>' : '') +
+        (it.tip ? '<div class="tip">💡 '+esc(it.tip)+'</div>' : '') +
+        '<div class="btns"><button class="btn sub" id="saveMyEn">自分の英文をこのお題に保存</button></div>' +
+        (it.myEn ? '' : '') +
+        '<div id="myEnSaved" class="check-msg"></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="judge">' +
+      '<button id="jOk">○ 言えた<small>後回し (1)</small></button>' +
+      '<button id="jMid">△ 微妙<small>また出す (2)</small></button>' +
+      '<button id="jNg">× 無理<small>すぐ出す (3)</small></button>' +
+    '</div>' +
+    '<div class="nav"><button class="btn sub" id="prevBtn">← 前</button><button class="btn sub" id="skipBtn">スキップ →</button></div>';
+
+  // 保存済みの自分の英文
+  const st = status[keyOf(it)];
+  if (st && st.my) document.getElementById('myEnSaved').innerHTML = '保存済みの自分の英文: <b style="color:var(--text)">'+esc(st.my)+'</b>';
+
+  const kt = document.getElementById('kataTag');
+  if (kt) kt.onclick = ()=>{ kt.textContent = '型: '+KATA[it.kata]; };
+  const ss = document.getElementById('showSimple');
+  if (ss) ss.onclick = ()=>document.getElementById('simpleBox').classList.add('show');
+  document.getElementById('checkBtn').onclick = runCheck;
+  document.getElementById('showModel').onclick = ()=>{ runCheck(true); document.getElementById('modelBox').classList.add('show'); if (kt) kt.textContent = '型: '+KATA[it.kata]; };
+  card.querySelectorAll('.model').forEach(m=>m.onclick = ev=>{ if (ev.target.closest('.pp')) return; speakEn(it.en[+m.dataset.i]); });
+  document.getElementById('saveMyEn').onclick = saveMyEn;
+  document.getElementById('jOk').onclick = ()=>judge('ok');
+  document.getElementById('jMid').onclick = ()=>judge('mid');
+  document.getElementById('jNg').onclick = ()=>judge('ng');
+  document.getElementById('prevBtn').onclick = prev;
+  document.getElementById('skipBtn').onclick = next;
+  document.getElementById('micBtn').onclick = toggleMic;
+  window.scrollTo({top: document.getElementById('card').offsetTop - 10, behavior:'smooth'});
+}
+function runCheck(silentIfEmpty){
+  const t = (document.getElementById('myEn').value || '').trim();
+  const out = document.getElementById('checked'), msg = document.getElementById('checkMsg');
+  if (!t) { if (silentIfEmpty!==true) { out.innerHTML=''; msg.textContent = '英語を入れるか🎤で話してからチェック'; } return; }
+  const r = checkHtml(t);
+  out.innerHTML = r.html;
+  msg.textContent = r.hard.length
+    ? '黄色は中学範囲外かも: ' + [...new Set(r.hard)].join(', ') + ' → もっと簡単に言えないか考える(固有名詞ならOK)'
+    : '✓ 全部中学英語の範囲。いいね';
+  msg.style.color = r.hard.length ? 'var(--yellow)' : 'var(--green)';
+}
+function saveMyEn(){
+  const t = (document.getElementById('myEn').value || '').trim();
+  if (!t) { document.getElementById('myEnSaved').textContent = '先に英語を入力してね'; return; }
+  const k = keyOf(current);
+  status[k] = status[k] || {s:'mid', w:1, n:0, t:0};
+  status[k].my = t;
+  if (current.mine) { const m = mine.find(x=>x.id===current.id); if (m && !m.en) { m.en = t; current.en = [t]; } }
+  document.getElementById('myEnSaved').innerHTML = '保存済みの自分の英文: <b style="color:var(--text)">'+esc(t)+'</b>';
+  scheduleSave();
+}
+function judge(s){
+  if (!current) return;
+  const k = keyOf(current);
+  const st = status[k] || {w:1.5, n:0};
+  st.s = s; st.n = (st.n||0) + 1; st.t = Date.now();
+  st.w = s==='ok' ? Math.max(0, (st.w||0) - 1) : s==='mid' ? (st.w||0) + 1 : (st.w||0) + 2;
+  status[k] = st;
+  if (s !== 'ok' && !retry.some(r=>r.item===current)) retry.push({item: current, wait: s==='ng' ? 3 : 7});
+  scheduleSave();
+  renderStats();
+  next();
+}
+document.addEventListener('keydown', ev=>{
+  if (ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'INPUT') return;
+  if (ev.key==='1') judge('ok'); if (ev.key==='2') judge('mid'); if (ev.key==='3') judge('ng');
+});
+function renderStats(){
+  const items = allItems();
+  let ok=0, mid=0, ng=0;
+  items.forEach(d=>{ const st=status[keyOf(d)]; if(!st||!st.s) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else ng++; });
+  const none = items.length - ok - mid - ng;
+  document.getElementById('stats').innerHTML = '全'+items.length+'問 ・ <b style="color:var(--green)">○'+ok+'</b> <b style="color:var(--yellow)">△'+mid+'</b> <b style="color:var(--red)">×'+ng+'</b> 未'+none + ' ・ 今の条件 '+queue.length+'問';
+}
+['orderSel','stepSel'].forEach(id=>document.getElementById(id).onchange = ()=>{ if(id==='orderSel') rebuild(); if(id==='orderSel') next(); else render(false); });
+
+// ===== 音声 =====
+let enVoice = null;
+function loadVoices(){ const vs = speechSynthesis.getVoices(); enVoice = vs.find(v=>v.lang==='en-US') || vs.find(v=>v.lang.startsWith('en')) || null; }
+loadVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+function speakEn(t){ const u = new SpeechSynthesisUtterance(t); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recOn = false;
+function toggleMic(){
+  const btn = document.getElementById('micBtn');
+  if (!SR) { document.getElementById('checkMsg').textContent = 'このブラウザは音声入力に未対応です(Chrome / Safari で開いてね)'; return; }
+  if (recOn) { rec && rec.stop(); return; }
+  rec = new SR();
+  rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  const box = document.getElementById('myEn');
+  const before = box.value ? box.value.trim() + ' ' : '';
+  rec.onresult = e=>{
+    let t=''; for (let i=0;i<e.results.length;i++) t += e.results[i][0].transcript;
+    box.value = before + t;
+    if (e.results[e.results.length-1].isFinal) runCheck();
+  };
+  rec.onerror = e=>{ if (e.error!=='no-speech' && e.error!=='aborted') document.getElementById('checkMsg').textContent = '音声入力エラー: '+e.error; };
+  rec.onend = ()=>{ recOn=false; const b=document.getElementById('micBtn'); if(b){ b.classList.remove('rec'); b.textContent='🎤 話す'; } };
+  recOn = true; btn.classList.add('rec'); btn.textContent = '■ 止める';
+  try { rec.start(); } catch(err) { recOn=false; }
+}
+
+// ===== マイお題 =====
+function renderMine(){
+  const box = document.getElementById('mineList');
+  if (!mine.length) { box.innerHTML = '<div class="check-msg">まだありません。実況で詰まった言葉をメモしていくと最強の教材になります。</div>'; return; }
+  box.innerHTML = mine.map(m=>'<div class="mine-item"><span>「'+esc(m.say)+'」<span style="color:var(--text-dim)"> '+esc(m.scene)+(m.en?' → '+esc(m.en):'')+'</span></span><button data-id="'+m.id+'">削除</button></div>').join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    if (!confirm('このお題を削除しますか？')) return;
+    mine = mine.filter(m=>m.id!==b.dataset.id); scheduleSave(); renderMine(); buildCats(); rebuild(); next();
+  });
+}
+document.getElementById('fAdd').onclick = ()=>{
+  const g = id=>document.getElementById(id).value.trim();
+  const say = g('fSay'), scene = g('fScene');
+  if (!say) { document.getElementById('fMsg').textContent = '「言いたいこと」は必須です'; return; }
+  mine.push({id: String(Date.now()), scene: scene || '(状況なし)', say, simple: g('fSimple'), en: g('fEn')});
+  ['fScene','fSay','fSimple','fEn'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fMsg').textContent = '追加しました(マイお題カテゴリに入ります)';
+  if (activeCats) activeCats.add('マイお題');
+  scheduleSave(); renderMine(); buildCats(); rebuild();
+};
+
+// ===== 同期(他アプリと同じGAS) =====
+function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
+function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); saveTimer = setTimeout(()=>saveAll(), 600); }
+function saveAll(retryFlag){
+  if (!currentUser) return;
+  fetch(GAS_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status, _mine: mine})})
+  }).then(r=>r.json()).then(res=>{
+    if (res && res.error) throw new Error(res.error);
+    setSyncBadge('保存済み');
+  }).catch(()=>{
+    if (!retryFlag) { setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true), 1500); }
+    else setSyncBadge('⚠保存失敗 タップで再試行');
+  });
+}
+function loadFromServer(user){
+  return fetch(GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY+':'+user))
+    .then(r=>r.json()).then(res=>{
+      try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; mine = p._mine || []; }
+      catch(e){ status = {}; mine = []; }
+    });
+}
+function initApp(){ activeCats = null; buildCats(); buildKata(); renderMine(); rebuild(); next(); }
+function startSession(user){
+  currentUser = user;
+  localStorage.setItem(LOCAL_USER_KEY, user);
+  document.getElementById('loginStatus').textContent = '読み込み中...';
+  loadFromServer(user).then(()=>{
+    document.getElementById('loginOverlay').style.display = 'none';
+    setSyncBadge(user + ' で同期中');
+    initApp();
+  }).catch(()=>{ document.getElementById('loginStatus').textContent = '通信に失敗しました。もう一度お試しください。'; });
+}
+document.getElementById('loginBtn').onclick = ()=>{
+  const v = document.getElementById('passInput').value.trim();
+  if (!v) { document.getElementById('loginStatus').textContent = '合言葉を入力してください'; return; }
+  startSession(v);
+};
+document.getElementById('passInput').onkeydown = e=>{ if (e.key==='Enter') document.getElementById('loginBtn').click(); };
+document.getElementById('syncBadge').onclick = ()=>{
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗') !== -1) { saveAll(); return; }
+  if (currentUser) loadFromServer(currentUser).then(()=>{ setSyncBadge(currentUser+' で同期中(更新済み)'); initApp(); });
+};
+const savedUser = (()=>{ try { return localStorage.getItem(LOCAL_USER_KEY); } catch(e){ return null; } })();
+if (savedUser) { document.getElementById('passInput').value = savedUser; startSession(savedUser); }
+</script>
+</body>
+</html>
