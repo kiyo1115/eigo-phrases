@@ -91,6 +91,37 @@
   .login-box button{width:100%;background:var(--amber);border:none;color:#1a1208;font-weight:700;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
   .login-status{font-size:11px;color:var(--text-dim);margin-top:10px;min-height:14px;}
   .sync-badge{position:fixed;top:10px;right:10px;font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:4px 10px;z-index:10;cursor:pointer;}
+
+  /* ===== タブ ===== */
+  .tabs{display:flex;gap:8px;margin:0 0 14px;}
+  .tabbtn{flex:1;background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:12px;padding:11px 8px;font-size:14px;font-weight:700;cursor:pointer;}
+  .tabbtn.on{background:var(--amber);border-color:var(--amber);color:#1a1208;}
+  .tabbtn .cnt{display:inline-block;min-width:20px;border-radius:99px;padding:0 6px;margin-left:4px;font-size:12px;background:rgba(0,0,0,.25);}
+  /* ドリルの☆ */
+  .memo-star{flex-shrink:0;align-self:center;background:var(--panel2);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .memo-star.on{background:var(--yellow);border-color:var(--yellow);color:#1a1208;}
+  /* ===== 覚えるリスト プレイヤー ===== */
+  .mp-stage{min-height:210px;}
+  .mp-say{font-size:26px;font-weight:800;line-height:1.4;margin:2px 0 4px;}
+  .mp-ans{margin-top:14px;padding:14px;background:var(--panel2);border-radius:12px;visibility:hidden;}
+  .mp-ans.show{visibility:visible;}
+  .mp-en{font-size:24px;font-weight:800;color:var(--amber);line-height:1.4;cursor:pointer;}
+  .mp-simple{font-size:13px;color:var(--text-dim);margin-top:6px;}
+  .think{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:12px;}
+  .think i{display:block;height:100%;width:0;background:var(--amber-dim);}
+  .mp-prog{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:12px;}
+  .mp-ctl{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:12px;}
+  .mp-ctl .btn{min-width:56px;font-size:18px;}
+  .mp-ctl #mpPlay{min-width:84px;font-size:22px;}
+  .memo-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .memo-row .t{flex:1;line-height:1.5;}
+  .memo-row .t b{color:var(--amber);font-size:14px;}
+  .memo-row button{background:none;border:1px solid var(--line);color:var(--text-dim);border-radius:6px;font-size:11px;padding:3px 7px;cursor:pointer;}
+  .pick-cat{font-size:12px;color:var(--amber-dim);font-weight:700;margin:14px 0 4px;}
+  .pick-item{padding:6px 0;border-bottom:1px solid var(--line);}
+  .pick-item .q{font-size:13px;color:var(--text-dim);}
+  .pick-item label{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:3px 0;cursor:pointer;flex-direction:row;color:var(--text);}
+  .pick-item input{margin-top:3px;accent-color:#ffd166;}
 </style>
 </head>
 <body>
@@ -115,6 +146,12 @@
     知らない単語は <b>who / that / which / where</b> で説明すればOK。
   </div>
 
+  <div class="tabs">
+    <button class="tabbtn on" data-tab="drill">🔁 ドリル</button>
+    <button class="tabbtn" data-tab="memo">★ 覚えるリスト<span class="cnt" id="memoCount">0</span></button>
+  </div>
+
+  <div id="tabDrill">
   <div class="chips" id="catChips"></div>
   <div class="row">
     <label>言い換えの型
@@ -164,8 +201,96 @@
     ・<b>気持ち・結果で言う</b>：原因の単語より、どう感じたか・どうなったか<br>
     ・<b>関係代名詞で説明</b>：知らない物や人は「〜する人/物」で言う<br>
     　the man <span class="rel">who</span> saw it / the thing <span class="rel">that</span> you use when… / a place <span class="rel">where</span>…<br>
-    ・黄色になった単語は中学範囲外かも。言い換えられないか考える
+    ・黄色になった単語は中学範囲外かも。言い換えられないか考える<br>
+    ・覚えたい言い方は <b>☆覚える</b> をタップ → 「覚えるリスト」タブで練習
   </div>
+  </div><!-- /tabDrill -->
+
+  <div id="tabMemo" style="display:none;">
+    <div class="row">
+      <label>モード
+        <select id="mpMode">
+          <option value="test" selected>テスト(状況→英語)</option>
+          <option value="listen">聞き流し(英語→日本語)</option>
+        </select>
+      </label>
+      <label>出す順番
+        <select id="mpOrder">
+          <option value="random" selected>ランダム(1周で全部)</option>
+          <option value="weak">苦手を優先</option>
+          <option value="added">追加した順</option>
+        </select>
+      </label>
+      <label>考える時間
+        <select id="mpThink">
+          <option value="3000">3秒</option>
+          <option value="5000" selected>5秒</option>
+          <option value="8000">8秒</option>
+          <option value="12000">12秒</option>
+          <option value="20000">20秒</option>
+        </select>
+      </label>
+      <label>英語の回数
+        <select id="mpRep">
+          <option value="1">1回</option>
+          <option value="2" selected>2回</option>
+          <option value="3">3回</option>
+          <option value="5">5回</option>
+        </select>
+      </label>
+      <label>速さ
+        <select id="mpRate">
+          <option value="0.8">遅め</option>
+          <option value="0.9" selected>ふつう</option>
+          <option value="1.1">速め</option>
+        </select>
+      </label>
+      <label>日本語読み上げ
+        <select id="mpJp">
+          <option value="off" selected>なし</option>
+          <option value="on">あり</option>
+        </select>
+      </label>
+      <label>○△×判定
+        <select id="mpJudgeMode">
+          <option value="on" selected>あり(押すまで待つ)</option>
+          <option value="off">なし(自動で次へ)</option>
+        </select>
+      </label>
+      <label>答えのあと
+        <select id="mpReview">
+          <option value="2000">2秒</option>
+          <option value="4000" selected>4秒</option>
+          <option value="8000">8秒</option>
+        </select>
+      </label>
+    </div>
+    <div class="stats" id="mpStats"></div>
+
+    <div class="card">
+      <div class="mp-stage" id="mpStage"></div>
+      <div class="judge" id="mpJudgeRow">
+        <button id="mpOk" style="background:#2f4a30;color:#b3ffb8;">○ 言えた<small>後回し (1)</small></button>
+        <button id="mpMid" style="background:#4f4420;color:#ffe9a8;">△ 微妙<small>少し後 (2)</small></button>
+        <button id="mpNg" style="background:#5a3030;color:#ffb3b3;">× 無理<small>すぐ出す (3)</small></button>
+      </div>
+      <div class="mp-prog"><span><span id="mpCycle">1</span>周目 ・ <span id="mpDone">0</span> / <span id="mpTotal">0</span></span><span>スペース=再生/停止 ・ ←→=前/次</span></div>
+      <div class="mp-ctl">
+        <button class="btn sub" id="mpPrev">⏮</button>
+        <button class="btn main" id="mpPlay">▶</button>
+        <button class="btn sub" id="mpNext">⏭</button>
+      </div>
+    </div>
+
+    <details class="panel" id="memoListPanel" open>
+      <summary>★ チェックした言い方(<span id="memoCount2">0</span>)</summary>
+      <div id="memoList"></div>
+    </details>
+    <details class="panel" id="pickPanel">
+      <summary>＋ ドリルの問題から選んでチェック</summary>
+      <div id="pickList"></div>
+    </details>
+  </div><!-- /tabMemo -->
 </div>
 
 <script>
@@ -446,7 +571,7 @@ function render(isRetry){
   const it = current;
   const stepOn = document.getElementById('stepSel').value === 'on';
   const models = it.en.length
-    ? it.en.map((e,i)=>'<div class="model" data-i="'+i+'"><span class="sp">🔊</span><span class="en">'+(it.kata==='rel'?relHighlight(e):esc(e))+'</span><a class="pp" href="'+ppLink(e, it.kata==='rel')+'" target="_blank" rel="noopener" title="映画やドラマで聞く">🎬 映画で聞く</a></div>').join('')
+    ? it.en.map((e,i)=>'<div class="model" data-i="'+i+'"><span class="sp">🔊</span><span class="en">'+(it.kata==='rel'?relHighlight(e):esc(e))+'</span>'+'<button class="memo-star'+(memo[memoKey(it,e)]?' on':'')+'" data-i="'+i+'">'+(memo[memoKey(it,e)]?'★ 覚える':'☆ 覚える')+'</button><a class="pp" href="'+ppLink(e, it.kata==='rel')+'" target="_blank" rel="noopener" title="映画やドラマで聞く">🎬 映画で聞く</a></div>').join('')
     : '<div class="check-msg">まだ英語が登録されていません。言えた英語を下で保存できます。</div>';
   card.innerHTML =
     '<div class="tags"><span class="tag">'+esc(it.cat)+'</span>' +
@@ -499,7 +624,12 @@ function render(isRetry){
   if (ss) ss.onclick = ()=>document.getElementById('simpleBox').classList.add('show');
   document.getElementById('checkBtn').onclick = runCheck;
   document.getElementById('showModel').onclick = ()=>{ runCheck(true); document.getElementById('modelBox').classList.add('show'); if (kt) kt.textContent = '型: '+KATA[it.kata]; };
-  card.querySelectorAll('.model').forEach(m=>m.onclick = ev=>{ if (ev.target.closest('.pp')) return; speakEn(it.en[+m.dataset.i]); });
+  card.querySelectorAll('.model').forEach(m=>m.onclick = ev=>{ if (ev.target.closest('.pp') || ev.target.closest('.memo-star')) return; speakEn(it.en[+m.dataset.i]); });
+  card.querySelectorAll('.memo-star').forEach(b=>b.onclick = ev=>{
+    ev.stopPropagation();
+    const on = toggleMemo(it, it.en[+b.dataset.i]);
+    b.classList.toggle('on', on); b.textContent = on ? '★ 覚える' : '☆ 覚える';
+  });
   document.getElementById('saveMyEn').onclick = saveMyEn;
   document.getElementById('jOk').onclick = ()=>judge('ok');
   document.getElementById('jMid').onclick = ()=>judge('mid');
@@ -544,6 +674,7 @@ function judge(s){
 }
 document.addEventListener('keydown', ev=>{
   if (ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'INPUT') return;
+  if (curTab === 'memo') return;
   if (ev.key==='1') judge('ok'); if (ev.key==='2') judge('mid'); if (ev.key==='3') judge('ng');
 });
 function renderStats(){
@@ -583,6 +714,237 @@ function toggleMic(){
   try { rec.start(); } catch(err) { recOn=false; }
 }
 
+
+// ===== 覚えるリスト(☆でチェックした言い方だけのプレイヤー) =====
+let memo = {};   // memoKey -> {en, say, scene, cat, simple, added, s, w, n}
+let curTab = 'drill';
+function memoKey(it, en){ return keyOf(it) + '#' + en; }
+function toggleMemo(it, en){
+  const k = memoKey(it, en);
+  let on;
+  if (memo[k]) { delete memo[k]; on = false; }
+  else { memo[k] = {en, say: it.say, scene: it.scene, cat: it.cat, simple: it.simple || '', added: Date.now(), w: 1.5, n: 0}; on = true; }
+  scheduleSave(); renderMemoAll();
+  return on;
+}
+function memoItems(){ return Object.keys(memo).map(k=>Object.assign({k}, memo[k])); }
+
+const MP = {queue:[], qi:0, cur:null, playing:false, token:0, cycle:1, waiting:false, timers:[], raf:null};
+const mpVal = id => document.getElementById(id).value;
+function mpSettings(){
+  return { mode: mpVal('mpMode'), order: mpVal('mpOrder'), think: +mpVal('mpThink'), rep: +mpVal('mpRep'),
+           rate: +mpVal('mpRate'), jp: mpVal('mpJp')==='on', judge: mpVal('mpJudgeMode')==='on', review: +mpVal('mpReview') };
+}
+function mpBuild(){
+  const order = mpVal('mpOrder');
+  let arr = memoItems();
+  if (order === 'added') arr.sort((a,b)=>a.added-b.added);
+  else if (order === 'weak') arr = arr.map(d=>({d, k: Math.random() - Math.min(d.w==null?1.5:d.w, 5)*0.3})).sort((a,b)=>a.k-b.k).map(x=>x.d);
+  else shuffle(arr);
+  MP.queue = arr.map(d=>d.k); MP.qi = 0;
+}
+function mpClear(){
+  MP.token++;
+  MP.timers.forEach(clearTimeout); MP.timers = [];
+  if (MP.raf) cancelAnimationFrame(MP.raf); MP.raf = null;
+  try { speechSynthesis.cancel(); } catch(e){}
+}
+function mpWait(ms, tok){ return new Promise(res=>{ MP.timers.push(setTimeout(()=>res(tok===MP.token), ms)); }); }
+function mpSay(text, lang, rate, tok){
+  return new Promise(res=>{
+    if (tok !== MP.token) return res(false);
+    let done = false;
+    const fin = ()=>{ if (done) return; done = true; res(tok === MP.token); };
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang; u.rate = rate;
+    if (lang === 'en-US' && enVoice) u.voice = enVoice;
+    u.onend = fin; u.onerror = fin;
+    MP.timers.push(setTimeout(fin, 2500 + text.length * (lang==='ja-JP' ? 260 : 110) / rate));
+    speechSynthesis.speak(u);
+  });
+}
+function mpBar(ms, tok){
+  const bar = document.getElementById('mpBar'); if (!bar) return;
+  const t0 = performance.now();
+  const step = ()=>{ if (tok !== MP.token) return; const r = Math.min(1, (performance.now()-t0)/ms); bar.style.width = (r*100)+'%'; if (r < 1) MP.raf = requestAnimationFrame(step); };
+  step();
+}
+function mpRender(show){
+  const box = document.getElementById('mpStage');
+  const d = MP.cur && memo[MP.cur];
+  if (!d) {
+    box.innerHTML = memoItems().length
+      ? '<div class="scene" style="margin-top:30px">▶ を押すとスタート</div>'
+      : '<div class="say" style="font-size:18px">まだ何もチェックしていません</div><div class="scene">ドリルで「言い方を見る」を押して、覚えたい英語の <b style="color:var(--yellow)">☆ 覚える</b> をタップ。<br>下の「ドリルの問題から選んでチェック」からまとめて選ぶこともできます。</div>';
+    mpRenderCtl(); return;
+  }
+  const st = d.s ? {ok:['st-ok','○'], mid:['st-mid','△'], ng:['st-ng','×']}[d.s] : null;
+  const listen = mpVal('mpMode') === 'listen';
+  box.innerHTML =
+    '<div class="tags"><span class="tag">'+esc(d.cat)+'</span>' + (st ? '<span class="tag '+st[0]+'">'+st[1]+' ('+d.n+'回)</span>' : '<span class="tag">未</span>') + '</div>' +
+    '<div class="scene-label">状況</div><div class="scene">'+esc(d.scene)+'</div>' +
+    '<div class="scene-label">言いたいこと</div><div class="mp-say">「'+esc(d.say)+'」</div>' +
+    (listen ? '' : '<div class="think"><i id="mpBar"></i></div>') +
+    '<div class="mp-ans'+(show?' show':'')+'" id="mpAns"><div class="mp-en" id="mpEn">🔊 '+esc(d.en)+'</div>' +
+      (d.simple ? '<div class="mp-simple">噛み砕き: '+esc(d.simple)+'</div>' : '') + '</div>' +
+    (show ? '' : '<div class="btns"><button class="btn sub" id="mpReveal">答えを見る</button></div>');
+  document.getElementById('mpEn').onclick = ()=>speakEn(d.en);
+  const rv = document.getElementById('mpReveal');
+  if (rv) rv.onclick = ()=>{ mpClear(); mpReveal(); speakEn(d.en); if (mpSettings().judge) MP.waiting = true; mpRenderCtl(); };
+  mpRenderCtl();
+}
+function mpReveal(){
+  const a = document.getElementById('mpAns'); if (a) a.classList.add('show');
+  const rv = document.getElementById('mpReveal'); if (rv) rv.remove();
+  const bar = document.getElementById('mpBar'); if (bar) bar.style.width = '100%';
+}
+function mpRenderCtl(){
+  document.getElementById('mpPlay').textContent = MP.playing ? '⏸' : '▶';
+  document.getElementById('mpJudgeRow').style.display = (MP.cur && memo[MP.cur] && mpVal('mpJudgeMode')==='on') ? 'flex' : 'none';
+  document.getElementById('mpCycle').textContent = MP.cycle;
+  document.getElementById('mpDone').textContent = Math.min(MP.qi, MP.queue.length);
+  document.getElementById('mpTotal').textContent = MP.queue.length || memoItems().length;
+}
+async function mpSequence(){
+  mpClear();
+  const tok = MP.token, s = mpSettings(), d = MP.cur && memo[MP.cur];
+  if (!d) return;
+  MP.waiting = false;
+  if (s.mode === 'test') {
+    mpRender(false);
+    if (s.jp && !await mpSay(d.say, 'ja-JP', 1, tok)) return;
+    mpBar(s.think, tok);
+    if (!await mpWait(s.think, tok)) return;
+    mpReveal();
+    for (let r = 0; r < s.rep; r++) {
+      if (!await mpSay(d.en, 'en-US', s.rate, tok)) return;
+      if (r < s.rep - 1 && !await mpWait(600, tok)) return;
+    }
+    if (s.judge) { MP.waiting = true; mpRenderCtl(); return; }
+    if (!await mpWait(s.review, tok)) return;
+  } else {
+    mpRender(true);
+    for (let r = 0; r < s.rep; r++) {
+      if (!await mpSay(d.en, 'en-US', s.rate, tok)) return;
+      if (!await mpWait(600, tok)) return;
+    }
+    if (s.jp && !await mpSay(d.say, 'ja-JP', 1, tok)) return;
+    if (s.judge) { MP.waiting = true; mpRenderCtl(); return; }
+    if (!await mpWait(s.review, tok)) return;
+  }
+  if (MP.playing && tok === MP.token) mpNext();
+}
+function mpLoad(){
+  // チェックが外された項目は飛ばす
+  while (MP.qi < MP.queue.length && !memo[MP.queue[MP.qi]]) MP.qi++;
+  if (MP.qi >= MP.queue.length) {
+    if (!memoItems().length) { MP.cur = null; return false; }
+    if (MP.queue.length) MP.cycle++;
+    mpBuild();
+  }
+  MP.cur = MP.queue[MP.qi++];
+  return true;
+}
+function mpNext(){
+  mpClear(); MP.waiting = false;
+  if (!mpLoad()) { MP.playing = false; mpRender(false); return; }
+  if (MP.playing) mpSequence(); else mpRender(mpVal('mpMode')==='listen');
+}
+function mpPrev(){
+  if (MP.qi < 2) return;
+  mpClear(); MP.waiting = false;
+  MP.qi -= 2; MP.cur = MP.queue[MP.qi++];
+  if (MP.playing) mpSequence(); else mpRender(mpVal('mpMode')==='listen');
+}
+function mpStop(){ MP.playing = false; mpClear(); if (document.getElementById('mpPlay')) mpRenderCtl(); }
+function mpToggle(){
+  if (MP.playing) { mpStop(); return; }
+  if (!memoItems().length) { mpRender(false); return; }
+  MP.playing = true;
+  if (!MP.cur || !memo[MP.cur] || MP.waiting) mpNext(); else mpSequence();
+}
+function mpJudge(s){
+  const d = MP.cur && memo[MP.cur];
+  if (!d) return;
+  d.s = s; d.n = (d.n||0) + 1; d.t = Date.now();
+  const w = d.w == null ? 1.5 : d.w;
+  d.w = s==='ok' ? Math.max(0, w-1) : s==='mid' ? w+1 : w+2;
+  if (s !== 'ok') {   // △は6問後、×は3問後にもう一回
+    const pos = Math.min(MP.qi + (s==='ng' ? 3 : 6), MP.queue.length);
+    MP.queue.splice(pos, 0, MP.cur);
+  }
+  scheduleSave(); renderMemoStats(); renderMemoList();
+  mpNext();
+}
+function renderMemoStats(){
+  const items = memoItems();
+  let ok=0, mid=0, ng=0;
+  items.forEach(d=>{ if(d.s==='ok')ok++; else if(d.s==='mid')mid++; else if(d.s==='ng')ng++; });
+  document.getElementById('mpStats').innerHTML = 'チェック '+items.length+'個 ・ <b style="color:var(--green)">○'+ok+'</b> <b style="color:var(--yellow)">△'+mid+'</b> <b style="color:var(--red)">×'+ng+'</b> 未'+(items.length-ok-mid-ng);
+  document.getElementById('memoCount').textContent = items.length;
+  document.getElementById('memoCount2').textContent = items.length;
+}
+function renderMemoList(){
+  const box = document.getElementById('memoList');
+  const items = memoItems().sort((a,b)=>a.added-b.added);
+  if (!items.length) { box.innerHTML = '<div class="check-msg">まだありません。</div>'; return; }
+  box.innerHTML = items.map(d=>{
+    const st = d.s ? {ok:'○', mid:'△', ng:'×'}[d.s] : '未';
+    return '<div class="memo-row"><span class="tag">'+st+'</span><span class="t"><b>'+esc(d.en)+'</b><br>「'+esc(d.say)+'」 '+esc(d.scene)+'</span><button data-k="'+esc(d.k)+'">外す</button></div>';
+  }).join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick = ()=>{ delete memo[b.dataset.k]; scheduleSave(); renderMemoAll(); if (curTab==='drill' && current) render(false); });
+}
+function renderPickList(){
+  const box = document.getElementById('pickList');
+  if (!document.getElementById('pickPanel').open) return;
+  const items = allItems().filter(it=>it.en.length);
+  const cats = [...new Set(items.map(d=>d.cat))];
+  box.innerHTML = cats.map(c=>'<div class="pick-cat">'+esc(c)+'</div>' + items.filter(d=>d.cat===c).map(it=>{
+    const id = items.indexOf(it);
+    return '<div class="pick-item"><div class="q">「'+esc(it.say)+'」 '+esc(it.scene)+'</div>' +
+      it.en.map((e,i)=>'<label><input type="checkbox" data-id="'+id+'" data-i="'+i+'"'+(memo[memoKey(it,e)]?' checked':'')+'>'+esc(e)+'</label>').join('') + '</div>';
+  }).join('')).join('');
+  box.querySelectorAll('input').forEach(cb=>cb.onchange = ()=>{
+    const it = items[+cb.dataset.id], e = it.en[+cb.dataset.i];
+    const on = !!memo[memoKey(it,e)];
+    if (on !== cb.checked) toggleMemo(it, e);
+  });
+}
+function renderMemoAll(){
+  renderMemoStats(); renderMemoList();
+  if (!MP.playing) mpRender(MP.cur && memo[MP.cur] ? (mpVal('mpMode')==='listen') : false);
+  else mpRenderCtl();
+}
+document.getElementById('pickPanel').addEventListener('toggle', renderPickList);
+document.getElementById('mpPlay').onclick = mpToggle;
+document.getElementById('mpNext').onclick = mpNext;
+document.getElementById('mpPrev').onclick = mpPrev;
+document.getElementById('mpOk').onclick = ()=>mpJudge('ok');
+document.getElementById('mpMid').onclick = ()=>mpJudge('mid');
+document.getElementById('mpNg').onclick = ()=>mpJudge('ng');
+document.getElementById('mpOrder').onchange = ()=>{ mpStop(); mpBuild(); MP.cur = null; MP.cycle = 1; mpRender(false); };
+document.getElementById('mpMode').onchange = ()=>{ const p = MP.playing; mpStop(); if (p) { MP.playing = true; mpSequence(); } else mpRender(MP.cur ? mpVal('mpMode')==='listen' : false); };
+document.getElementById('mpJudgeMode').onchange = ()=>{ mpRenderCtl(); if (MP.waiting && mpVal('mpJudgeMode')==='off' && MP.playing) mpNext(); };
+document.addEventListener('keydown', ev=>{
+  if (curTab !== 'memo') return;
+  if (ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'INPUT' || ev.target.tagName === 'SELECT') return;
+  if (ev.key === ' ') { ev.preventDefault(); mpToggle(); }
+  else if (ev.key === 'ArrowRight') mpNext();
+  else if (ev.key === 'ArrowLeft') mpPrev();
+  else if (mpVal('mpJudgeMode')==='on' && MP.cur && memo[MP.cur]) {
+    if (ev.key==='1') mpJudge('ok'); if (ev.key==='2') mpJudge('mid'); if (ev.key==='3') mpJudge('ng');
+  }
+});
+document.querySelectorAll('.tabbtn').forEach(b=>b.onclick = ()=>{
+  curTab = b.dataset.tab;
+  document.querySelectorAll('.tabbtn').forEach(x=>x.classList.toggle('on', x===b));
+  document.getElementById('tabDrill').style.display = curTab==='drill' ? '' : 'none';
+  document.getElementById('tabMemo').style.display = curTab==='memo' ? '' : 'none';
+  if (curTab === 'drill') { mpStop(); if (current) render(false); }
+  else { renderMemoAll(); renderPickList(); }
+  try { localStorage.setItem('iikae_tab', curTab); } catch(e){}
+});
+
 // ===== マイお題 =====
 function renderMine(){
   const box = document.getElementById('mineList');
@@ -612,7 +974,7 @@ function saveAll(retryFlag){
   fetch(GAS_URL, {
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status, _mine: mine})})
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status, _mine: mine, _memo: memo})})
   }).then(r=>r.json()).then(res=>{
     if (res && res.error) throw new Error(res.error);
     setSyncBadge('保存済み');
@@ -624,11 +986,11 @@ function saveAll(retryFlag){
 function loadFromServer(user){
   return fetch(GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY+':'+user))
     .then(r=>r.json()).then(res=>{
-      try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; mine = p._mine || []; }
-      catch(e){ status = {}; mine = []; }
+      try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; mine = p._mine || []; memo = p._memo || {}; }
+      catch(e){ status = {}; mine = []; memo = {}; }
     });
 }
-function initApp(){ activeCats = null; buildCats(); buildKata(); renderMine(); rebuild(); next(); }
+function initApp(){ activeCats = null; buildCats(); buildKata(); renderMine(); rebuild(); next(); mpStop(); MP.queue=[]; MP.qi=0; MP.cur=null; MP.cycle=1; renderMemoAll(); }
 function startSession(user){
   currentUser = user;
   localStorage.setItem(LOCAL_USER_KEY, user);
@@ -637,6 +999,7 @@ function startSession(user){
     document.getElementById('loginOverlay').style.display = 'none';
     setSyncBadge(user + ' で同期中');
     initApp();
+    try { if (localStorage.getItem('iikae_tab')==='memo') document.querySelector('.tabbtn[data-tab=memo]').click(); } catch(e){}
   }).catch(()=>{ document.getElementById('loginStatus').textContent = '通信に失敗しました。もう一度お試しください。'; });
 }
 document.getElementById('loginBtn').onclick = ()=>{
