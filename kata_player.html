@@ -72,6 +72,10 @@
   .swap .j{font-size:12px;color:var(--text-dim);}
   .swap.cur{background:rgba(255,209,102,.08);border-radius:6px;}
   .addon-note{font-size:12.5px;color:var(--mint);margin-top:6px;}
+  .mk .swap span:nth-child(2){color:#e8c9ff;}
+  .mk-mini{font-size:12px;color:#c9a8e8;margin:6px 0 4px;line-height:1.6;}
+  .mk-mini .mk-line{cursor:pointer;}
+  .addon-tbl .mkx{color:#c9a8e8;}
 
   .judge{display:flex;gap:8px;margin-top:14px;}
   .judge button{flex:1;border:none;border-radius:12px;padding:14px 6px;font-size:16px;font-weight:800;cursor:pointer;}
@@ -215,7 +219,7 @@
   <div id="tabList" style="display:none;">
     <div class="chips" id="grpChips2"></div>
     <div class="stats">チェックを入れると「★ 覚える」に入ります。🔊で読み上げ。</div>
-    <div class="btns" style="margin:-4px 0 12px;"><button class="btn sub" id="allShortBtn2">短い文を全部チェック(165)</button></div>
+    <div class="btns" style="margin:-4px 0 12px;"><button class="btn sub" id="allShortBtn2">短い文を全部チェック(<span class="nAll"></span>)</button></div>
     <div id="kataList"></div>
     <details class="panel" id="addonPanel" open>
       <summary>＋ 付け足しパーツ一覧(どの型にも付けられる)</summary>
@@ -284,7 +288,7 @@
       </label>
     </div>
     <div class="stats" id="mpStats"></div>
-    <div class="btns" style="margin:-4px 0 12px;"><button class="btn sub" id="allShortBtn">短い文を全部チェック(165)</button><button class="btn sub" id="clearMemoBtn">全部外す</button></div>
+    <div class="btns" style="margin:-4px 0 12px;"><button class="btn sub" id="allShortBtn">短い文を全部チェック(<span class="nAll"></span>)</button><button class="btn sub" id="clearMemoBtn">全部外す</button></div>
     <div class="card">
       <div class="mp-stage" id="mpStage"></div>
       <div class="judge" id="mpJudgeRow">
@@ -308,13 +312,13 @@
 
 <script>
 // ===== 型 =====
-const GROUPS = ['命令・呼びかけ','自分の状態','したい・ほしい','状況・感想'];
+const GROUPS = ['命令・呼びかけ','自分の状態','したい・ほしい','状況・感想','Markiplier流'];
 const KATA = [
   {id:'get',    grp:0, head:"Get",            tpl:"Get ___",            mean:"〜しろ(体の動き)"},
   {id:'dont',   grp:0, head:"Don't",          tpl:"Don't ___",          mean:"〜するな"},
   {id:'stop',   grp:0, head:"Stop",           tpl:"Stop ___",           mean:"〜をやめろ／止まれ"},
-  {id:'lets',   grp:0, head:"Let's",          tpl:"Let's ___",          mean:"〜しよう"},
-  {id:'letme',  grp:0, head:"Let me",         tpl:"Let me ___",         mean:"俺に〜させて"},
+  {id:'lets',   grp:0, head:"Let's",          tpl:"Let's ___",          mean:"〜しよう", mk:'lets'},
+  {id:'letme',  grp:0, head:"Let me",         tpl:"Let me ___",         mean:"俺に〜させて", mk:'let_me'},
   {id:'give',   grp:0, head:"Give me",        tpl:"Give me ___",        mean:"〜をくれ"},
   {id:'im',     grp:1, head:"I'm",            tpl:"I'm ___",            mean:"今〜な状態"},
   {id:'igot',   grp:1, head:"I got",          tpl:"I got ___",          mean:"〜された／〜を手に入れた"},
@@ -322,10 +326,10 @@ const KATA = [
   {id:'icant',  grp:1, head:"I can't",        tpl:"I can't ___",        mean:"〜できない"},
   {id:'ididnt', grp:1, head:"I didn't",       tpl:"I didn't ___",       mean:"〜してない"},
   {id:'ineed',  grp:2, head:"I need",         tpl:"I need ___",         mean:"〜がいる(物)"},
-  {id:'ineedto',grp:2, head:"I need to",      tpl:"I need to ___",      mean:"〜しなきゃ(動き)"},
-  {id:'iwantto',grp:2, head:"I want to",      tpl:"I want to ___",      mean:"〜したい"},
+  {id:'ineedto',grp:2, head:"I need to",      tpl:"I need to ___",      mean:"〜しなきゃ(動き)", mk:'need_to'},
+  {id:'iwantto',grp:2, head:"I want to",      tpl:"I want to ___",      mean:"〜したい", mk:'i_want_to'},
   {id:'canget', grp:2, head:"Can I get",      tpl:"Can I get ___?",     mean:"〜もらえる？／〜取れる？(予約・注文も)"},
-  {id:'howdoi', grp:2, head:"How do I",       tpl:"How do I ___?",      mean:"どうやって〜するの？"},
+  {id:'howdoi', grp:2, head:"How do I",       tpl:"How do I ___?",      mean:"どうやって〜するの？", mk:'how_do_i'},
   {id:'theres', grp:3, head:"There's",        tpl:"There's ___",        mean:"〜がいる／ある"},
   {id:'too',    grp:3, head:"Too",            tpl:"Too ___!",           mean:"〜すぎ"},
   {id:'thisis', grp:3, head:"This is",        tpl:"This is ___",        mean:"これは〜だ(今のこと)"},
@@ -333,23 +337,54 @@ const KATA = [
   {id:'its',    grp:3, head:"It's",           tpl:"It's ___",           mean:"それ〜だ(物の状態)"},
   {id:'where',  grp:3, head:"Where's",        tpl:"Where's ___?",       mean:"〜どこ？"},
   {id:'why',    grp:3, head:"Why is he",      tpl:"Why is he ___?",     mean:"なんであいつ〜してるの？"},
-  {id:'think',  grp:3, head:"I think",        tpl:"I think ___",        mean:"〜だと思う／〜かも"},
+  {id:'think',  grp:3, head:"I think",        tpl:"I think ___",        mean:"〜だと思う／〜かも", mk:'i_think'},
   {id:'noidea', grp:3, head:"I have no idea", tpl:"I have no idea ___", mean:"〜が全然分からない(単体でもOK)"},
+  {id:'mk_goingto', grp:4, head:"I'm going to",     tpl:"I'm going to ___",     mean:"〜するぞ／今から〜する", mk:'im_going_to'},
+  {id:'mk_notgoing',grp:4, head:"I'm not going to", tpl:"I'm not going to ___", mean:"〜しないぞ／〜なんてしない", mk:'not_going_to'},
+  {id:'mk_just',    grp:4, head:"I'm just going to",tpl:"I'm just going to ___",mean:"とりあえず〜しとく", mk:'im_just_going_to'},
+  {id:'mk_feel',    grp:4, head:"I feel like",      tpl:"I feel like ___",      mean:"〜な気がする", mk:'i_feel_like'},
+  {id:'mk_looks',   grp:4, head:"It looks like",    tpl:"It looks like ___",    mean:"〜っぽい／〜みたい", mk:'looks_like'},
+  {id:'mk_should',  grp:4, head:"I should have",    tpl:"I should have ___",    mean:"〜すればよかった(後悔)", mk:'should_have'},
+  {id:'mk_whatif',  grp:4, head:"What if",          tpl:"What if ___?",         mean:"もし〜だったら？", mk:'what_if'},
+  {id:'mk_dkif',    grp:4, head:"I don't know if",  tpl:"I don't know if ___",  mean:"〜かどうか分からない", mk:'i_dont_know_if'},
+  {id:'mk_why',     grp:4, head:"Why would I",      tpl:"Why would I ___?",     mean:"なんで俺が〜するんだよ", mk:'why_would'},
+  {id:'mk_good',    grp:4, head:"Good thing",       tpl:"Good thing ___",       mean:"〜でよかった", mk:'good_thing'},
+  {id:'mk_trying',  grp:4, head:"I'm trying to",    tpl:"I'm trying to ___",    mean:"〜しようとしてるんだけど", mk:'trying_to'},
+  {id:'mk_supposed',grp:4, head:"It's supposed to", tpl:"It's supposed to ___", mean:"本当は〜のはずなんだけど", mk:'supposed_to'},
+  {id:'mk_look',    grp:4, head:"Look at",          tpl:"Look at ___!",         mean:"〜見て！(視聴者に)", mk:'look_at'},
 ];
+// Markiplier語録(RE7〜RE8)からの本人の実際のセリフ: id -> {n:出てきた回数, ex:[[英,日],...]}
+const MKEX = {"im_going_to": {"n": 631, "ex": [["This isn't going to work, is it?", "これ、うまくいかないよね？"], ["I'm going to need more of those.", "あれがもっと必要になるな。"], ["I'm going to go up the stairs.", "階段を上がるぞ。"]]}, "all_right": {"n": 497, "ex": [["All right, so what was I doing?", "よし、で、何してたっけ？"], ["All right, I'm going for it.", "よし、行くぞ。"], ["All right, let's see what's happening.", "よし、何が起きてるか見てみよう。"]]}, "oh_my_god": {"n": 239, "ex": [["Oh my god, they got bullets.", "マジか、弾持ってるじゃん。"], ["Oh my god, it worked.", "うわ、うまくいった。"], ["Oh my god, I might have missed the door.", "うわ、ドア見逃したかも。"]]}, "i_dont_know_if": {"n": 145, "ex": [["I don't know how to use it.", "使い方が分からない。"], ["I don't know if I needed that.", "あれが必要だったか分からない。"], ["I don't know where I'm going.", "どこに向かってるのか分からない。"]]}, "you_know": {"n": 138, "ex": [["It's pretty damn good, you know.", "かなりいいよ、ほんとに。"], ["You know, I don't need to be there.", "ほら、俺がそこにいる必要ないし。"], ["You're not like other people, you know.", "君は他の人とは違うんだよ、ね。"]]}, "i_think": {"n": 130, "ex": [["But I think we should move on.", "でも先に進んだ方がいいと思う。"], ["I think I see ammo up there.", "上に弾がある気がする。"], ["I think I can do that.", "それならできると思う。"]]}, "right_tag": {"n": 110, "ex": [["There was another door over here, right?", "こっちにもう1つドアがあったよね？"], ["They made a bunch of these, right?", "これ、たくさん作ったんだよね？"], ["Wait, at least we're in it together, right?", "待って、少なくとも俺らは一緒だよな？"]]}, "what_the_hell": {"n": 98, "ex": [["Also, what the hell is going on here?", "それと、ここで何が起きてんだよ？"], ["What the hell, man?", "なんだよ、おい？"], ["Wait, what the hell?", "待って、は？"]]}, "lets": {"n": 93, "ex": [["Let's see how many bullets I got.", "弾がいくつあるか見てみよう。"], ["All right, let's go for it.", "よし、突っ込もう。"], ["All right, so let's use that.", "よし、じゃあそれを使おう。"]]}, "need_to": {"n": 87, "ex": [["I need to save that for myself.", "それは自分のために取っておかないと。"], ["We need to keep our voices down.", "声を小さくしないと。"], ["Okay, here's what I need to do.", "よし、やるべきことはこれだ。"]]}, "i_guess": {"n": 86, "ex": [["I guess I'm out of options here.", "もう打つ手がないみたいだ。"], ["Okay, we're done, I guess.", "オッケー、これで終わりかな。"], ["I guess I could get rid of the green herb.", "緑のハーブは捨ててもいいかな。"]]}, "hold_on": {"n": 74, "ex": [["Hey, wait a minute.", "おい、ちょっと待て。"], ["All right, hold on.", "よし、ちょっと待って。"], ["Wait a minute.", "ちょっと待って。"]]}, "let_me": {"n": 73, "ex": [["Let me see if he's going the correct way.", "あいつが正しい方に行ってるか見てみよう。"], ["Let me do my storage first and then I'll save.", "先に整理させて、それからセーブする。"], ["Let me pick it.", "ちょっと開けさせて。"]]}, "i_feel_like": {"n": 52, "ex": [["I feel like that every night.", "毎晩そんな気分だよ。"], ["Mom, I feel like I'm going to throw up.", "ママ、吐きそうな気がする。"], ["I've saved 16 times thus far, but I feel like it was necessary.", "16回もセーブしたけど、必要だった気がする。"]]}, "looks_like": {"n": 51, "ex": [["Looks like it measures vital signs.", "生命反応を測るものみたい。"], ["Just looks like a screwdriver of some kind.", "なんかのドライバーに見える。"], ["This looks like it leads outside.", "ここから外に出られそう。"]]}, "not_going_to": {"n": 51, "ex": [["Ooh, I'm not going to listen to that.", "うわ、あれは聞かないでおく。"], ["I'm not going to need it.", "それは要らないな。"], ["It's not going to work.", "うまくいかないよ。"]]}, "i_want_to": {"n": 44, "ex": [["Uh I want to report a murder.", "あの、殺人事件を通報したいんですが。"], ["I don't want to read.", "読みたくない。"], ["I want to talk to you for a second.", "ちょっと話がしたい。"]]}, "should_have": {"n": 44, "ex": [["I should have taken a bigger breath.", "もっと大きく息を吸っておけばよかった。"], ["I should have grabbed that first.", "先にあれを取っておけばよかった。"], ["That was scarier than it should have been.", "本来より怖かった。"]]}, "oh_boy": {"n": 43, "ex": [["Oh boy, I'm Yeah, don't shine anything else.", "うわぁ…うん、もう何も照らさないで。"]]}, "you_know_what": {"n": 41, "ex": [["You know what I'm saying?", "分かる？"], ["Okay, you know what?", "よし、あのさ。"], ["You know what?", "あのさ。"]]}, "or_something": {"n": 41, "ex": [["Wait, is it auto saving or something?", "待って、オートセーブか何か？"], ["Okay, maybe that's upgrades or something.", "じゃあ、それはアップグレードか何かかな。"], ["Thought there might be a goodie or something.", "何かいい物があると思ったんだけど。"]]}, "pretty": {"n": 41, "ex": [["Oh my god, that was pretty good.", "うわ、今のかなり良かった。"], ["Pretty sure that was his voice.", "たぶんあいつの声だった。"], ["I'm pretty sure we haven't left anything behind.", "何も置いてきてないはず、たぶん。"]]}, "of_course": {"n": 39, "ex": [["Ah, of course it is.", "ああ、そりゃそうだよな。"], ["YEAH, OF COURSE.", "うん、もちろん。"]]}, "look_at": {"n": 37, "ex": [["Grace, look at me.", "グレース、こっち見て。"], ["Look at him go.", "あいつの動き見てよ。"], ["Look at that power.", "あの威力見てよ。"]]}, "supposed_to": {"n": 33, "ex": [["Now, what was I supposed to do?", "で、何をすればよかったんだっけ？"], ["How am I supposed to kill you?", "どうやってお前を倒せばいいんだよ？"], ["That's not where I'm supposed to go.", "そっちは行くべき場所じゃない。"]]}, "good_thing": {"n": 32, "ex": [["Okay, good thing I have this.", "よし、これ持っててよかった。"], ["OH, Good thing he didn't see me, right?", "あいつに見つからなくてよかった、だろ？"], ["Good thing no one heard that.", "誰にも聞かれなくてよかった。"]]}, "im_just_going_to": {"n": 31, "ex": [["I'm just going to go for it.", "とりあえず突っ込むわ。"], ["I'm just going to run for it.", "とりあえず走って逃げる。"], ["But I'm just going to get more bullets.", "でもとりあえず弾をもっと取っとく。"]]}, "trying_to": {"n": 28, "ex": [["Oh, Leon, I know what you trying to tell me.", "レオン、何が言いたいか分かるよ。"], ["It's I I'm not trying to be, you know, bothersome.", "うざくするつもりはないんだけど。"]]}, "here_we_go": {"n": 26, "ex": [["Here we go, baby.", "さあ行くぞ、ベイビー。"], ["Here we go.", "さあ行くぞ。"]]}, "how_do_i": {"n": 24, "ex": [["So, how do I get further up?", "で、どうやってもっと上に行くんだ？"], ["How do you even turn around?", "どうやって振り向くんだよ？"], ["How do I run faster?", "どうやってもっと速く走るの？"]]}, "why_would": {"n": 24, "ex": [["Why would they send her here alone?", "なんで彼女を1人でここに送るんだ？"], ["Why would I ever do that?", "なんで俺がそんなことするんだよ？"], ["Why would I want that?", "なんでそんなもの欲しがるんだよ？"]]}, "what_if": {"n": 11, "ex": [["What if I use a the gun?", "銃を使ったらどうなる？"], ["What if I didn't find them?", "見つけられなかったらどうする？"], ["What if we put this here and then over there?", "これをここに置いて、それからあそこに置いたら？"]]}};
 const KMAP = Object.fromEntries(KATA.map(k=>[k.id,k]));
 
 // ===== 付け足しパーツ =====
 const ADDONS = [
   {t:'Wait, 〜',        jp:'待って、〜',          re:/^wait$/i},
-  {t:'Okay, 〜',        jp:'よし、〜／で、〜',     re:/^okay(, okay)?$|^all right$/i},
-  {t:'Oh no, 〜',       jp:'うわ、〜／やば、〜',   re:/^oh no$|^oh my god$|^whoa$/i},
+  {t:'All right, 〜 / All right, so 〜', jp:'よし、〜／さて、じゃあ〜', re:/^all right(, so)?$/i, mk:'all_right'},
+  {t:'Hold on, 〜',     jp:'待って、〜(Wait と同じ)', re:/^hold on$/i, mk:'hold_on'},
+  {t:'Oh my god, 〜',   jp:'うわ、マジか',         re:/^oh my god$/i, mk:'oh_my_god'},
+  {t:'You know what? 〜', jp:'もういいや／ていうか', re:/^you know what$/i, mk:'you_know_what'},
+  {t:'〜, you know',    jp:'〜なんだよね',         re:/^you know$/i, mk:'you_know'},
+  {t:'〜, I guess',     jp:'〜かな／たぶん',       re:/^i guess$/i, mk:'i_guess'},
+  {t:'〜, right?',      jp:'〜だよね？／〜じゃない？', re:/^right$/i, mk:'right_tag'},
+  {t:'〜 or something', jp:'〜か何か',             re:/^or something$/i, mk:'or_something'},
+  {t:'Oh boy.',         jp:'うわー、参ったな',      re:/^oh boy$/i, mk:'oh_boy'},
+  {t:'Here we go!',     jp:'行くぞ！／きたきた！',  re:/^here we go$/i, mk:'here_we_go'},
+  {t:'What the hell?',  jp:'なんだよ！？',          re:/^what the hell$/i, mk:'what_the_hell'},
+  {t:'〜, of course / No way!', jp:'もちろん〜／ありえない！', re:/^of course$|^no way$/i, mk:'of_course'},
+  {t:'pretty 〜',       jp:'結構〜',               re:/pretty/i, mk:'pretty'},
+  {t:'〜, though',      jp:'でも〜',               re:/^though$/i},
+  {t:'My bad. / Just kidding. / Bye!', jp:'俺のミス／冗談だよ／じゃあね', re:/^(my bad|just kidding|bye)$/i},
+  {t:'Okay, 〜',        jp:'よし、〜／で、〜',     re:/^okay(, okay)?$/i},
+  {t:'Oh no, 〜',       jp:'うわ、〜／やば、〜',   re:/^oh no$|^whoa$/i},
   {t:'Hey, 〜',         jp:'おい、〜',            re:/^hey$/i},
   {t:'Come on, 〜',     jp:'ほら／頼むよ／おい',   re:/^come on$/i},
   {t:'Sorry, 〜 / I\'m sorry, 〜', jp:'ごめん、〜', re:/^(sorry|i'm sorry)$/i},
   {t:'No no no, 〜',    jp:'いやいやいや、〜',     re:/^no( no no)?$/i},
   {t:'What? / Seriously? / Really?', jp:'は？／マジかよ／マジ？', re:/^(what|seriously|really)$/i},
   {t:'Help! / Look! / Yes!', jp:'助けて！／見て！／よっしゃ！', re:/^(help|look|yes)$/i},
-  {t:'〜, man',         jp:'〜って！／〜じゃん(グチ・強め)', re:/^man$/i},
+  {t:'〜, man / Man, 〜', jp:'〜って！／あー、〜(グチ・強め)', re:/^man$/i},
+  {t:'Phew, / Hmm, / Uh-oh, / Oh, / Nope.', jp:'ふう／うーん／あっ、やば／あ、／無理', re:/^(phew|hmm|uh-oh|oh|nope)$/i},
   {t:'〜, please',      jp:'お願い／〜ください',   re:/^please$/i},
   {t:'〜 right now / 〜, now', jp:'今すぐ〜',     re:/^(right )?now$/i},
   {t:'〜 again / Not again.', jp:'また〜／またかよ', re:/^again$|^not again$/i},
@@ -360,7 +395,7 @@ const ADDONS = [
   {t:'〜 at all',       jp:'全然〜',              re:/^at all$/i},
   {t:'〜 for real / 〜, I swear', jp:'マジで〜／誓って〜', re:/^for real$|^i swear$/i},
   {t:'〜 so bad',       jp:'めちゃくちゃ〜',       re:/^so bad$/i},
-  {t:'〜 for a second / real quick', jp:'ちょっと〜／サッと〜', re:/^for a second$|^real quick$|^for a while$/i},
+  {t:'〜 for a second / real quick', jp:'ちょっと〜／サッと〜', re:/^for a second$|^real quick$|^for a while$|^for a little bit$/i},
   {t:'〜 this time / for today / someday', jp:'今回は／今日は／いつか', re:/^this time$|^for today$|^just for today$|^someday$/i},
   {t:'〜 too',          jp:'〜も',                re:/^too$/i},
   {t:'〜 anything / anywhere / somewhere', jp:'何も／どこにも／どこかに', re:/^(anything|anywhere|somewhere)$/i},
@@ -369,7 +404,7 @@ const ADDONS = [
   {t:'〜, but 〜',      jp:'〜けど、〜',          re:/^but/i},
   {t:'〜 for 〜 / to 〜', jp:'〜用に／〜まで／〜するために', re:/^for (two|tonight|this|me|no reason)$|^to /i},
   {t:'〜 like 〜',      jp:'〜みたいに／そんな風に', re:/^like/i},
-  {t:'＋もう一文(型をつなげる)', jp:'型どうしをつなげて2文にする', re:/./},
+  {t:'＋もう一言', jp:'短い文や型をもう1つつなげる(2文にする)', re:/./},
 ];
 
 // ===== 問題(オリジナル) k:型 / en:短い文 / jp:言いたいこと / sc:状況 / x:付け足し文([ ]が付け足し) / xj:その意味 =====
@@ -1693,6 +1728,638 @@ const RAW = [
 "sc": "知らないキャラが話しかけてきた",
 "x": "[Wait,] I have no idea who he is.",
 "xj": "待って、あいつ誰か分からん"
+},
+{
+"k": "mk_goingto",
+"en": "I'm going to steal this car.",
+"jp": "この車盗むぞ",
+"sc": "駐車場で高級車を見つけた",
+"x": "[All right,] I'm going to steal this car.",
+"xj": "よし、この車盗むぞ"
+},
+{
+"k": "mk_goingto",
+"en": "I'm going to die.",
+"jp": "死ぬ…",
+"sc": "体力ゲージが点滅している",
+"x": "[Oh my god,] I'm going to die.",
+"xj": "うわ、死ぬ"
+},
+{
+"k": "mk_goingto",
+"en": "I'm going to jump.",
+"jp": "飛ぶぞ",
+"sc": "坂の先がジャンプ台になっている",
+"x": "I'm going to jump. [Here we go!]",
+"xj": "飛ぶぞ。行くぞ！"
+},
+{
+"k": "mk_goingto",
+"en": "I'm going to rob this bank.",
+"jp": "この銀行襲うぞ",
+"sc": "銀行の前に着いた",
+"x": "[All right, so] I'm going to rob this bank.",
+"xj": "よし、じゃあこの銀行襲うぞ"
+},
+{
+"k": "mk_goingto",
+"en": "I'm going to crash.",
+"jp": "ぶつかる！",
+"sc": "スピードを出しすぎてカーブに入った",
+"x": "[Oh no,] I'm going to crash!",
+"xj": "やばい、ぶつかる！"
+},
+{
+"k": "mk_goingto",
+"en": "I'm going to follow him.",
+"jp": "あいつ追うぞ",
+"sc": "怪しい車が走り去った",
+"x": "[Hold on,] I'm going to follow him.",
+"xj": "待って、あいつ追うぞ"
+},
+{
+"k": "mk_goingto",
+"en": "I'm going to need a bigger gun.",
+"jp": "もっとデカい銃がいるな",
+"sc": "敵がめちゃくちゃ硬い",
+"x": "I'm going to need a bigger gun[, I guess].",
+"xj": "もっとデカい銃がいるかな"
+},
+{
+"k": "mk_notgoing",
+"en": "I'm not going to die.",
+"jp": "死なないぞ",
+"sc": "敵に囲まれた",
+"x": "[Come on,] I'm not going to die!",
+"xj": "頼む、死なないぞ！"
+},
+{
+"k": "mk_notgoing",
+"en": "I'm not going to stop.",
+"jp": "止まらないぞ",
+"sc": "警察が止まれと言っている",
+"x": "I'm not going to stop! [No way!]",
+"xj": "止まるかよ！ありえない！"
+},
+{
+"k": "mk_notgoing",
+"en": "I'm not going to pay.",
+"jp": "金は払わないぞ",
+"sc": "店で会計を頼まれた",
+"x": "I'm not going to pay[, of course].",
+"xj": "もちろん払わないぞ"
+},
+{
+"k": "mk_notgoing",
+"en": "I'm not going to make it.",
+"jp": "間に合わない",
+"sc": "制限時間が残り3秒",
+"x": "[Oh my god,] I'm not going to make it!",
+"xj": "うわ、間に合わない！"
+},
+{
+"k": "mk_notgoing",
+"en": "I'm not going to lie.",
+"jp": "正直に言うと",
+"sc": "本音を言う前",
+"x": "I'm not going to lie, [this is pretty fun].",
+"xj": "正直、これ結構楽しい"
+},
+{
+"k": "mk_notgoing",
+"en": "I'm not going to go in there.",
+"jp": "あそこには入らないぞ",
+"sc": "真っ暗で不気味な建物",
+"x": "[Nope.] I'm not going to go in there.",
+"xj": "無理。あそこには入らない"
+},
+{
+"k": "mk_just",
+"en": "I'm just going to take this.",
+"jp": "とりあえずこれもらっとく",
+"sc": "店の棚に物が置いてある",
+"x": "[You know what?] I'm just going to take this.",
+"xj": "もういいや、とりあえずこれもらっとく"
+},
+{
+"k": "mk_just",
+"en": "I'm just going to drive.",
+"jp": "とりあえず走る",
+"sc": "目的地がよく分からない",
+"x": "I'm just going to drive[, I guess].",
+"xj": "とりあえず走るか"
+},
+{
+"k": "mk_just",
+"en": "I'm just going to run.",
+"jp": "とりあえず逃げる",
+"sc": "何が起きてるか分からないけど撃たれてる",
+"x": "[Okay,] I'm just going to run.",
+"xj": "よし、とりあえず逃げる"
+},
+{
+"k": "mk_just",
+"en": "I'm just going to wait here.",
+"jp": "とりあえずここで待つ",
+"sc": "仲間がまだ来ない",
+"x": "I'm just going to wait here [for a little bit].",
+"xj": "ちょっとここで待っとく"
+},
+{
+"k": "mk_just",
+"en": "I'm just going to leave.",
+"jp": "もう帰る",
+"sc": "NPCがキレてきた",
+"x": "I'm just going to leave. [Bye!]",
+"xj": "もう帰る。じゃあね！"
+},
+{
+"k": "mk_just",
+"en": "I'm just going to shoot everyone.",
+"jp": "もう全員撃つ",
+"sc": "作戦が全部失敗した",
+"x": "[All right,] I'm just going to shoot everyone.",
+"xj": "よし、もう全員撃つ"
+},
+{
+"k": "mk_feel",
+"en": "I feel like I'm lost.",
+"jp": "迷ってる気がする",
+"sc": "同じ道を何度も通っている",
+"x": "I feel like I'm lost. [Right?]",
+"xj": "迷ってる気がする。だよね？"
+},
+{
+"k": "mk_feel",
+"en": "I feel like he's lying.",
+"jp": "あいつ嘘ついてる気がする",
+"sc": "NPCの話が怪しい",
+"x": "I feel like he's lying[, you know?]",
+"xj": "あいつ嘘ついてる気がするんだよね"
+},
+{
+"k": "mk_feel",
+"en": "I feel like this is a trap.",
+"jp": "これ罠な気がする",
+"sc": "簡単すぎるミッション",
+"x": "[Hold on,] I feel like this is a trap.",
+"xj": "待って、これ罠な気がする"
+},
+{
+"k": "mk_feel",
+"en": "I feel like something is wrong.",
+"jp": "何かおかしい気がする",
+"sc": "街が静かすぎる",
+"x": "I feel like something is wrong [here].",
+"xj": "ここ何かおかしい気がする"
+},
+{
+"k": "mk_feel",
+"en": "I feel like a god.",
+"jp": "神になった気分",
+"sc": "何をやっても全部うまくいく",
+"x": "I feel like a god [right now]!",
+"xj": "今、神になった気分！"
+},
+{
+"k": "mk_feel",
+"en": "I feel like I've been here before.",
+"jp": "ここ来たことある気がする",
+"sc": "見覚えのある場所に来た",
+"x": "[Wait,] I feel like I've been here before.",
+"xj": "待って、ここ来たことある気がする"
+},
+{
+"k": "mk_looks",
+"en": "It looks like a movie.",
+"jp": "映画みたい",
+"sc": "グラフィックがすごい",
+"x": "It looks like a movie[, right?]",
+"xj": "映画みたいじゃない？"
+},
+{
+"k": "mk_looks",
+"en": "It looks like rain.",
+"jp": "雨降りそう",
+"sc": "空が暗くなってきた",
+"x": "[Oh,] it looks like rain.",
+"xj": "あ、雨降りそう"
+},
+{
+"k": "mk_looks",
+"en": "It looks like a party.",
+"jp": "パーティーっぽい",
+"sc": "家の前に人がたくさん集まっている",
+"x": "It looks like a party [or something].",
+"xj": "パーティーか何かっぽい"
+},
+{
+"k": "mk_looks",
+"en": "It looks like nobody's home.",
+"jp": "誰もいないっぽい",
+"sc": "家に入ったら静か",
+"x": "[Okay,] it looks like nobody's home.",
+"xj": "よし、誰もいないっぽい"
+},
+{
+"k": "mk_looks",
+"en": "It looks like he's angry.",
+"jp": "怒ってるっぽい",
+"sc": "NPCが叫んでいる",
+"x": "[Uh-oh,] it looks like he's angry.",
+"xj": "あ、怒ってるっぽい"
+},
+{
+"k": "mk_looks",
+"en": "It looks like we did it.",
+"jp": "やったっぽい",
+"sc": "ミッション完了っぽい表示が出た",
+"x": "[Oh my god,] it looks like we did it!",
+"xj": "マジか、やったっぽい！"
+},
+{
+"k": "mk_should",
+"en": "I should have saved.",
+"jp": "セーブしとけばよかった",
+"sc": "死んで30分前に戻された",
+"x": "[Oh my god,] I should have saved.",
+"xj": "うわ、セーブしとけばよかった"
+},
+{
+"k": "mk_should",
+"en": "I should have gone left.",
+"jp": "左に行けばよかった",
+"sc": "右に行ったら行き止まり",
+"x": "[Man,] I should have gone left.",
+"xj": "あー、左に行けばよかった"
+},
+{
+"k": "mk_should",
+"en": "I should have bought a gun.",
+"jp": "銃買っとけばよかった",
+"sc": "丸腰のところに敵が来た",
+"x": "I should have bought a gun [first].",
+"xj": "先に銃買っとけばよかった"
+},
+{
+"k": "mk_should",
+"en": "I should have listened.",
+"jp": "ちゃんと聞いとけばよかった",
+"sc": "ミッション説明を聞き流した",
+"x": "I should have listened. [My bad.]",
+"xj": "ちゃんと聞いとけばよかった。俺のミス"
+},
+{
+"k": "mk_should",
+"en": "I should have taken the car.",
+"jp": "車で来ればよかった",
+"sc": "歩いて来たら遠かった",
+"x": "[You know what?] I should have taken the car.",
+"xj": "ていうか、車で来ればよかった"
+},
+{
+"k": "mk_should",
+"en": "I should have stopped.",
+"jp": "止まっとけばよかった",
+"sc": "信号無視して事故った",
+"x": "I should have stopped. [I'm sorry.]",
+"xj": "止まっとけばよかった。ごめん"
+},
+{
+"k": "mk_whatif",
+"en": "What if he sees me?",
+"jp": "見られたらどうする？",
+"sc": "こっそり近づいている",
+"x": "[Hold on,] what if he sees me?",
+"xj": "待って、見られたらどうする？"
+},
+{
+"k": "mk_whatif",
+"en": "What if I jump?",
+"jp": "飛んだらどうなる？",
+"sc": "高い橋の上にいる",
+"x": "What if I jump? [Let's find out!]",
+"xj": "飛んだらどうなる？試してみよう！"
+},
+{
+"k": "mk_whatif",
+"en": "What if it's a trap?",
+"jp": "罠だったらどうする？",
+"sc": "怪しい依頼が来た",
+"x": "What if it's a trap[, though]?",
+"xj": "でも罠だったらどうする？"
+},
+{
+"k": "mk_whatif",
+"en": "What if I shoot him?",
+"jp": "あいつ撃ったらどうなる？",
+"sc": "目の前に警察官がいる",
+"x": "What if I shoot him? [Just kidding.]",
+"xj": "あいつ撃ったら？冗談だよ"
+},
+{
+"k": "mk_whatif",
+"en": "What if we lose?",
+"jp": "負けたらどうする？",
+"sc": "ボス戦の前",
+"x": "What if we lose? [Oh boy.]",
+"xj": "負けたらどうする？うわー"
+},
+{
+"k": "mk_whatif",
+"en": "What if there's no gas?",
+"jp": "ガソリンなかったらどうする？",
+"sc": "何もない砂漠を走っている",
+"x": "[Wait,] what if there's no gas?",
+"xj": "待って、ガソリンなかったら？"
+},
+{
+"k": "mk_dkif",
+"en": "I don't know if this works.",
+"jp": "これ効くか分からない",
+"sc": "新しい作戦を試す",
+"x": "I don't know if this works, [but let's try].",
+"xj": "うまくいくか分からないけど、やってみよう"
+},
+{
+"k": "mk_dkif",
+"en": "I don't know if he's dead.",
+"jp": "あいつ死んだか分からない",
+"sc": "敵が倒れたけどまだ怪しい",
+"x": "[Hmm,] I don't know if he's dead.",
+"xj": "うーん、死んだか分からない"
+},
+{
+"k": "mk_dkif",
+"en": "I don't know if I can do this.",
+"jp": "できるか分からない",
+"sc": "難しいミッションが始まる",
+"x": "[Oh boy,] I don't know if I can do this.",
+"xj": "うわー、できるか分からない"
+},
+{
+"k": "mk_dkif",
+"en": "I don't know if this is the right way.",
+"jp": "この道で合ってるか分からない",
+"sc": "地図を見ないで進んでいる",
+"x": "I don't know if this is the right way[, you know].",
+"xj": "この道で合ってるか分かんないんだよね"
+},
+{
+"k": "mk_dkif",
+"en": "I don't know if I want to go in there.",
+"jp": "あそこ入りたくないんだけど",
+"sc": "不気味な地下室の前",
+"x": "I don't know if I want to go in there[, man].",
+"xj": "あそこマジで入りたくないんだけど"
+},
+{
+"k": "mk_dkif",
+"en": "I don't know if we have time.",
+"jp": "時間あるか分からない",
+"sc": "制限時間がギリギリ",
+"x": "[Hold on,] I don't know if we have time.",
+"xj": "待って、時間あるか分からない"
+},
+{
+"k": "mk_why",
+"en": "Why would I do that?",
+"jp": "なんでそんなことするんだよ",
+"sc": "視聴者に変なことを勧められた",
+"x": "Why would I do that? [No way!]",
+"xj": "なんでそんなことすんの？ありえない！"
+},
+{
+"k": "mk_why",
+"en": "Why would I go back?",
+"jp": "なんで戻るんだよ",
+"sc": "ミッションの指示で戻れと言われた",
+"x": "Why would I go back[, though]?",
+"xj": "でも、なんで戻るの？"
+},
+{
+"k": "mk_why",
+"en": "Why would I pay for this?",
+"jp": "なんでこれに金払うんだよ",
+"sc": "盗めそうな物を店で売っている",
+"x": "Why would I pay for this? [I'm just going to take it.]",
+"xj": "なんで金払うの？もらっとくわ"
+},
+{
+"k": "mk_why",
+"en": "Why would I lie?",
+"jp": "なんで嘘つくんだよ",
+"sc": "仲間に疑われた",
+"x": "[Come on,] why would I lie?",
+"xj": "おいおい、なんで嘘つくんだよ"
+},
+{
+"k": "mk_why",
+"en": "Why would I help you?",
+"jp": "なんでお前を助けるんだよ",
+"sc": "敵だったNPCに助けを頼まれた",
+"x": "Why would I help you? [Get out of here.]",
+"xj": "なんで助けるんだよ。あっち行け"
+},
+{
+"k": "mk_why",
+"en": "Why would I stop?",
+"jp": "なんで止まるんだよ",
+"sc": "仲間に「止まれ」と言われた",
+"x": "Why would I stop? [This is fun!]",
+"xj": "なんで止まるの？楽しいのに！"
+},
+{
+"k": "mk_good",
+"en": "Good thing I saved.",
+"jp": "セーブしといてよかった",
+"sc": "死んだけどすぐ戻れた",
+"x": "[Phew,] good thing I saved.",
+"xj": "ふう、セーブしといてよかった"
+},
+{
+"k": "mk_good",
+"en": "Good thing I had a gun.",
+"jp": "銃持っててよかった",
+"sc": "急に敵が来た",
+"x": "Good thing I had a gun[, right?]",
+"xj": "銃持っててよかったよな？"
+},
+{
+"k": "mk_good",
+"en": "Good thing nobody saw that.",
+"jp": "誰にも見られなくてよかった",
+"sc": "恥ずかしいミスをした",
+"x": "Good thing nobody saw that. [Except you guys.]",
+"xj": "誰も見てなくてよかった。お前ら以外な"
+},
+{
+"k": "mk_good",
+"en": "Good thing I'm rich.",
+"jp": "金持っててよかった",
+"sc": "車を壊して修理代が高い",
+"x": "Good thing I'm rich[, I guess].",
+"xj": "金持っててよかった、たぶん"
+},
+{
+"k": "mk_good",
+"en": "Good thing the cops didn't see me.",
+"jp": "警察に見られなくてよかった",
+"sc": "信号無視したけどパトカーが通り過ぎた",
+"x": "[Oh my god,] good thing the cops didn't see me.",
+"xj": "うわ、警察に見られなくてよかった"
+},
+{
+"k": "mk_good",
+"en": "Good thing it didn't explode.",
+"jp": "爆発しなくてよかった",
+"sc": "燃えてる車から降りた",
+"x": "Good thing it didn't explode. [That was close.]",
+"xj": "爆発しなくてよかった。危なかった"
+},
+{
+"k": "mk_trying",
+"en": "I'm trying to drive.",
+"jp": "運転してるんだけど",
+"sc": "仲間が話しかけてきて邪魔",
+"x": "[Hey,] I'm trying to drive!",
+"xj": "おい、運転中なんだけど！"
+},
+{
+"k": "mk_trying",
+"en": "I'm trying to find the mission.",
+"jp": "ミッション探してるんだけど",
+"sc": "マップを見ている",
+"x": "I'm trying to find the mission[, okay?]",
+"xj": "ミッション探してるんだって、いい？"
+},
+{
+"k": "mk_trying",
+"en": "I'm trying to help you.",
+"jp": "助けようとしてるんだって",
+"sc": "助けたNPCが攻撃してくる",
+"x": "I'm trying to help you! [Stop it!]",
+"xj": "助けようとしてんだよ！やめろ！"
+},
+{
+"k": "mk_trying",
+"en": "I'm trying to park.",
+"jp": "駐車しようとしてるんだけど",
+"sc": "狭い所に車を止める",
+"x": "[Hold on,] I'm trying to park.",
+"xj": "待って、駐車してるとこ"
+},
+{
+"k": "mk_trying",
+"en": "I'm trying to be nice.",
+"jp": "優しくしようとしてるのに",
+"sc": "親切にしたのにNPCに怒られた",
+"x": "I'm trying to be nice[, man]!",
+"xj": "優しくしようとしてんのに！"
+},
+{
+"k": "mk_trying",
+"en": "I'm trying to get away.",
+"jp": "逃げようとしてるんだって",
+"sc": "警察に追われている",
+"x": "I'm trying to get away! [Come on!]",
+"xj": "逃げようとしてんの！頼むよ！"
+},
+{
+"k": "mk_supposed",
+"en": "It's supposed to be easy.",
+"jp": "簡単なはずなんだけど",
+"sc": "簡単なミッションで何度も失敗",
+"x": "It's supposed to be easy[, right?]",
+"xj": "簡単なはずだよね？"
+},
+{
+"k": "mk_supposed",
+"en": "It's supposed to be here.",
+"jp": "ここにあるはずなんだけど",
+"sc": "目的地に何もない",
+"x": "[Wait,] it's supposed to be here.",
+"xj": "待って、ここにあるはずなんだけど"
+},
+{
+"k": "mk_supposed",
+"en": "It's supposed to open.",
+"jp": "開くはずなんだけど",
+"sc": "ドアが開かない",
+"x": "It's supposed to open. [What the hell?]",
+"xj": "開くはずなのに。なんでだよ？"
+},
+{
+"k": "mk_supposed",
+"en": "It's supposed to be fast.",
+"jp": "速いはずなんだけど",
+"sc": "高い車なのに遅い",
+"x": "It's supposed to be fast[, you know].",
+"xj": "速いはずなんだけどな"
+},
+{
+"k": "mk_supposed",
+"en": "It's supposed to explode.",
+"jp": "爆発するはずなんだけど",
+"sc": "爆弾を置いたのに何も起きない",
+"x": "[Hold on,] it's supposed to explode.",
+"xj": "待って、爆発するはずなんだけど"
+},
+{
+"k": "mk_supposed",
+"en": "It's supposed to be a secret.",
+"jp": "秘密のはずなんだけど",
+"sc": "NPCが計画を大声で話している",
+"x": "It's supposed to be a secret[, man]!",
+"xj": "秘密のはずだろ！"
+},
+{
+"k": "mk_look",
+"en": "Look at this car!",
+"jp": "この車見て！",
+"sc": "超かっこいい車を見つけた",
+"x": "[Oh my god,] look at this car!",
+"xj": "うわ、この車見て！"
+},
+{
+"k": "mk_look",
+"en": "Look at him!",
+"jp": "あいつ見て！",
+"sc": "変なNPCがいる",
+"x": "Look at him! [What is he doing?]",
+"xj": "あいつ見て！何してんの？"
+},
+{
+"k": "mk_look",
+"en": "Look at that view!",
+"jp": "この景色見て！",
+"sc": "山の上から街が見える",
+"x": "Look at that view! [It's pretty nice.]",
+"xj": "この景色見て！結構いいじゃん"
+},
+{
+"k": "mk_look",
+"en": "Look at all this money!",
+"jp": "この金見て！",
+"sc": "強盗で大金を手に入れた",
+"x": "Look at all this money! [Here we go!]",
+"xj": "この金見て！きたきた！"
+},
+{
+"k": "mk_look",
+"en": "Look at me!",
+"jp": "俺を見て！",
+"sc": "視聴者にキャラの服を見せたい",
+"x": "Look at me! [Pretty cool, right?]",
+"xj": "俺見て！結構かっこよくない？"
+},
+{
+"k": "mk_look",
+"en": "Look at my car.",
+"jp": "俺の車見て",
+"sc": "車がボロボロになった",
+"x": "Look at my car. [Oh boy.]",
+"xj": "俺の車見て。うわー…"
 }
 ];
 const ITEMS = RAW.map((r,i)=>({i, k:r.k, en:r.en, jp:r.jp, sc:r.sc, x:r.x, xj:r.xj, grp:KMAP[r.k].grp}));
@@ -1730,6 +2397,13 @@ function hlExt(it){
   };
   return paint(m[1]) + '<span class="ka">'+esc(m[2])+'</span>' + paint(m[3]);
 }
+function mkHtml(K){
+  const m = K && K.mk && MKEX[K.mk];
+  if (!m || !m.ex.length) return '';
+  return '<div class="mk"><div class="swap-h">🎬 Markiplierの実際のセリフ(語録で'+m.n+'回)</div>' +
+    m.ex.map(e=>'<div class="swap mk-line" data-say="'+esc(e[0])+'"><span class="sp">🔊</span><span>'+esc(e[0])+'</span><span class="j">'+esc(e[1])+'</span></div>').join('') + '</div>';
+}
+function bindMk(root){ root.querySelectorAll('.mk-line').forEach(x=>x.onclick = ev=>{ ev.stopPropagation(); speakEn(x.dataset.say); }); }
 function enHtml(q){ return q.long ? hlExt(q.it) : hlBase(q.it.en, q.it.k); }
 function enText(q){ return q.long ? xPlain(q.it) : q.it.en; }
 function jpText(q){ return q.long ? q.it.xj : q.it.jp; }
@@ -1743,6 +2417,7 @@ let status = {};  // 英文 -> {s, w, n, t}
 let memo = {};    // 英文 -> {en, jp, sc, k, long, i, added, s, w, n}
 let curTab = 'drill';
 let autoShortDone = false;  // 初回に短い文を全部チェック済みか
+let autoMkDone = false;     // Markiplier流の短い文を自動チェック済みか
 
 let activeGrps = new Set(GROUPS.map((g,i)=>i));
 let kataF = 'all';
@@ -1825,6 +2500,7 @@ function render(isRetry){
         '<div class="addon-note">付け足し: <b>'+esc(addOf(it))+'</b> '+addonJp(it)+'</div>' +
         '<div class="swap-h">この型の入れ替え ・ <span class="kh">'+esc(K.tpl)+'</span> '+esc(K.mean)+'</div>' +
         sibs.map(s=>'<div class="swap'+(s===it?' cur':'')+'" data-i="'+s.i+'"><span class="sp">🔊</span><span>'+hlBase(s.en, s.k)+'</span><span class="j">'+esc(s.jp)+'</span></div>').join('') +
+        mkHtml(K) +
       '</div>' +
     '</div>' +
     '<div class="judge"><button class="j-ok" id="jOk">○ 言えた<small>後回し (1)</small></button><button class="j-mid" id="jMid">△ 微妙<small>また出す (2)</small></button><button class="j-ng" id="jNg">× 無理<small>すぐ出す (3)</small></button></div>' +
@@ -1834,7 +2510,8 @@ function render(isRetry){
   if (hb) hb.onclick = showHint;
   document.getElementById('showModel').onclick = ()=>{ showHint(); compareMine(); document.getElementById('modelBox').classList.add('show'); speakEn(enText(q)); };
   card.querySelectorAll('.model').forEach(m=>m.onclick = ev=>{ if (ev.target.closest('.memo-star')) return; speakEn(m.dataset.t==='1' ? xPlain(it) : it.en); });
-  card.querySelectorAll('.swap').forEach(s=>s.onclick = ()=>speakEn(ITEMS[+s.dataset.i].en));
+  card.querySelectorAll('.swap[data-i]').forEach(s=>s.onclick = ()=>speakEn(ITEMS[+s.dataset.i].en));
+  bindMk(card);
   bindStars(card);
   document.getElementById('jOk').onclick = ()=>judge('ok');
   document.getElementById('jMid').onclick = ()=>judge('mid');
@@ -1851,7 +2528,7 @@ function showHint(){
 function addonJp(it){
   const a = addOf(it);
   const hit = ADDONS.find(x=>x.re.test(a));
-  return hit && hit.re.source !== '.' ? '＝ '+esc(hit.jp) : '(型をもう1つつなげた形)';
+  return hit && hit.re.source !== '.' ? '＝ '+esc(hit.jp) : '(もう一言つなげた形。意味は上の日本語)';
 }
 const normEn = s => s.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9' ]/g,' ').replace(/\s+/g,' ').trim();
 function compareMine(){
@@ -1921,6 +2598,7 @@ function renderKataList(){
     const its = ITEMS.filter(it=>it.k===K.id);
     return '<div class="kcard"><div class="kcard-h"><span class="tpl">'+esc(K.tpl)+'</span><span class="mean">'+esc(K.mean)+' ・ '+its.length+'個</span>' +
       '<button data-drill="'+K.id+'">この型でドリル</button><button data-all="'+K.id+'">短い文ぜんぶ☆</button></div>' +
+      (K.mk && MKEX[K.mk] ? '<div class="mk-mini">🎬 Markiplier: '+MKEX[K.mk].ex.slice(0,2).map(e=>'<span class="mk-line" data-say="'+esc(e[0])+'">'+esc(e[0])+'</span>').join(' ／ ')+'</div>' : '') +
       its.map(it=>'<div class="krow">' +
         '<label><input type="checkbox" data-i="'+it.i+'" data-long="0"'+(memo[it.en]?' checked':'')+'><span><span class="e">'+hlBase(it.en,it.k)+'</span> <span class="sp" data-say="'+esc(it.en)+'">🔊</span><br><span class="j">'+esc(it.jp)+' ・ '+esc(it.sc)+'</span></span></label>' +
         '<label class="x"><input type="checkbox" data-i="'+it.i+'" data-long="1"'+(memo[xPlain(it)]?' checked':'')+'><span><span class="e">'+hlExt(it)+'</span> <span class="sp" data-say="'+esc(xPlain(it))+'">🔊</span><br><span class="j">'+esc(it.xj)+'</span></span></label>' +
@@ -1931,13 +2609,15 @@ function renderKataList(){
     if (!!memo[key] !== cb.checked) toggleMemo(it, long, true);
   });
   box.querySelectorAll('.sp').forEach(s=>s.onclick = ev=>{ ev.preventDefault(); ev.stopPropagation(); speakEn(s.dataset.say); });
+  bindMk(box);
   box.querySelectorAll('[data-drill]').forEach(b=>b.onclick = ()=>{ kataF = b.dataset.drill; switchTab('drill'); buildKataSel(); document.getElementById('kataSel').value = kataF; rebuild(); next(); });
   box.querySelectorAll('[data-all]').forEach(b=>b.onclick = ()=>{ ITEMS.filter(it=>it.k===b.dataset.all).forEach(it=>{ if (!memo[it.en]) toggleMemo(it, false, true); }); renderKataList(); });
 }
 function renderAddons(){
   const used = ADDONS.map(a=>({a, ex: ITEMS.filter(it=>a.re.test(addOf(it)) && ADDONS.find(x=>x.re.test(addOf(it)))===a)}));
   document.getElementById('addonTbl').innerHTML = used.filter(u=>u.ex.length).map(u=>
-    '<tr><td>'+esc(u.a.t)+'</td><td>'+esc(u.a.jp)+'<div class="ex">'+u.ex.slice(0,3).map(it=>esc(xPlain(it))).join(' ／ ')+'</div></td></tr>').join('');
+    '<tr><td>'+esc(u.a.t)+'</td><td>'+esc(u.a.jp)+'<div class="ex">'+u.ex.slice(0,3).map(it=>esc(xPlain(it))).join(' ／ ')+'</div>' +
+    (u.a.mk && MKEX[u.a.mk] ? '<div class="ex mkx">🎬 Markiplier: '+esc(MKEX[u.a.mk].ex[0][0])+'</div>' : '') + '</td></tr>').join('');
 }
 
 // ===== 覚えるリスト =====
@@ -2010,12 +2690,13 @@ function mpRender(show){
       (it0 ? '<div class="mp-other" id="mpOther"><span class="sp">🔊</span> <span class="lbl2">'+(d.long?'短い文':'＋付け足し')+'</span> '+(d.long?hlBase(it0.en,it0.k):hlExt(it0))+'<div class="mp-sub">'+esc(d.long?it0.jp:it0.xj)+'</div></div>' : '') +
       (K ? '<div class="mp-sub">型: <span class="kh">'+esc(K.tpl)+'</span> '+esc(K.mean)+'</div>' : '') + '</div>' +
     (K && it0 ? '<div class="mp-swaps'+(show?' show':'')+'" id="mpSwaps"><div class="swap-h">この型の入れ替え ・ <span class="kh">'+esc(K.tpl)+'</span> '+esc(K.mean)+'</div>' +
-      ITEMS.filter(x=>x.k===d.k).map(x=>'<div class="swap'+(x===it0?' cur':'')+'" data-i="'+x.i+'"><span class="sp">🔊</span><span>'+hlBase(x.en, x.k)+'</span><span class="j">'+esc(x.jp)+'</span></div>').join('') + '</div>' : '') +
+      ITEMS.filter(x=>x.k===d.k).map(x=>'<div class="swap'+(x===it0?' cur':'')+'" data-i="'+x.i+'"><span class="sp">🔊</span><span>'+hlBase(x.en, x.k)+'</span><span class="j">'+esc(x.jp)+'</span></div>').join('') + mkHtml(K) + '</div>' : '') +
     (show ? '' : '<div class="btns"><button class="btn sub" id="mpReveal">答えを見る</button></div>');
   document.getElementById('mpEn').onclick = ()=>speakEn(d.en);
   const ot = document.getElementById('mpOther');
   if (ot) ot.onclick = ()=>speakEn(d.long ? it0.en : xPlain(it0));
-  box.querySelectorAll('.swap').forEach(x=>x.onclick = ()=>speakEn(ITEMS[+x.dataset.i].en));
+  box.querySelectorAll('.swap[data-i]').forEach(x=>x.onclick = ()=>speakEn(ITEMS[+x.dataset.i].en));
+  bindMk(box);
   const rv = document.getElementById('mpReveal');
   if (rv) rv.onclick = ()=>{ mpClear(); mpReveal(); speakEn(d.en); if (mpSettings().judge) MP.waiting = true; mpRenderCtl(); };
   mpRenderCtl();
@@ -2177,18 +2858,20 @@ function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); 
 function saveAll(retryFlag){
   if (!currentUser) return;
   fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status, _memo: memo, _autoShort: autoShortDone})})
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status, _memo: memo, _autoShort: autoShortDone, _autoMk: autoMkDone})})
   }).then(r=>r.json()).then(res=>{ if (res && res.error) throw new Error(res.error); setSyncBadge('保存済み'); })
   .catch(()=>{ if (!retryFlag) { setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true), 1500); } else setSyncBadge('⚠保存失敗 タップで再試行'); });
 }
 function loadFromServer(user){
   return fetch(GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY+':'+user)).then(r=>r.json()).then(res=>{
-    try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; memo = p._memo || {}; autoShortDone = !!p._autoShort; } catch(e){ status = {}; memo = {}; autoShortDone = false; }
+    try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; memo = p._memo || {}; autoShortDone = !!p._autoShort; autoMkDone = !!p._autoMk; } catch(e){ status = {}; memo = {}; autoShortDone = false; autoMkDone = false; }
   });
 }
 function initApp(){
   mpStop(); MP.queue=[]; MP.qi=0; MP.cur=null; MP.cycle=1;
-  if (!autoShortDone) { ITEMS.forEach(it=>addMemo(it, false)); autoShortDone = true; scheduleSave(); }
+  if (!autoShortDone) { ITEMS.forEach(it=>addMemo(it, false)); autoShortDone = true; autoMkDone = true; scheduleSave(); }
+  if (!autoMkDone) { ITEMS.filter(it=>it.grp===4).forEach(it=>addMemo(it, false)); autoMkDone = true; scheduleSave(); }
+  document.querySelectorAll('.nAll').forEach(x=>x.textContent = ITEMS.length);
   renderAddons(); drillRefresh(); renderMemoAll();
   let t = 'drill'; try { t = localStorage.getItem('kata_tab') || 'drill'; } catch(e){}
   if (t !== 'drill') switchTab(t);
