@@ -112,6 +112,9 @@
   .mp-ans.show{visibility:visible;}
   .mp-en{font-size:24px;font-weight:800;line-height:1.4;cursor:pointer;}
   .mp-sub{font-size:13px;color:var(--text-dim);margin-top:6px;}
+  .mp-other{margin-top:12px;padding-top:10px;border-top:1px dashed var(--amber-deep);font-size:19px;font-weight:700;line-height:1.4;cursor:pointer;}
+  .mp-other .lbl2{font-size:11px;font-weight:400;color:var(--mint);border:1px solid #2f6b55;border-radius:99px;padding:1px 8px;vertical-align:middle;}
+  .mp-other .mp-sub{font-weight:400;margin-top:2px;}
   .think{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:12px;}
   .think i{display:block;height:100%;width:0;background:var(--amber-dim);}
   .mp-prog{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:12px;}
@@ -1984,15 +1987,19 @@ function mpRender(show){
   }
   const st = d.s ? {ok:['st-ok','○'], mid:['st-mid','△'], ng:['st-ng','×']}[d.s] : null;
   const listen = mpVal('mpMode') === 'listen', K = KMAP[d.k];
+  const it0 = ITEMS[d.i];
   box.innerHTML =
     '<div class="tags"><span class="tag kata">'+esc(K?K.tpl:'')+'</span>'+(d.long?'<span class="tag long">付け足しあり</span>':'') + (st ? '<span class="tag '+st[0]+'">'+st[1]+' ('+d.n+'回)</span>' : '<span class="tag">未</span>') + '</div>' +
     '<div class="scene-label">状況</div><div class="scene">'+esc(d.sc)+'</div>' +
     '<div class="scene-label">言いたいこと</div><div class="mp-say">「'+esc(d.jp)+'」</div>' +
     (listen ? '' : '<div class="think"><i id="mpBar"></i></div>') +
     '<div class="mp-ans'+(show?' show':'')+'" id="mpAns"><div class="mp-en" id="mpEn">🔊 '+memoHtml(d)+'</div>' +
+      (it0 ? '<div class="mp-other" id="mpOther"><span class="sp">🔊</span> <span class="lbl2">'+(d.long?'短い文':'＋付け足し')+'</span> '+(d.long?hlBase(it0.en,it0.k):hlExt(it0))+'<div class="mp-sub">'+esc(d.long?it0.jp:it0.xj)+'</div></div>' : '') +
       (K ? '<div class="mp-sub">型: <span class="kh">'+esc(K.tpl)+'</span> '+esc(K.mean)+'</div>' : '') + '</div>' +
     (show ? '' : '<div class="btns"><button class="btn sub" id="mpReveal">答えを見る</button></div>');
   document.getElementById('mpEn').onclick = ()=>speakEn(d.en);
+  const ot = document.getElementById('mpOther');
+  if (ot) ot.onclick = ()=>speakEn(d.long ? it0.en : xPlain(it0));
   const rv = document.getElementById('mpReveal');
   if (rv) rv.onclick = ()=>{ mpClear(); mpReveal(); speakEn(d.en); if (mpSettings().judge) MP.waiting = true; mpRenderCtl(); };
   mpRenderCtl();
