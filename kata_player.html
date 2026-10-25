@@ -215,6 +215,7 @@
   <div id="tabList" style="display:none;">
     <div class="chips" id="grpChips2"></div>
     <div class="stats">チェックを入れると「★ 覚える」に入ります。🔊で読み上げ。</div>
+    <div class="btns" style="margin:-4px 0 12px;"><button class="btn sub" id="allShortBtn2">短い文を全部チェック(165)</button></div>
     <div id="kataList"></div>
     <details class="panel" id="addonPanel" open>
       <summary>＋ 付け足しパーツ一覧(どの型にも付けられる)</summary>
@@ -235,6 +236,7 @@
         <select id="mpOrder">
           <option value="random" selected>ランダム(1周で全部)</option>
           <option value="weak">苦手を優先</option>
+          <option value="kata">型ごと(Get→Don't→…)</option>
           <option value="added">追加した順</option>
         </select>
       </label>
@@ -282,6 +284,7 @@
       </label>
     </div>
     <div class="stats" id="mpStats"></div>
+    <div class="btns" style="margin:-4px 0 12px;"><button class="btn sub" id="allShortBtn">短い文を全部チェック(165)</button><button class="btn sub" id="clearMemoBtn">全部外す</button></div>
     <div class="card">
       <div class="mp-stage" id="mpStage"></div>
       <div class="judge" id="mpJudgeRow">
@@ -1739,6 +1742,7 @@ let currentUser = null, saveTimer = null;
 let status = {};  // 英文 -> {s, w, n, t}
 let memo = {};    // 英文 -> {en, jp, sc, k, long, i, added, s, w, n}
 let curTab = 'drill';
+let autoShortDone = false;  // 初回に短い文を全部チェック済みか
 
 let activeGrps = new Set(GROUPS.map((g,i)=>i));
 let kataF = 'all';
@@ -1945,6 +1949,12 @@ function toggleMemo(it, long, quiet){
   scheduleSave(); renderMemoAll();
   return on;
 }
+function addMemo(it, long){
+  const key = long ? xPlain(it) : it.en;
+  if (!memo[key]) memo[key] = {en:key, jp: long?it.xj:it.jp, sc: it.sc, k: it.k, long: !!long, i: it.i, added: Date.now() + it.i, w: 1.5, n: 0};
+}
+function checkAllShort(){ ITEMS.forEach(it=>addMemo(it, false)); scheduleSave(); renderMemoAll(); if (curTab==='list') renderKataList(); }
+function clearAllMemo(){ if (!confirm('チェックを全部外しますか？(○△×の記録も消えます)')) return; memo = {}; mpStop(); MP.queue=[]; MP.qi=0; MP.cur=null; scheduleSave(); renderMemoAll(); if (curTab==='list') renderKataList(); }
 function memoItems(){ return Object.keys(memo).map(k=>Object.assign({key:k}, memo[k])); }
 function memoHtml(d){ const it = ITEMS[d.i]; if (!it) return esc(d.en); return d.long ? hlExt(it) : hlBase(it.en, it.k); }
 
@@ -1955,6 +1965,7 @@ function mpBuild(){
   const order = mpVal('mpOrder');
   let arr = memoItems();
   if (order === 'added') arr.sort((a,b)=>a.added-b.added);
+  else if (order === 'kata') arr.sort((a,b)=>(a.i-b.i) || ((a.long?1:0)-(b.long?1:0)));
   else if (order === 'weak') arr = arr.map(d=>({d, k: Math.random() - Math.min(d.w==null?1.5:d.w, 5)*0.3})).sort((a,b)=>a.k-b.k).map(x=>x.d);
   else shuffle(arr);
   MP.queue = arr.map(d=>d.key); MP.qi = 0;
@@ -2104,6 +2115,9 @@ function renderMemoAll(){
   else mpRenderCtl();
 }
 document.getElementById('mpPlay').onclick = mpToggle;
+document.getElementById('allShortBtn').onclick = checkAllShort;
+document.getElementById('allShortBtn2').onclick = checkAllShort;
+document.getElementById('clearMemoBtn').onclick = clearAllMemo;
 document.getElementById('mpNext').onclick = mpNext;
 document.getElementById('mpPrev').onclick = mpPrev;
 document.getElementById('mpOk').onclick = ()=>mpJudge('ok');
@@ -2163,17 +2177,18 @@ function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); 
 function saveAll(retryFlag){
   if (!currentUser) return;
   fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status, _memo: memo})})
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status, _memo: memo, _autoShort: autoShortDone})})
   }).then(r=>r.json()).then(res=>{ if (res && res.error) throw new Error(res.error); setSyncBadge('保存済み'); })
   .catch(()=>{ if (!retryFlag) { setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true), 1500); } else setSyncBadge('⚠保存失敗 タップで再試行'); });
 }
 function loadFromServer(user){
   return fetch(GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY+':'+user)).then(r=>r.json()).then(res=>{
-    try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; memo = p._memo || {}; } catch(e){ status = {}; memo = {}; }
+    try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; memo = p._memo || {}; autoShortDone = !!p._autoShort; } catch(e){ status = {}; memo = {}; autoShortDone = false; }
   });
 }
 function initApp(){
   mpStop(); MP.queue=[]; MP.qi=0; MP.cur=null; MP.cycle=1;
+  if (!autoShortDone) { ITEMS.forEach(it=>addMemo(it, false)); autoShortDone = true; scheduleSave(); }
   renderAddons(); drillRefresh(); renderMemoAll();
   let t = 'drill'; try { t = localStorage.getItem('kata_tab') || 'drill'; } catch(e){}
   if (t !== 'drill') switchTab(t);
