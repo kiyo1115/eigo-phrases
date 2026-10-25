@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>型ドリル - 入れ替えるだけで言える</title>
+<style>
+  :root{--bg:#14110f;--panel:#1c1815;--panel2:#231e1a;--amber:#ff8c2e;--amber-dim:#c4691a;--amber-deep:#7a4518;--text:#ede5d8;--text-dim:#968d7f;--line:#2e2822;--green:#4ade80;--red:#ff8080;--yellow:#ffd166;--blue:#9cc4e8;--mint:#7ee0b5;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;padding:16px 16px 60px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  a.back{color:var(--text-dim);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:12px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;}
+  .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--amber-dim);font-weight:700;}
+  h1{font-size:24px;margin:4px 0 6px;}
+  h1 span{color:var(--amber);}
+  .lead{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:14px;}
+  .lead b{color:var(--amber);}
+  .legend{font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.9;}
+  .kh{color:var(--blue);}
+  .ks{color:var(--yellow);}
+  .ka{color:var(--mint);}
+  .legend .kh,.legend .ks,.legend .ka{font-weight:700;}
+
+  .tabs{display:flex;gap:6px;margin:0 0 14px;}
+  .tabbtn{flex:1;background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:12px;padding:11px 4px;font-size:13px;font-weight:700;cursor:pointer;}
+  .tabbtn.on{background:var(--amber);border-color:var(--amber);color:#1a1208;}
+  .tabbtn .cnt{display:inline-block;min-width:20px;border-radius:99px;padding:0 6px;margin-left:4px;font-size:12px;background:rgba(0,0,0,.25);}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+  .chip{background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;user-select:none;}
+  .chip.on{background:var(--amber);color:#1a1208;border-color:var(--amber);font-weight:700;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .row label{font-size:11px;color:var(--text-dim);display:flex;flex-direction:column;gap:3px;}
+  select{background:var(--panel);color:var(--text);border:1px solid var(--amber-deep);border-radius:8px;padding:6px 10px;font-size:13px;}
+  .stats{font-size:12px;color:var(--text-dim);margin-bottom:12px;}
+  .stats b{color:var(--text);}
+
+  .card{background:var(--panel);border:2px solid var(--amber-deep);border-radius:18px;padding:22px 18px;margin-bottom:14px;}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .tag{font-size:11px;border-radius:999px;padding:3px 10px;border:1px solid var(--amber-dim);color:var(--amber);}
+  .tag.kata{border-color:#4a6b8a;color:var(--blue);}
+  .tag.long{border-color:#2f6b55;color:var(--mint);}
+  .tag.st-ok{border-color:#2f5a35;color:var(--green);}
+  .tag.st-mid{border-color:#6b5a1f;color:var(--yellow);}
+  .tag.st-ng{border-color:#6b2f2f;color:var(--red);}
+  .scene-label{font-size:11px;color:var(--text-dim);letter-spacing:.1em;}
+  .scene{font-size:16px;line-height:1.6;margin:2px 0 14px;}
+  .say{font-size:28px;font-weight:800;line-height:1.4;margin:2px 0 6px;}
+  .hintbox{margin:6px 0 4px;font-size:15px;}
+  .hintbox .tpl{font-size:20px;font-weight:800;}
+  .hintbox .mean{font-size:12.5px;color:var(--text-dim);margin-left:6px;}
+
+  .step{border-top:1px dashed var(--amber-deep);padding-top:14px;margin-top:14px;}
+  .step-h{font-size:12px;color:var(--amber-dim);font-weight:700;margin-bottom:8px;}
+  textarea{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;font-family:inherit;min-height:48px;resize:vertical;}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn.main{background:var(--amber);color:#1a1208;}
+  .btn.sub{background:var(--panel2);color:var(--text);border:1px solid var(--amber-deep);}
+  .btn.mic.rec{background:#5a3030;color:#ffb3b3;border-color:#5a3030;}
+  .reveal{display:none;margin-top:10px;background:var(--panel2);border-radius:10px;padding:12px 14px;}
+  .reveal.show{display:block;}
+  .check-msg{font-size:12px;color:var(--text-dim);margin-top:4px;}
+  .model{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+  .model .en{flex:1;font-size:21px;font-weight:800;line-height:1.4;}
+  .model .en small{display:block;font-size:12.5px;font-weight:400;color:var(--text-dim);margin-top:2px;}
+  .model .lbl{flex-shrink:0;font-size:10.5px;color:var(--text-dim);width:46px;}
+  .memo-star{flex-shrink:0;background:var(--panel2);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .memo-star.on{background:var(--yellow);border-color:var(--yellow);color:#1a1208;}
+  .swap-h{font-size:12px;color:var(--amber-dim);font-weight:700;margin:14px 0 4px;}
+  .swap{display:flex;gap:8px;align-items:baseline;padding:4px 0;font-size:15px;cursor:pointer;}
+  .swap .j{font-size:12px;color:var(--text-dim);}
+  .swap.cur{background:rgba(255,209,102,.08);border-radius:6px;}
+  .addon-note{font-size:12.5px;color:var(--mint);margin-top:6px;}
+
+  .judge{display:flex;gap:8px;margin-top:14px;}
+  .judge button{flex:1;border:none;border-radius:12px;padding:14px 6px;font-size:16px;font-weight:800;cursor:pointer;}
+  .judge small{display:block;font-size:10.5px;font-weight:400;opacity:.75;margin-top:2px;}
+  .j-ok{background:#2f4a30;color:#b3ffb8;}
+  .j-mid{background:#4f4420;color:#ffe9a8;}
+  .j-ng{background:#5a3030;color:#ffb3b3;}
+  .nav{display:flex;gap:8px;justify-content:space-between;margin-top:10px;}
+
+  /* 型一覧 */
+  .kcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 14px 8px;margin-bottom:10px;}
+  .kcard-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .kcard-h .tpl{font-size:20px;font-weight:800;color:var(--blue);}
+  .kcard-h .mean{font-size:12.5px;color:var(--text-dim);flex:1;}
+  .kcard-h button{font-size:11px;background:var(--panel2);border:1px solid var(--amber-deep);color:var(--text);border-radius:8px;padding:4px 8px;cursor:pointer;}
+  .krow{padding:7px 0;border-top:1px solid var(--line);}
+  .krow label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;}
+  .krow input{margin-top:5px;accent-color:#ffd166;flex-shrink:0;}
+  .krow .e{font-size:16px;font-weight:700;}
+  .krow .j{font-size:12px;color:var(--text-dim);}
+  .krow .x{margin-left:22px;margin-top:3px;}
+  .krow .x .e{font-size:14px;}
+  .sp{cursor:pointer;opacity:.7;font-size:13px;}
+  .addon-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}
+  .addon-tbl td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top;}
+  .addon-tbl td:first-child{color:var(--mint);font-weight:700;white-space:nowrap;}
+  .addon-tbl .ex{color:var(--text-dim);font-size:12px;}
+
+  details.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;}
+  details.panel summary{cursor:pointer;font-size:13px;color:var(--amber);font-weight:700;}
+  .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text-dim);line-height:1.8;}
+  .note b{color:var(--amber);}
+
+  /* 覚えるリスト */
+  .mp-stage{min-height:210px;}
+  .mp-say{font-size:26px;font-weight:800;line-height:1.4;margin:2px 0 4px;}
+  .mp-ans{margin-top:14px;padding:14px;background:var(--panel2);border-radius:12px;visibility:hidden;}
+  .mp-ans.show{visibility:visible;}
+  .mp-en{font-size:24px;font-weight:800;line-height:1.4;cursor:pointer;}
+  .mp-sub{font-size:13px;color:var(--text-dim);margin-top:6px;}
+  .think{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:12px;}
+  .think i{display:block;height:100%;width:0;background:var(--amber-dim);}
+  .mp-prog{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:12px;}
+  .mp-ctl{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:12px;}
+  .mp-ctl .btn{min-width:56px;font-size:18px;}
+  .mp-ctl #mpPlay{min-width:84px;font-size:22px;}
+  .memo-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .memo-row .t{flex:1;line-height:1.5;}
+  .memo-row .t b{font-size:15px;}
+  .memo-row button{background:none;border:1px solid var(--line);color:var(--text-dim);border-radius:6px;font-size:11px;padding:3px 7px;cursor:pointer;}
+
+  .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;text-align:center;}
+  .login-box h2{font-size:18px;margin:0 0 6px;}
+  .login-box p{font-size:12px;color:var(--text-dim);margin:0 0 20px;}
+  .login-box input{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;text-align:center;margin-bottom:12px;}
+  .login-box button{width:100%;background:var(--amber);border:none;color:#1a1208;font-weight:700;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
+  .login-status{font-size:11px;color:var(--text-dim);margin-top:10px;min-height:14px;}
+  .sync-badge{position:fixed;top:10px;right:10px;font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:4px 10px;z-index:10;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">型ドリル / 入れ替えるだけで言える</div>
+  <h1>型は固定、<span>後ろだけ</span>入れ替える</h1>
+  <div class="lead">
+    文の頭(型)は毎回同じ。<b>後ろの1語か短いかたまりを入れ替えるだけ</b>で、意味が何十通りにも変わる。<br>
+    言えたら、決まった言い回しを<b>付け足して</b>伸ばす。
+  </div>
+  <div class="legend">
+    <span class="kh">青＝型(固定)</span> ・ <span class="ks">黄＝入れ替える所</span> ・ <span class="ka">緑＝付け足し</span><br>
+    例: <span class="ka">Wait,</span> <span class="kh">Can I get</span> <span class="ks">a table</span>? ／ <span class="kh">I'm</span> <span class="ks">lost</span> <span class="ka">again</span>.
+  </div>
+
+  <div class="tabs">
+    <button class="tabbtn on" data-tab="drill">🔁 ドリル</button>
+    <button class="tabbtn" data-tab="list">📖 型一覧</button>
+    <button class="tabbtn" data-tab="memo">★ 覚える<span class="cnt" id="memoCount">0</span></button>
+  </div>
+
+  <!-- ===== ドリル ===== -->
+  <div id="tabDrill">
+    <div class="chips" id="grpChips"></div>
+    <div class="row">
+      <label>型をしぼる
+        <select id="kataSel"></select>
+      </label>
+      <label>問題の長さ
+        <select id="lenSel">
+          <option value="short" selected>短い文(型＋入れ替え)</option>
+          <option value="long">付け足しあり</option>
+          <option value="mix">まぜる</option>
+        </select>
+      </label>
+      <label>出す順番
+        <select id="orderSel">
+          <option value="weak" selected>苦手を優先</option>
+          <option value="random">ランダム</option>
+          <option value="new">まだやってない問題から</option>
+          <option value="ngonly">△×だけ</option>
+        </select>
+      </label>
+      <label>型ヒント
+        <select id="hintSel">
+          <option value="tap" selected>押したら出す</option>
+          <option value="always">最初から出す</option>
+        </select>
+      </label>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="card" id="card"></div>
+    <div class="note">
+      <b>やり方</b><br>
+      1. 言いたいことを見て、<b>どの型に入るか</b>を先に決める(I'm? Get? I need to?)<br>
+      2. 後ろの<b>入れ替える所だけ</b>考えて声に出す<br>
+      3. 答えを見たら、下の「この型の入れ替え」で同じ型の他の言い方もまとめて見る<br>
+      4. 慣れたら「付け足しあり」で、<b>Wait, / Oh no, / again / right now</b> などを付けて伸ばす<br>
+      ・覚えたい言い方は <b>☆覚える</b> → 「★ 覚える」タブでテスト・聞き流し
+    </div>
+  </div>
+
+  <!-- ===== 型一覧 ===== -->
+  <div id="tabList" style="display:none;">
+    <div class="chips" id="grpChips2"></div>
+    <div class="stats">チェックを入れると「★ 覚える」に入ります。🔊で読み上げ。</div>
+    <div id="kataList"></div>
+    <details class="panel" id="addonPanel" open>
+      <summary>＋ 付け足しパーツ一覧(どの型にも付けられる)</summary>
+      <table class="addon-tbl" id="addonTbl"></table>
+    </details>
+  </div>
+
+  <!-- ===== 覚えるリスト ===== -->
+  <div id="tabMemo" style="display:none;">
+    <div class="row">
+      <label>モード
+        <select id="mpMode">
+          <option value="test" selected>テスト(状況→英語)</option>
+          <option value="listen">聞き流し(英語→日本語)</option>
+        </select>
+      </label>
+      <label>出す順番
+        <select id="mpOrder">
+          <option value="random" selected>ランダム(1周で全部)</option>
+          <option value="weak">苦手を優先</option>
+          <option value="added">追加した順</option>
+        </select>
+      </label>
+      <label>考える時間
+        <select id="mpThink">
+          <option value="3000">3秒</option>
+          <option value="5000" selected>5秒</option>
+          <option value="8000">8秒</option>
+          <option value="12000">12秒</option>
+        </select>
+      </label>
+      <label>英語の回数
+        <select id="mpRep">
+          <option value="1">1回</option>
+          <option value="2" selected>2回</option>
+          <option value="3">3回</option>
+          <option value="5">5回</option>
+        </select>
+      </label>
+      <label>速さ
+        <select id="mpRate">
+          <option value="0.8">遅め</option>
+          <option value="0.9" selected>ふつう</option>
+          <option value="1.1">速め</option>
+        </select>
+      </label>
+      <label>日本語読み上げ
+        <select id="mpJp">
+          <option value="off" selected>なし</option>
+          <option value="on">あり</option>
+        </select>
+      </label>
+      <label>○△×判定
+        <select id="mpJudgeMode">
+          <option value="on" selected>あり(押すまで待つ)</option>
+          <option value="off">なし(自動で次へ)</option>
+        </select>
+      </label>
+      <label>答えのあと
+        <select id="mpReview">
+          <option value="2000">2秒</option>
+          <option value="4000" selected>4秒</option>
+          <option value="8000">8秒</option>
+        </select>
+      </label>
+    </div>
+    <div class="stats" id="mpStats"></div>
+    <div class="card">
+      <div class="mp-stage" id="mpStage"></div>
+      <div class="judge" id="mpJudgeRow">
+        <button class="j-ok" id="mpOk">○ 言えた<small>後回し (1)</small></button>
+        <button class="j-mid" id="mpMid">△ 微妙<small>少し後 (2)</small></button>
+        <button class="j-ng" id="mpNg">× 無理<small>すぐ出す (3)</small></button>
+      </div>
+      <div class="mp-prog"><span><span id="mpCycle">1</span>周目 ・ <span id="mpDone">0</span> / <span id="mpTotal">0</span></span><span>スペース=再生/停止 ・ ←→=前/次</span></div>
+      <div class="mp-ctl">
+        <button class="btn sub" id="mpPrev">⏮</button>
+        <button class="btn main" id="mpPlay">▶</button>
+        <button class="btn sub" id="mpNext">⏭</button>
+      </div>
+    </div>
+    <details class="panel" open>
+      <summary>★ チェックした言い方(<span id="memoCount2">0</span>)</summary>
+      <div id="memoList"></div>
+    </details>
+  </div>
+</div>
+
+<script>
+// ===== 型 =====
+const GROUPS = ['命令・呼びかけ','自分の状態','したい・ほしい','状況・感想'];
+const KATA = [
+  {id:'get',    grp:0, head:"Get",            tpl:"Get ___",            mean:"〜しろ(体の動き)"},
+  {id:'dont',   grp:0, head:"Don't",          tpl:"Don't ___",          mean:"〜するな"},
+  {id:'stop',   grp:0, head:"Stop",           tpl:"Stop ___",           mean:"〜をやめろ／止まれ"},
+  {id:'lets',   grp:0, head:"Let's",          tpl:"Let's ___",          mean:"〜しよう"},
+  {id:'letme',  grp:0, head:"Let me",         tpl:"Let me ___",         mean:"俺に〜させて"},
+  {id:'give',   grp:0, head:"Give me",        tpl:"Give me ___",        mean:"〜をくれ"},
+  {id:'im',     grp:1, head:"I'm",            tpl:"I'm ___",            mean:"今〜な状態"},
+  {id:'igot',   grp:1, head:"I got",          tpl:"I got ___",          mean:"〜された／〜を手に入れた"},
+  {id:'ijust',  grp:1, head:"I just",         tpl:"I just ___",         mean:"今〜したばかり／〜しただけ"},
+  {id:'icant',  grp:1, head:"I can't",        tpl:"I can't ___",        mean:"〜できない"},
+  {id:'ididnt', grp:1, head:"I didn't",       tpl:"I didn't ___",       mean:"〜してない"},
+  {id:'ineed',  grp:2, head:"I need",         tpl:"I need ___",         mean:"〜がいる(物)"},
+  {id:'ineedto',grp:2, head:"I need to",      tpl:"I need to ___",      mean:"〜しなきゃ(動き)"},
+  {id:'iwantto',grp:2, head:"I want to",      tpl:"I want to ___",      mean:"〜したい"},
+  {id:'canget', grp:2, head:"Can I get",      tpl:"Can I get ___?",     mean:"〜もらえる？／〜取れる？(予約・注文も)"},
+  {id:'howdoi', grp:2, head:"How do I",       tpl:"How do I ___?",      mean:"どうやって〜するの？"},
+  {id:'theres', grp:3, head:"There's",        tpl:"There's ___",        mean:"〜がいる／ある"},
+  {id:'too',    grp:3, head:"Too",            tpl:"Too ___!",           mean:"〜すぎ"},
+  {id:'thisis', grp:3, head:"This is",        tpl:"This is ___",        mean:"これは〜だ(今のこと)"},
+  {id:'thatwas',grp:3, head:"That was",       tpl:"That was ___",       mean:"今のは〜だった(終わったこと)"},
+  {id:'its',    grp:3, head:"It's",           tpl:"It's ___",           mean:"それ〜だ(物の状態)"},
+  {id:'where',  grp:3, head:"Where's",        tpl:"Where's ___?",       mean:"〜どこ？"},
+  {id:'why',    grp:3, head:"Why is he",      tpl:"Why is he ___?",     mean:"なんであいつ〜してるの？"},
+  {id:'think',  grp:3, head:"I think",        tpl:"I think ___",        mean:"〜だと思う／〜かも"},
+  {id:'noidea', grp:3, head:"I have no idea", tpl:"I have no idea ___", mean:"〜が全然分からない(単体でもOK)"},
+];
+const KMAP = Object.fromEntries(KATA.map(k=>[k.id,k]));
+
+// ===== 付け足しパーツ =====
+const ADDONS = [
+  {t:'Wait, 〜',        jp:'待って、〜',          re:/^wait$/i},
+  {t:'Okay, 〜',        jp:'よし、〜／で、〜',     re:/^okay(, okay)?$|^all right$/i},
+  {t:'Oh no, 〜',       jp:'うわ、〜／やば、〜',   re:/^oh no$|^oh my god$|^whoa$/i},
+  {t:'Hey, 〜',         jp:'おい、〜',            re:/^hey$/i},
+  {t:'Come on, 〜',     jp:'ほら／頼むよ／おい',   re:/^come on$/i},
+  {t:'Sorry, 〜 / I\'m sorry, 〜', jp:'ごめん、〜', re:/^(sorry|i'm sorry)$/i},
+  {t:'No no no, 〜',    jp:'いやいやいや、〜',     re:/^no( no no)?$/i},
+  {t:'What? / Seriously? / Really?', jp:'は？／マジかよ／マジ？', re:/^(what|seriously|really)$/i},
+  {t:'Help! / Look! / Yes!', jp:'助けて！／見て！／よっしゃ！', re:/^(help|look|yes)$/i},
+  {t:'〜, man',         jp:'〜って！／〜じゃん(グチ・強め)', re:/^man$/i},
+  {t:'〜, please',      jp:'お願い／〜ください',   re:/^please$/i},
+  {t:'〜 right now / 〜, now', jp:'今すぐ〜',     re:/^(right )?now$/i},
+  {t:'〜 again / Not again.', jp:'また〜／またかよ', re:/^again$|^not again$/i},
+  {t:'〜 anymore',      jp:'もう〜ない',           re:/^anymore$/i},
+  {t:'〜 already',      jp:'もう〜(早すぎ)',       re:/^already$/i},
+  {t:'〜 first',        jp:'まず〜',              re:/^first$/i},
+  {t:'〜 instead',      jp:'代わりに〜',          re:/^instead$/i},
+  {t:'〜 at all',       jp:'全然〜',              re:/^at all$/i},
+  {t:'〜 for real / 〜, I swear', jp:'マジで〜／誓って〜', re:/^for real$|^i swear$/i},
+  {t:'〜 so bad',       jp:'めちゃくちゃ〜',       re:/^so bad$/i},
+  {t:'〜 for a second / real quick', jp:'ちょっと〜／サッと〜', re:/^for a second$|^real quick$|^for a while$/i},
+  {t:'〜 this time / for today / someday', jp:'今回は／今日は／いつか', re:/^this time$|^for today$|^just for today$|^someday$/i},
+  {t:'〜 too',          jp:'〜も',                re:/^too$/i},
+  {t:'〜 anything / anywhere / somewhere', jp:'何も／どこにも／どこかに', re:/^(anything|anywhere|somewhere)$/i},
+  {t:'〜, or I\'ll 〜',  jp:'じゃないと〜するぞ',  re:/^or i'll/i},
+  {t:'〜 before 〜',    jp:'〜する前に',          re:/^before/i},
+  {t:'〜, but 〜',      jp:'〜けど、〜',          re:/^but/i},
+  {t:'〜 for 〜 / to 〜', jp:'〜用に／〜まで／〜するために', re:/^for (two|tonight|this|me|no reason)$|^to /i},
+  {t:'〜 like 〜',      jp:'〜みたいに／そんな風に', re:/^like/i},
+  {t:'＋もう一文(型をつなげる)', jp:'型どうしをつなげて2文にする', re:/./},
+];
+
+// ===== 問題(オリジナル) k:型 / en:短い文 / jp:言いたいこと / sc:状況 / x:付け足し文([ ]が付け足し) / xj:その意味 =====
+const RAW = [
+{
+"k": "get",
+"en": "Get in!",
+"jp": "乗れ！",
+"sc": "仲間を車に乗せたい",
+"x": "[Come on,] get in!",
+"xj": "ほら、乗れ！"
+},
+{
+"k": "get",
+"en": "Get out!",
+"jp": "降りろ！",
+"sc": "運転手を引きずり出して車を奪う",
+"x": "Get out[, or I'll shoot]!",
+"xj": "降りろ、じゃないと撃つぞ！"
+},
+{
+"k": "get",
+"en": "Get down!",
+"jp": "伏せろ！",
+"sc": "いきなり銃撃戦が始まった",
+"x": "Get down! [Right now!]",
+"xj": "伏せろ！今すぐ！"
+},
+{
+"k": "get",
+"en": "Get off me!",
+"jp": "離れろ！",
+"sc": "NPCに掴みかかられた",
+"x": "Get off me[, man]!",
+"xj": "離れろって！"
+},
+{
+"k": "get",
+"en": "Get away from my car!",
+"jp": "俺の車から離れろ！",
+"sc": "知らない奴が自分の車に近づいてくる",
+"x": "[Hey,] get away from my car!",
+"xj": "おい、俺の車から離れろ！"
+},
+{
+"k": "get",
+"en": "Get out of the way!",
+"jp": "どけ！",
+"sc": "道のど真ん中に人が立っている",
+"x": "Get out of the way[, please]!",
+"xj": "どいてください！"
+},
+{
+"k": "get",
+"en": "Get back here!",
+"jp": "戻ってこい！",
+"sc": "金を持った奴が逃げた",
+"x": "Get back here [right now]!",
+"xj": "今すぐ戻ってこい！"
+},
+{
+"k": "get",
+"en": "Get ready.",
+"jp": "準備しろ",
+"sc": "銀行強盗の直前",
+"x": "[Okay,] get ready.",
+"xj": "よし、準備しろ"
+},
+{
+"k": "dont",
+"en": "Don't shoot!",
+"jp": "撃つな！",
+"sc": "警察に銃を向けられた",
+"x": "Don't shoot! [I'm sorry!]",
+"xj": "撃たないで！ごめんって！"
+},
+{
+"k": "dont",
+"en": "Don't move!",
+"jp": "動くな！",
+"sc": "強盗で店員に銃を向ける",
+"x": "Don't move[, or I'll shoot]!",
+"xj": "動くな、じゃないと撃つぞ！"
+},
+{
+"k": "dont",
+"en": "Don't follow me!",
+"jp": "ついてくるな！",
+"sc": "変なNPCがずっとついてくる",
+"x": "Don't follow me [anymore]!",
+"xj": "もうついてくるな！"
+},
+{
+"k": "dont",
+"en": "Don't touch my car!",
+"jp": "車に触るな！",
+"sc": "NPCが自分の車をベタベタ触る",
+"x": "Don't touch my car[, man]!",
+"xj": "俺の車触んなって！"
+},
+{
+"k": "dont",
+"en": "Don't look at me.",
+"jp": "こっち見んな",
+"sc": "NPCにじっと見られている",
+"x": "Don't look at me [like that].",
+"xj": "そんな目で見るな"
+},
+{
+"k": "dont",
+"en": "Don't do that!",
+"jp": "それやめろ！",
+"sc": "仲間が勝手に撃ち始めた",
+"x": "[No no no,] don't do that!",
+"xj": "いやいやいや、やめろ！"
+},
+{
+"k": "dont",
+"en": "Don't die!",
+"jp": "死ぬな！",
+"sc": "仲間が撃たれて倒れた",
+"x": "[Come on,] don't die!",
+"xj": "頼む、死ぬな！"
+},
+{
+"k": "stop",
+"en": "Stop it!",
+"jp": "やめろ！",
+"sc": "NPCが殴りかかってくる",
+"x": "Stop it[, please]!",
+"xj": "お願いだからやめて！"
+},
+{
+"k": "stop",
+"en": "Stop the car!",
+"jp": "車止めて！",
+"sc": "助手席に乗っていて降りたい",
+"x": "Stop the car [right now]!",
+"xj": "今すぐ車止めて！"
+},
+{
+"k": "stop",
+"en": "Stop shooting!",
+"jp": "撃つのやめろ！",
+"sc": "仲間が人のいる所で撃ちまくる",
+"x": "[Hey,] stop shooting!",
+"xj": "おい、撃つのやめろ！"
+},
+{
+"k": "stop",
+"en": "Stop running!",
+"jp": "走るな！",
+"sc": "逃げる奴を追いかけている",
+"x": "Stop running[, man]!",
+"xj": "走るなって！"
+},
+{
+"k": "stop",
+"en": "Stop talking.",
+"jp": "しゃべるな",
+"sc": "NPCがずっとうるさい",
+"x": "Stop talking [for a second].",
+"xj": "ちょっと黙ってて"
+},
+{
+"k": "stop",
+"en": "Stop right there!",
+"jp": "そこで止まれ！",
+"sc": "逃げる奴に追いつきそう",
+"x": "[Hey,] stop right there!",
+"xj": "おい、そこで止まれ！"
+},
+{
+"k": "lets",
+"en": "Let's go!",
+"jp": "行こう！",
+"sc": "ミッションスタート",
+"x": "[Okay,] let's go!",
+"xj": "よし、行こう！"
+},
+{
+"k": "lets",
+"en": "Let's go this way.",
+"jp": "こっち行こう",
+"sc": "近道を見つけた",
+"x": "[Wait,] let's go this way.",
+"xj": "待って、こっち行こう"
+},
+{
+"k": "lets",
+"en": "Let's try again.",
+"jp": "もう一回やろう",
+"sc": "ミッション失敗",
+"x": "[Okay, okay,] let's try again.",
+"xj": "よしよし、もう一回やろう"
+},
+{
+"k": "lets",
+"en": "Let's get out of here!",
+"jp": "ここから逃げよう！",
+"sc": "強盗が終わってサイレンが鳴りだした",
+"x": "Let's get out of here [before the cops come]!",
+"xj": "警察が来る前に逃げよう！"
+},
+{
+"k": "lets",
+"en": "Let's take this car.",
+"jp": "この車にしよう",
+"sc": "駐車場で良い車を見つけた",
+"x": "Let's take this car [instead].",
+"xj": "代わりにこの車にしよう"
+},
+{
+"k": "lets",
+"en": "Let's go to the beach.",
+"jp": "ビーチ行こう",
+"sc": "ミッションの合間に気分転換",
+"x": "Let's go to the beach [for a while].",
+"xj": "ちょっとビーチ行こう"
+},
+{
+"k": "lets",
+"en": "Let's do this!",
+"jp": "やってやろう！",
+"sc": "大きなミッションの開始直前",
+"x": "[All right,] let's do this!",
+"xj": "よっしゃ、やってやろう！"
+},
+{
+"k": "letme",
+"en": "Let me try.",
+"jp": "俺にやらせて",
+"sc": "仲間が何度も失敗している",
+"x": "Let me try [this time].",
+"xj": "今回は俺にやらせて"
+},
+{
+"k": "letme",
+"en": "Let me see.",
+"jp": "見せて",
+"sc": "仲間が何か見つけた",
+"x": "[Wait,] let me see.",
+"xj": "待って、見せて"
+},
+{
+"k": "letme",
+"en": "Let me drive.",
+"jp": "俺が運転する",
+"sc": "仲間の運転がひどい",
+"x": "[No,] let me drive.",
+"xj": "いや、俺が運転する"
+},
+{
+"k": "letme",
+"en": "Let me think.",
+"jp": "ちょっと考えさせて",
+"sc": "どのルートで行くか迷う",
+"x": "Let me think [for a second].",
+"xj": "ちょっとだけ考えさせて"
+},
+{
+"k": "letme",
+"en": "Let me check the map.",
+"jp": "地図見せて",
+"sc": "道が分からなくなった",
+"x": "Let me check the map [real quick].",
+"xj": "サッと地図見せて"
+},
+{
+"k": "letme",
+"en": "Let me out!",
+"jp": "出して！",
+"sc": "部屋に閉じ込められた",
+"x": "Let me out [of here]!",
+"xj": "ここから出して！"
+},
+{
+"k": "letme",
+"en": "Let me go!",
+"jp": "離して！",
+"sc": "警察に捕まった",
+"x": "Let me go! [I didn't do anything!]",
+"xj": "離せ！何もしてないって！"
+},
+{
+"k": "give",
+"en": "Give me the money!",
+"jp": "金をよこせ！",
+"sc": "銀行強盗でカウンターに",
+"x": "Give me the money [right now]!",
+"xj": "今すぐ金をよこせ！"
+},
+{
+"k": "give",
+"en": "Give me your car!",
+"jp": "車よこせ！",
+"sc": "信号待ちの車に近づく",
+"x": "Give me your car[, please]!",
+"xj": "車ください！(丁寧な強盗)"
+},
+{
+"k": "give",
+"en": "Give me a second.",
+"jp": "ちょっと待って",
+"sc": "操作が分からなくて確認したい",
+"x": "[Wait,] give me a second.",
+"xj": "待って、ちょっと待って"
+},
+{
+"k": "give",
+"en": "Give me that!",
+"jp": "それよこせ！",
+"sc": "NPCが良い銃を持っている",
+"x": "[Hey,] give me that!",
+"xj": "おい、それよこせ！"
+},
+{
+"k": "give",
+"en": "Give me a break.",
+"jp": "勘弁してくれ",
+"sc": "やっとまいたのにまた警察が来た",
+"x": "[Not again.] Give me a break.",
+"xj": "またかよ、勘弁してくれ"
+},
+{
+"k": "give",
+"en": "Give me a gun.",
+"jp": "銃くれ",
+"sc": "仲間が武器を持っている",
+"x": "Give me a gun [too].",
+"xj": "俺にも銃くれ"
+},
+{
+"k": "im",
+"en": "I'm dead.",
+"jp": "死んだ",
+"sc": "撃たれて倒れた",
+"x": "[Oh no,] I'm dead.",
+"xj": "うわ、死んだ"
+},
+{
+"k": "im",
+"en": "I'm lost.",
+"jp": "迷った",
+"sc": "知らない街で道が分からない",
+"x": "I'm lost [again].",
+"xj": "また迷った"
+},
+{
+"k": "im",
+"en": "I'm stuck.",
+"jp": "ハマった",
+"sc": "車が溝にハマって動けない",
+"x": "I'm stuck [for real].",
+"xj": "マジでハマった"
+},
+{
+"k": "im",
+"en": "I'm out of ammo!",
+"jp": "弾切れ！",
+"sc": "撃とうとしたらカチッと鳴った",
+"x": "I'm out of ammo [already]!",
+"xj": "もう弾切れ！"
+},
+{
+"k": "im",
+"en": "I'm almost dead!",
+"jp": "死にそう！",
+"sc": "体力ゲージが真っ赤",
+"x": "[Help!] I'm almost dead!",
+"xj": "助けて！死にそう！"
+},
+{
+"k": "im",
+"en": "I'm done.",
+"jp": "もう無理",
+"sc": "同じところで5回失敗した",
+"x": "I'm done [for today].",
+"xj": "今日はもう無理"
+},
+{
+"k": "im",
+"en": "I'm back!",
+"jp": "戻ってきた！",
+"sc": "死んで病院から復活した",
+"x": "[Okay,] I'm back!",
+"xj": "よし、戻ってきた！"
+},
+{
+"k": "im",
+"en": "I'm so sorry!",
+"jp": "本当にごめん！",
+"sc": "手配度を上げながら暴れている",
+"x": "[Oh no,] I'm so sorry!",
+"xj": "うわ、本当にごめん！"
+},
+{
+"k": "im",
+"en": "I'm on my way.",
+"jp": "今向かってる",
+"sc": "ミッションの依頼人から電話",
+"x": "I'm on my way [right now].",
+"xj": "今すぐ向かう"
+},
+{
+"k": "igot",
+"en": "I got shot!",
+"jp": "撃たれた！",
+"sc": "どこからか撃たれた",
+"x": "I got shot [again]!",
+"xj": "また撃たれた！"
+},
+{
+"k": "igot",
+"en": "I got caught.",
+"jp": "捕まった",
+"sc": "警察に逮捕された",
+"x": "[Seriously?] I got caught.",
+"xj": "マジかよ、捕まった"
+},
+{
+"k": "igot",
+"en": "I got hit by a car.",
+"jp": "車にひかれた",
+"sc": "歩いていたら車が突っ込んできた",
+"x": "I got hit by a car [for no reason].",
+"xj": "理由もなく車にひかれた"
+},
+{
+"k": "igot",
+"en": "I got money!",
+"jp": "金ゲット！",
+"sc": "強盗で金を手に入れた",
+"x": "[Yes!] I got money!",
+"xj": "よっしゃ！金ゲット！"
+},
+{
+"k": "igot",
+"en": "I got a new car!",
+"jp": "新しい車ゲット！",
+"sc": "高級車を手に入れた",
+"x": "I got a new car! [Look at this!]",
+"xj": "新しい車！これ見て！"
+},
+{
+"k": "igot",
+"en": "I got it!",
+"jp": "分かった！",
+"sc": "やり方がやっと分かった",
+"x": "[Okay,] I got it!",
+"xj": "よし、分かった！"
+},
+{
+"k": "igot",
+"en": "I got away!",
+"jp": "逃げ切った！",
+"sc": "警察をまいた",
+"x": "I got away! [Finally!]",
+"xj": "逃げ切った！やっと！"
+},
+{
+"k": "ijust",
+"en": "I just died.",
+"jp": "今死んだ",
+"sc": "一瞬で何が起きたか分からない",
+"x": "[What?] I just died.",
+"xj": "は？今死んだ"
+},
+{
+"k": "ijust",
+"en": "I just got here.",
+"jp": "今来たとこ",
+"sc": "目的地に着いた直後に敵が来た",
+"x": "[Wait,] I just got here!",
+"xj": "待って、今来たとこ！"
+},
+{
+"k": "ijust",
+"en": "I just crashed my car.",
+"jp": "車ぶつけたばっか",
+"sc": "出発してすぐ事故った",
+"x": "I just crashed my car [again].",
+"xj": "また車ぶつけた"
+},
+{
+"k": "ijust",
+"en": "I just bought this car!",
+"jp": "この車買ったばっかなのに！",
+"sc": "買ったばかりの車が爆発した",
+"x": "[No no no,] I just bought this car!",
+"xj": "いやいやいや、買ったばっかなのに！"
+},
+{
+"k": "ijust",
+"en": "I just wanted to help!",
+"jp": "助けたかっただけなのに！",
+"sc": "善意でやったら大事故になった",
+"x": "[I'm sorry,] I just wanted to help!",
+"xj": "ごめん、助けたかっただけなのに！"
+},
+{
+"k": "ijust",
+"en": "I just lost everything.",
+"jp": "全部失った",
+"sc": "死んで金も武器もなくなった",
+"x": "I just lost everything[, man].",
+"xj": "全部失ったよ…"
+},
+{
+"k": "icant",
+"en": "I can't see!",
+"jp": "見えない！",
+"sc": "夜で真っ暗",
+"x": "I can't see [anything]!",
+"xj": "何も見えない！"
+},
+{
+"k": "icant",
+"en": "I can't stop!",
+"jp": "止まれない！",
+"sc": "ブレーキが効かない",
+"x": "[Oh no,] I can't stop!",
+"xj": "うわ、止まれない！"
+},
+{
+"k": "icant",
+"en": "I can't find it.",
+"jp": "見つからない",
+"sc": "目的地のマークを探している",
+"x": "I can't find it [anywhere].",
+"xj": "どこにもない"
+},
+{
+"k": "icant",
+"en": "I can't drive this car.",
+"jp": "この車運転できない",
+"sc": "借りた車がまっすぐ走らない",
+"x": "I can't drive this car [at all].",
+"xj": "この車全然運転できない"
+},
+{
+"k": "icant",
+"en": "I can't do this.",
+"jp": "これ無理",
+"sc": "難しいミニゲームが始まった",
+"x": "I can't do this [anymore].",
+"xj": "もう無理"
+},
+{
+"k": "icant",
+"en": "I can't get out!",
+"jp": "出られない！",
+"sc": "車が水に落ちた",
+"x": "[Help!] I can't get out!",
+"xj": "助けて！出られない！"
+},
+{
+"k": "icant",
+"en": "I can't hear you.",
+"jp": "聞こえない",
+"sc": "NPCの声が小さくて聞き取れない",
+"x": "[Sorry,] I can't hear you.",
+"xj": "ごめん、聞こえない"
+},
+{
+"k": "ididnt",
+"en": "I didn't see that.",
+"jp": "見えなかった",
+"sc": "角から急に車が出てきた",
+"x": "[Sorry,] I didn't see that.",
+"xj": "ごめん、見えなかった"
+},
+{
+"k": "ididnt",
+"en": "I didn't mean to!",
+"jp": "わざとじゃない！",
+"sc": "通行人を轢いてしまった",
+"x": "[I'm sorry,] I didn't mean to!",
+"xj": "ごめん、わざとじゃない！"
+},
+{
+"k": "ididnt",
+"en": "I didn't do anything!",
+"jp": "何もしてない！",
+"sc": "理由もなく警察に追われる",
+"x": "I didn't do anything[, I swear]!",
+"xj": "誓って何もしてない！"
+},
+{
+"k": "ididnt",
+"en": "I didn't know that.",
+"jp": "知らなかった",
+"sc": "視聴者に新しい仕組みを教えてもらった",
+"x": "[Really?] I didn't know that.",
+"xj": "マジ？知らなかった"
+},
+{
+"k": "ididnt",
+"en": "I didn't hear him.",
+"jp": "あいつの話聞いてなかった",
+"sc": "ミッションのセリフを聞き逃した",
+"x": "[Wait,] I didn't hear him.",
+"xj": "待って、聞いてなかった"
+},
+{
+"k": "ididnt",
+"en": "I didn't touch it!",
+"jp": "触ってない！",
+"sc": "車が勝手に爆発した",
+"x": "[What?] I didn't touch it!",
+"xj": "は？触ってないって！"
+},
+{
+"k": "ineed",
+"en": "I need a car.",
+"jp": "車がいる",
+"sc": "歩いて移動するには遠すぎる",
+"x": "I need a car [right now].",
+"xj": "今すぐ車がいる"
+},
+{
+"k": "ineed",
+"en": "I need a gun.",
+"jp": "銃がいる",
+"sc": "丸腰で敵の拠点に来てしまった",
+"x": "I need a gun [first].",
+"xj": "まず銃がいる"
+},
+{
+"k": "ineed",
+"en": "I need help!",
+"jp": "助けて！",
+"sc": "一人で敵に囲まれた",
+"x": "I need help [over here]!",
+"xj": "こっち助けて！"
+},
+{
+"k": "ineed",
+"en": "I need money.",
+"jp": "金がいる",
+"sc": "欲しい物があるのに金がない",
+"x": "I need money [so bad].",
+"xj": "金がめちゃくちゃ欲しい"
+},
+{
+"k": "ineed",
+"en": "I need a doctor.",
+"jp": "医者がいる",
+"sc": "撃たれて体力が少ない",
+"x": "I need a doctor[, now]!",
+"xj": "今すぐ医者を！"
+},
+{
+"k": "ineed",
+"en": "I need a faster car.",
+"jp": "もっと速い車がいる",
+"sc": "逃げる車に追いつけない",
+"x": "I need a faster car [to catch him].",
+"xj": "あいつに追いつくにはもっと速い車がいる"
+},
+{
+"k": "ineedto",
+"en": "I need to hide.",
+"jp": "隠れなきゃ",
+"sc": "手配度が上がってパトカーが来る",
+"x": "I need to hide [somewhere].",
+"xj": "どこかに隠れなきゃ"
+},
+{
+"k": "ineedto",
+"en": "I need to go back.",
+"jp": "戻らなきゃ",
+"sc": "大事な物を置いてきた",
+"x": "[Wait,] I need to go back.",
+"xj": "待って、戻らなきゃ"
+},
+{
+"k": "ineedto",
+"en": "I need to hurry.",
+"jp": "急がなきゃ",
+"sc": "制限時間が残りわずか",
+"x": "I need to hurry[, or I'll be late].",
+"xj": "急がないと遅れる"
+},
+{
+"k": "ineedto",
+"en": "I need to fix my car.",
+"jp": "車直さなきゃ",
+"sc": "車から煙が出ている",
+"x": "I need to fix my car [first].",
+"xj": "まず車直さなきゃ"
+},
+{
+"k": "ineedto",
+"en": "I need to find him.",
+"jp": "あいつ探さなきゃ",
+"sc": "ターゲットを見失った",
+"x": "I need to find him [before he gets away].",
+"xj": "逃げられる前にあいつ探さなきゃ"
+},
+{
+"k": "ineedto",
+"en": "I need to save money.",
+"jp": "金貯めなきゃ",
+"sc": "欲しい家が高すぎる",
+"x": "I need to save money [for this].",
+"xj": "これのために金貯めなきゃ"
+},
+{
+"k": "iwantto",
+"en": "I want to go home.",
+"jp": "家に帰りたい",
+"sc": "長いミッションでヘトヘト",
+"x": "I want to go home [so bad].",
+"xj": "マジで家に帰りたい"
+},
+{
+"k": "iwantto",
+"en": "I want to try this.",
+"jp": "これ試したい",
+"sc": "新しい武器を手に入れた",
+"x": "I want to try this [right now].",
+"xj": "今すぐこれ試したい"
+},
+{
+"k": "iwantto",
+"en": "I want to buy this car.",
+"jp": "この車買いたい",
+"sc": "車屋で一目ぼれした",
+"x": "I want to buy this car[, but it's too expensive].",
+"xj": "この車買いたいけど高すぎる"
+},
+{
+"k": "iwantto",
+"en": "I want to fly.",
+"jp": "飛びたい",
+"sc": "空港で飛行機を見つけた",
+"x": "I want to fly [like a bird].",
+"xj": "鳥みたいに飛びたい"
+},
+{
+"k": "iwantto",
+"en": "I want to be a cop.",
+"jp": "警察になりたい",
+"sc": "パトカーを奪った(冗談で)",
+"x": "I want to be a cop[, just for today].",
+"xj": "今日だけ警察になりたい"
+},
+{
+"k": "iwantto",
+"en": "I want to be rich.",
+"jp": "金持ちになりたい",
+"sc": "豪邸の前を通った",
+"x": "I want to be rich [someday].",
+"xj": "いつか金持ちになりたい"
+},
+{
+"k": "canget",
+"en": "Can I get a table?",
+"jp": "席とれる？",
+"sc": "レストランに入った(予約を取りたい)",
+"x": "Can I get a table [for two]?",
+"xj": "2人で席とれる？"
+},
+{
+"k": "canget",
+"en": "Can I get a room?",
+"jp": "部屋とれる？",
+"sc": "ホテルのフロント",
+"x": "Can I get a room [for tonight]?",
+"xj": "今夜の部屋とれる？"
+},
+{
+"k": "canget",
+"en": "Can I get a coffee?",
+"jp": "コーヒー1つください",
+"sc": "カフェで注文",
+"x": "Can I get a coffee[, please]?",
+"xj": "コーヒー1つお願いします"
+},
+{
+"k": "canget",
+"en": "Can I get some help?",
+"jp": "手伝ってくれる？",
+"sc": "一人じゃ無理なミッション",
+"x": "[Hey,] can I get some help?",
+"xj": "なあ、手伝ってくれる？"
+},
+{
+"k": "canget",
+"en": "Can I get a ride?",
+"jp": "乗せてくれる？",
+"sc": "車がなくて仲間に頼む",
+"x": "Can I get a ride [to the bank]?",
+"xj": "銀行まで乗せてくれる？"
+},
+{
+"k": "canget",
+"en": "Can I get this one?",
+"jp": "これにしていい？",
+"sc": "店で服を選んだ",
+"x": "Can I get this one [instead]?",
+"xj": "代わりにこれにしていい？"
+},
+{
+"k": "canget",
+"en": "Can I get a discount?",
+"jp": "まけてくれる？",
+"sc": "車の値段が高すぎる",
+"x": "Can I get a discount[, please]?",
+"xj": "まけてくれません？"
+},
+{
+"k": "howdoi",
+"en": "How do I get out?",
+"jp": "どうやって出るの？",
+"sc": "建物の中で迷った",
+"x": "[Wait,] how do I get out?",
+"xj": "待って、どうやって出るの？"
+},
+{
+"k": "howdoi",
+"en": "How do I open this?",
+"jp": "これどう開けるの？",
+"sc": "ドアが開かない",
+"x": "How do I open this [thing]?",
+"xj": "これ、どうやって開けんの？"
+},
+{
+"k": "howdoi",
+"en": "How do I start the mission?",
+"jp": "ミッションどう始めるの？",
+"sc": "マークの所に来たけど何も起きない",
+"x": "[Okay,] how do I start the mission?",
+"xj": "で、ミッションどう始めるの？"
+},
+{
+"k": "howdoi",
+"en": "How do I get money?",
+"jp": "どうやって金稼ぐの？",
+"sc": "ゲームを始めたばかり",
+"x": "How do I get money [fast]?",
+"xj": "どうやって早く金稼ぐの？"
+},
+{
+"k": "howdoi",
+"en": "How do I fix this?",
+"jp": "これどう直すの？",
+"sc": "車が壊れた",
+"x": "How do I fix this[, man]?",
+"xj": "これどう直すんだよ"
+},
+{
+"k": "howdoi",
+"en": "How do I get up there?",
+"jp": "どうやってあそこ行くの？",
+"sc": "屋上に宝箱が見える",
+"x": "How do I get up there? [Any ideas?]",
+"xj": "どうやってあそこ行くの？誰か分かる？"
+},
+{
+"k": "theres",
+"en": "There's a cop!",
+"jp": "警察いる！",
+"sc": "角を曲がったらパトカーがいた",
+"x": "[Oh no,] there's a cop!",
+"xj": "やばい、警察いる！"
+},
+{
+"k": "theres",
+"en": "There's someone in the car.",
+"jp": "車に誰か乗ってる",
+"sc": "奪おうとした車に人がいた",
+"x": "[Wait,] there's someone in the car.",
+"xj": "待って、車に誰か乗ってる"
+},
+{
+"k": "theres",
+"en": "There's no way!",
+"jp": "無理だろ！",
+"sc": "届くはずのない距離をジャンプしようとしている",
+"x": "There's no way [I can do that]!",
+"xj": "そんなの無理だろ！"
+},
+{
+"k": "theres",
+"en": "There's nothing here.",
+"jp": "ここ何もない",
+"sc": "建物を探したけど空っぽ",
+"x": "There's nothing here[, man].",
+"xj": "ここ何もないじゃん"
+},
+{
+"k": "theres",
+"en": "There's a car behind me.",
+"jp": "後ろに車いる",
+"sc": "ずっと同じ車がついてくる",
+"x": "There's a car behind me [again].",
+"xj": "また後ろに車いる"
+},
+{
+"k": "theres",
+"en": "There's money on the floor!",
+"jp": "床に金落ちてる！",
+"sc": "強盗のあと札が散らばっている",
+"x": "[Look!] There's money on the floor!",
+"xj": "見て！床に金落ちてる！"
+},
+{
+"k": "theres",
+"en": "There's a shop over there.",
+"jp": "あっちに店ある",
+"sc": "弾を買いたい",
+"x": "There's a shop over there. [Let's go.]",
+"xj": "あっちに店ある。行こう"
+},
+{
+"k": "too",
+"en": "Too fast!",
+"jp": "速すぎ！",
+"sc": "スーパーカーが速すぎて曲がれない",
+"x": "Too fast! [I can't stop!]",
+"xj": "速すぎ！止まれない！"
+},
+{
+"k": "too",
+"en": "Too late.",
+"jp": "遅かった",
+"sc": "着いた時にはもうターゲットがいない",
+"x": "[Oh no,] too late.",
+"xj": "あー、遅かった"
+},
+{
+"k": "too",
+"en": "Too many cops!",
+"jp": "警察多すぎ！",
+"sc": "手配度5でパトカーだらけ",
+"x": "Too many cops! [I need to hide!]",
+"xj": "警察多すぎ！隠れなきゃ！"
+},
+{
+"k": "too",
+"en": "Too close!",
+"jp": "近すぎ！",
+"sc": "爆発がすぐそばで起きた",
+"x": "[Whoa,] too close!",
+"xj": "うおっ、近すぎ！"
+},
+{
+"k": "too",
+"en": "Too expensive.",
+"jp": "高すぎ",
+"sc": "店で値段を見た",
+"x": "Too expensive [for me].",
+"xj": "俺には高すぎ"
+},
+{
+"k": "too",
+"en": "Too dark.",
+"jp": "暗すぎ",
+"sc": "夜の森に入った",
+"x": "Too dark. [I can't see anything.]",
+"xj": "暗すぎ。何も見えない"
+},
+{
+"k": "thisis",
+"en": "This is crazy!",
+"jp": "これヤバい！",
+"sc": "街中が大混乱",
+"x": "This is crazy[, man]!",
+"xj": "これマジでヤバいって！"
+},
+{
+"k": "thisis",
+"en": "This is not fair!",
+"jp": "これはズルい！",
+"sc": "敵だけ強い武器を持っている",
+"x": "[Come on,] this is not fair!",
+"xj": "おい、これズルいだろ！"
+},
+{
+"k": "thisis",
+"en": "This is my car now.",
+"jp": "今から俺の車",
+"sc": "車を奪った直後",
+"x": "This is my car now. [Thank you!]",
+"xj": "今から俺の車。ありがとね！"
+},
+{
+"k": "thisis",
+"en": "This is so hard.",
+"jp": "これ難しすぎ",
+"sc": "何度やってもクリアできない",
+"x": "[Oh my god,] this is so hard.",
+"xj": "うわ、これ難しすぎ"
+},
+{
+"k": "thisis",
+"en": "This is perfect.",
+"jp": "完璧",
+"sc": "理想どおりの車を見つけた",
+"x": "This is perfect. [I love it.]",
+"xj": "完璧。最高"
+},
+{
+"k": "thisis",
+"en": "This is the place.",
+"jp": "ここだ",
+"sc": "目的地に着いた",
+"x": "[Okay,] this is the place.",
+"xj": "よし、ここだ"
+},
+{
+"k": "thisis",
+"en": "This is so fun!",
+"jp": "これ楽しい！",
+"sc": "カーチェイスが始まった",
+"x": "This is so fun! [Let's go!]",
+"xj": "これ楽しい！行くぞ！"
+},
+{
+"k": "thatwas",
+"en": "That was close!",
+"jp": "危なかった！",
+"sc": "ギリギリで車をよけた",
+"x": "That was close! [Too close!]",
+"xj": "危なかった！近すぎ！"
+},
+{
+"k": "thatwas",
+"en": "That was stupid.",
+"jp": "バカだった",
+"sc": "自分から崖に突っ込んだ",
+"x": "That was stupid. [I'm sorry.]",
+"xj": "バカだった。ごめん"
+},
+{
+"k": "thatwas",
+"en": "That was fun!",
+"jp": "楽しかった！",
+"sc": "ミッションが終わった",
+"x": "That was fun! [Let's do it again!]",
+"xj": "楽しかった！もう一回やろう！"
+},
+{
+"k": "thatwas",
+"en": "That was my fault.",
+"jp": "俺のせいだ",
+"sc": "自分のミスで仲間が死んだ",
+"x": "[Sorry,] that was my fault.",
+"xj": "ごめん、俺のせいだ"
+},
+{
+"k": "thatwas",
+"en": "That was easy.",
+"jp": "楽勝だった",
+"sc": "一発でクリアした",
+"x": "That was easy. [Too easy.]",
+"xj": "楽勝。楽勝すぎ"
+},
+{
+"k": "thatwas",
+"en": "That was so lucky!",
+"jp": "超ラッキーだった！",
+"sc": "奇跡的に助かった",
+"x": "That was so lucky! [I can't believe it!]",
+"xj": "超ラッキー！信じられない！"
+},
+{
+"k": "thatwas",
+"en": "That was a bad idea.",
+"jp": "悪いアイデアだった",
+"sc": "作戦が完全に失敗した",
+"x": "[Okay,] that was a bad idea.",
+"xj": "うん、悪いアイデアだった"
+},
+{
+"k": "its",
+"en": "It's mine!",
+"jp": "俺のだ！",
+"sc": "NPCに金を取られそう",
+"x": "It's mine! [Don't touch it!]",
+"xj": "俺のだ！触るな！"
+},
+{
+"k": "its",
+"en": "It's over.",
+"jp": "終わった",
+"sc": "ミッション失敗の画面が出た",
+"x": "It's over. [I'm done.]",
+"xj": "終わった。もう無理"
+},
+{
+"k": "its",
+"en": "It's broken.",
+"jp": "壊れてる",
+"sc": "車がもう動かない",
+"x": "It's broken [again].",
+"xj": "また壊れた"
+},
+{
+"k": "its",
+"en": "It's locked.",
+"jp": "鍵かかってる",
+"sc": "ドアが開かない",
+"x": "[Oh no,] it's locked.",
+"xj": "うわ、鍵かかってる"
+},
+{
+"k": "its",
+"en": "It's not working.",
+"jp": "動かない",
+"sc": "ボタンを押しても何も起きない",
+"x": "It's not working [at all].",
+"xj": "全然動かない"
+},
+{
+"k": "its",
+"en": "It's okay.",
+"jp": "大丈夫",
+"sc": "ちょっとぶつけたけど平気",
+"x": "It's okay. [I'm okay.]",
+"xj": "大丈夫。俺は平気"
+},
+{
+"k": "its",
+"en": "It's on fire!",
+"jp": "燃えてる！",
+"sc": "車から火が出た",
+"x": "It's on fire! [Get out!]",
+"xj": "燃えてる！降りろ！"
+},
+{
+"k": "where",
+"en": "Where's my car?",
+"jp": "俺の車どこ？",
+"sc": "駐車した場所を忘れた",
+"x": "[Wait,] where's my car?",
+"xj": "待って、俺の車どこ？"
+},
+{
+"k": "where",
+"en": "Where's the mission?",
+"jp": "ミッションどこ？",
+"sc": "マップのどこに行けばいいか分からない",
+"x": "[Okay,] where's the mission?",
+"xj": "で、ミッションどこ？"
+},
+{
+"k": "where",
+"en": "Where's the exit?",
+"jp": "出口どこ？",
+"sc": "建物の中で迷った",
+"x": "Where's the exit? [I need to get out!]",
+"xj": "出口どこ？出なきゃ！"
+},
+{
+"k": "where",
+"en": "Where's the hospital?",
+"jp": "病院どこ？",
+"sc": "ケガをした",
+"x": "Where's the hospital? [I need a doctor!]",
+"xj": "病院どこ？医者がいる！"
+},
+{
+"k": "where",
+"en": "Where's my phone?",
+"jp": "携帯どこ？",
+"sc": "電話をかけたいのにメニューが分からない",
+"x": "Where's my phone [in this game]?",
+"xj": "このゲームの携帯どこ？"
+},
+{
+"k": "where",
+"en": "Where's he going?",
+"jp": "あいつどこ行くの？",
+"sc": "仲間が勝手に走り出した",
+"x": "[Hey,] where's he going?",
+"xj": "おい、あいつどこ行くの？"
+},
+{
+"k": "why",
+"en": "Why is he running?",
+"jp": "なんで走ってるの？",
+"sc": "NPCがいきなり走り出した",
+"x": "Why is he running? [I didn't do anything!]",
+"xj": "なんで走ってるの？何もしてないのに！"
+},
+{
+"k": "why",
+"en": "Why is he so angry?",
+"jp": "なんでそんな怒ってるの？",
+"sc": "ちょっとぶつかっただけでキレられた",
+"x": "Why is he so angry? [I just touched his car.]",
+"xj": "なんでそんな怒ってるの？車にちょっと触っただけなのに"
+},
+{
+"k": "why",
+"en": "Why is he following me?",
+"jp": "なんでついてくるの？",
+"sc": "知らない車がずっと後ろにいる",
+"x": "Why is he following me? [Stop it!]",
+"xj": "なんでついてくるの？やめろ！"
+},
+{
+"k": "why",
+"en": "Why is he shooting at me?",
+"jp": "なんで撃ってくるの？",
+"sc": "何もしてないのに撃たれた",
+"x": "Why is he shooting at me? [What did I do?]",
+"xj": "なんで撃ってくるの？俺何した？"
+},
+{
+"k": "why",
+"en": "Why is he here?",
+"jp": "なんでここにいるの？",
+"sc": "死んだはずのキャラが出てきた",
+"x": "[Wait,] why is he here?",
+"xj": "待って、なんでここにいるの？"
+},
+{
+"k": "why",
+"en": "Why is he naked?",
+"jp": "なんで裸なの？",
+"sc": "街に変なNPCがいる",
+"x": "Why is he naked? [What is this game?]",
+"xj": "なんで裸なの？何このゲーム？"
+},
+{
+"k": "think",
+"en": "I think he's a cop.",
+"jp": "あいつ警察だと思う",
+"sc": "怪しい車が近づいてくる",
+"x": "I think he's a cop. [Be careful.]",
+"xj": "あいつ警察だと思う。気をつけて"
+},
+{
+"k": "think",
+"en": "I think we're safe.",
+"jp": "もう安全だと思う",
+"sc": "警察の音が聞こえなくなった",
+"x": "[Okay,] I think we're safe.",
+"xj": "よし、もう安全だと思う"
+},
+{
+"k": "think",
+"en": "I think this is wrong.",
+"jp": "これ違うと思う",
+"sc": "道を間違えた気がする",
+"x": "I think this is wrong. [Let's go back.]",
+"xj": "これ違うと思う。戻ろう"
+},
+{
+"k": "think",
+"en": "I think I broke it.",
+"jp": "壊したかも",
+"sc": "ボタンを連打したら止まった",
+"x": "[Oh no,] I think I broke it.",
+"xj": "やば、壊したかも"
+},
+{
+"k": "think",
+"en": "I think he's dead.",
+"jp": "あいつ死んだと思う",
+"sc": "敵が動かなくなった",
+"x": "I think he's dead. [I'm sorry.]",
+"xj": "あいつ死んだと思う。ごめん"
+},
+{
+"k": "think",
+"en": "I think it's this way.",
+"jp": "こっちだと思う",
+"sc": "地図を見ずに進む",
+"x": "I think it's this way. [Maybe.]",
+"xj": "こっちだと思う。たぶん"
+},
+{
+"k": "noidea",
+"en": "I have no idea.",
+"jp": "全然分からん",
+"sc": "英語のミッション説明が全く分からない",
+"x": "I have no idea. [I'm sorry.]",
+"xj": "全然分からん。ごめん"
+},
+{
+"k": "noidea",
+"en": "I have no idea where I am.",
+"jp": "ここどこか分からん",
+"sc": "迷ってマップも見てない",
+"x": "I have no idea where I am [right now].",
+"xj": "今どこにいるか分からん"
+},
+{
+"k": "noidea",
+"en": "I have no idea what he said.",
+"jp": "何言ったか分からん",
+"sc": "NPCのセリフが速すぎた",
+"x": "[Sorry,] I have no idea what he said.",
+"xj": "ごめん、何言ったか分からん"
+},
+{
+"k": "noidea",
+"en": "I have no idea what to do.",
+"jp": "何すればいいか分からん",
+"sc": "ミッションの目的が分からない",
+"x": "I have no idea what to do [now].",
+"xj": "今何すればいいか分からん"
+},
+{
+"k": "noidea",
+"en": "I have no idea how to do this.",
+"jp": "これのやり方分からん",
+"sc": "初めてのミニゲーム",
+"x": "I have no idea how to do this[, man].",
+"xj": "これのやり方マジで分からん"
+},
+{
+"k": "noidea",
+"en": "I have no idea who he is.",
+"jp": "あいつ誰か分からん",
+"sc": "知らないキャラが話しかけてきた",
+"x": "[Wait,] I have no idea who he is.",
+"xj": "待って、あいつ誰か分からん"
+}
+];
+const ITEMS = RAW.map((r,i)=>({i, k:r.k, en:r.en, jp:r.jp, sc:r.sc, x:r.x, xj:r.xj, grp:KMAP[r.k].grp}));
+const xPlain = it => it.x.replace(/[\[\]]/g,'');
+const addOf = it => (it.x.match(/\[(.*?)\]/)||['',''])[1].replace(/^[\s,]+|[\s,.!?]+$/g,'');
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// 短い文: 型=青 / 入れ替え=黄
+function hlBase(en, k){
+  const h = KMAP[k].head;
+  if (!en.toLowerCase().startsWith(h.toLowerCase())) return esc(en);
+  const rest = en.slice(h.length);
+  const m = rest.match(/^(\s*)(.*?)([.!?]*)$/);
+  return '<span class="kh">'+esc(en.slice(0,h.length))+'</span>'+esc(m[1])+(m[2]?'<span class="ks">'+esc(m[2])+'</span>':'')+esc(m[3]);
+}
+// 付け足し文: 付け足し=緑 / 残りは短い文と同じ色分け(入れ替え部分は短い文と同じ所を黄色に)
+function slotOf(it){ return it.en.slice(KMAP[it.k].head.length).replace(/^\s+|[.!?]+$/g,''); }
+function hlExt(it){
+  const m = it.x.match(/^(.*?)\[(.*?)\](.*)$/);
+  if (!m) return esc(it.x);
+  const h = KMAP[it.k].head, slot = slotOf(it);
+  let painted = false;
+  const paint = s => {
+    if (painted) return esc(s);
+    const idx = s.toLowerCase().indexOf(h.toLowerCase());
+    if (idx === -1) return esc(s);
+    painted = true;
+    let out = esc(s.slice(0, idx)) + '<span class="kh">'+esc(s.slice(idx, idx+h.length))+'</span>';
+    let after = s.slice(idx + h.length);
+    const sp = after.match(/^\s*/)[0]; out += esc(sp); after = after.slice(sp.length);
+    if (slot && after.toLowerCase().startsWith(slot.toLowerCase())) {
+      out += '<span class="ks">'+esc(after.slice(0, slot.length))+'</span>' + esc(after.slice(slot.length));
+    } else out += esc(after);
+    return out;
+  };
+  return paint(m[1]) + '<span class="ka">'+esc(m[2])+'</span>' + paint(m[3]);
+}
+function enHtml(q){ return q.long ? hlExt(q.it) : hlBase(q.it.en, q.it.k); }
+function enText(q){ return q.long ? xPlain(q.it) : q.it.en; }
+function jpText(q){ return q.long ? q.it.xj : q.it.jp; }
+
+// ===== 状態 =====
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'kata';
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+let currentUser = null, saveTimer = null;
+let status = {};  // 英文 -> {s, w, n, t}
+let memo = {};    // 英文 -> {en, jp, sc, k, long, i, added, s, w, n}
+let curTab = 'drill';
+
+let activeGrps = new Set(GROUPS.map((g,i)=>i));
+let kataF = 'all';
+let queue = [], qi = 0, current = null, retry = [];
+
+function questions(){
+  const len = document.getElementById('lenSel').value;
+  const out = [];
+  ITEMS.filter(it=>activeGrps.has(it.grp) && (kataF==='all' || it.k===kataF)).forEach(it=>{
+    if (len==='short' || len==='mix') out.push({it, long:false});
+    if (len==='long' || len==='mix') out.push({it, long:true});
+  });
+  return out;
+}
+const keyQ = q => enText(q);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function rebuild(){
+  const order = document.getElementById('orderSel').value;
+  let arr = questions();
+  if (order === 'ngonly') arr = arr.filter(q=>status[keyQ(q)] && status[keyQ(q)].s !== 'ok');
+  if (order === 'weak' || order === 'ngonly') {
+    arr = arr.map(q=>{ const st=status[keyQ(q)]; const w = st ? st.w : 1.5; return {q, k: Math.random() - Math.min(w,5)*0.3}; })
+             .sort((a,b)=>a.k-b.k).map(x=>x.q);
+  } else if (order === 'new') {
+    arr = shuffle(arr.filter(q=>!status[keyQ(q)])).concat(shuffle(arr.filter(q=>status[keyQ(q)])));
+  } else shuffle(arr);
+  queue = arr; qi = 0; retry = [];
+  renderStats();
+}
+function next(){
+  retry.forEach(r=>r.wait--);
+  const due = retry.findIndex(r=>r.wait<=0);
+  if (due !== -1) { current = retry.splice(due,1)[0].q; render(true); return; }
+  if (!queue.length) { current = null; render(); return; }
+  if (qi >= queue.length) { rebuild(); if (!queue.length) { current=null; render(); return; } }
+  current = queue[qi++];
+  render(false);
+}
+function prev(){ if (qi >= 2) { qi -= 2; current = queue[qi++]; render(false); } }
+
+function stTagFor(key){
+  const st = status[key];
+  if (!st) return '<span class="tag">未</span>';
+  const m = {ok:['st-ok','○ 言えた'], mid:['st-mid','△ 微妙'], ng:['st-ng','× 無理']}[st.s];
+  return '<span class="tag '+m[0]+'">'+m[1]+' ('+st.n+'回)</span>';
+}
+function starBtn(it, long){
+  const key = long ? xPlain(it) : it.en, on = !!memo[key];
+  return '<button class="memo-star'+(on?' on':'')+'" data-i="'+it.i+'" data-long="'+(long?1:0)+'">'+(on?'★ 覚える':'☆ 覚える')+'</button>';
+}
+function bindStars(root){
+  root.querySelectorAll('.memo-star').forEach(b=>b.onclick = ev=>{
+    ev.stopPropagation();
+    const on = toggleMemo(ITEMS[+b.dataset.i], b.dataset.long==='1');
+    root.querySelectorAll('.memo-star[data-i="'+b.dataset.i+'"][data-long="'+b.dataset.long+'"]').forEach(x=>{ x.classList.toggle('on', on); x.textContent = on ? '★ 覚える' : '☆ 覚える'; });
+  });
+}
+function render(isRetry){
+  const card = document.getElementById('card');
+  if (!current) { card.innerHTML = '<div class="say" style="font-size:18px">この条件の問題がありません</div><div class="scene">グループや型、出す順番を変えてみてください。</div>'; return; }
+  const q = current, it = q.it, K = KMAP[it.k];
+  const always = document.getElementById('hintSel').value === 'always';
+  const sibs = ITEMS.filter(x=>x.k===it.k);
+  card.innerHTML =
+    '<div class="tags"><span class="tag">'+GROUPS[it.grp]+'</span>' +
+      (q.long ? '<span class="tag long">付け足しあり</span>' : '') +
+      stTagFor(keyQ(q)) + (isRetry?'<span class="tag st-ng">もう一回</span>':'') + '</div>' +
+    '<div class="scene-label">状況</div><div class="scene">'+esc(it.sc)+'</div>' +
+    '<div class="scene-label">言いたいこと</div><div class="say">「'+esc(jpText(q))+'」</div>' +
+    '<div class="hintbox" id="hintBox">' + (always
+      ? '<span class="tpl kh">'+esc(K.tpl)+'</span><span class="mean">'+esc(K.mean)+'</span>'
+      : '<button class="btn sub" id="hintBtn">型ヒント</button>') + '</div>' +
+    '<div class="step"><div class="step-h">声に出す(🎤で話すと聞き取った英語が出ます)</div>' +
+      '<textarea id="myEn" placeholder="英語を入力 or 🎤で話す"></textarea>' +
+      '<div class="btns"><button class="btn sub mic" id="micBtn">🎤 話す</button><button class="btn main" id="showModel">答えを見る</button></div>' +
+      '<div class="check-msg" id="checkMsg"></div>' +
+      '<div class="reveal" id="modelBox">' +
+        '<div class="model" data-t="0"><span class="lbl">短い文</span><span class="en">'+hlBase(it.en, it.k)+'<small>'+esc(it.jp)+'</small></span>'+starBtn(it,false)+'</div>' +
+        '<div class="model" data-t="1"><span class="lbl">＋付け足し</span><span class="en">'+hlExt(it)+'<small>'+esc(it.xj)+'</small></span>'+starBtn(it,true)+'</div>' +
+        '<div class="addon-note">付け足し: <b>'+esc(addOf(it))+'</b> '+addonJp(it)+'</div>' +
+        '<div class="swap-h">この型の入れ替え ・ <span class="kh">'+esc(K.tpl)+'</span> '+esc(K.mean)+'</div>' +
+        sibs.map(s=>'<div class="swap'+(s===it?' cur':'')+'" data-i="'+s.i+'"><span class="sp">🔊</span><span>'+hlBase(s.en, s.k)+'</span><span class="j">'+esc(s.jp)+'</span></div>').join('') +
+      '</div>' +
+    '</div>' +
+    '<div class="judge"><button class="j-ok" id="jOk">○ 言えた<small>後回し (1)</small></button><button class="j-mid" id="jMid">△ 微妙<small>また出す (2)</small></button><button class="j-ng" id="jNg">× 無理<small>すぐ出す (3)</small></button></div>' +
+    '<div class="nav"><button class="btn sub" id="prevBtn">← 前</button><button class="btn sub" id="skipBtn">スキップ →</button></div>';
+
+  const hb = document.getElementById('hintBtn');
+  if (hb) hb.onclick = showHint;
+  document.getElementById('showModel').onclick = ()=>{ showHint(); compareMine(); document.getElementById('modelBox').classList.add('show'); speakEn(enText(q)); };
+  card.querySelectorAll('.model').forEach(m=>m.onclick = ev=>{ if (ev.target.closest('.memo-star')) return; speakEn(m.dataset.t==='1' ? xPlain(it) : it.en); });
+  card.querySelectorAll('.swap').forEach(s=>s.onclick = ()=>speakEn(ITEMS[+s.dataset.i].en));
+  bindStars(card);
+  document.getElementById('jOk').onclick = ()=>judge('ok');
+  document.getElementById('jMid').onclick = ()=>judge('mid');
+  document.getElementById('jNg').onclick = ()=>judge('ng');
+  document.getElementById('prevBtn').onclick = prev;
+  document.getElementById('skipBtn').onclick = next;
+  document.getElementById('micBtn').onclick = toggleMic;
+  window.scrollTo({top: document.getElementById('card').offsetTop - 10, behavior:'smooth'});
+}
+function showHint(){
+  const K = KMAP[current.it.k], box = document.getElementById('hintBox');
+  if (box) box.innerHTML = '<span class="tpl kh">'+esc(K.tpl)+'</span><span class="mean">'+esc(K.mean)+'</span>';
+}
+function addonJp(it){
+  const a = addOf(it);
+  const hit = ADDONS.find(x=>x.re.test(a));
+  return hit && hit.re.source !== '.' ? '＝ '+esc(hit.jp) : '(型をもう1つつなげた形)';
+}
+const normEn = s => s.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9' ]/g,' ').replace(/\s+/g,' ').trim();
+function compareMine(){
+  const t = (document.getElementById('myEn').value||'').trim(), msg = document.getElementById('checkMsg');
+  if (!t) return;
+  const ok = normEn(t) === normEn(enText(current));
+  msg.textContent = ok ? '✓ ぴったり！' : '答えと違ってもOK。型が合っていて意味が通じれば○でいい';
+  msg.style.color = ok ? 'var(--green)' : 'var(--text-dim)';
+}
+function judge(s){
+  if (!current) return;
+  const k = keyQ(current), st = status[k] || {w:1.5, n:0};
+  st.s = s; st.n = (st.n||0) + 1; st.t = Date.now();
+  st.w = s==='ok' ? Math.max(0, (st.w||0) - 1) : s==='mid' ? (st.w||0) + 1 : (st.w||0) + 2;
+  status[k] = st;
+  if (s !== 'ok' && !retry.some(r=>r.q===current)) retry.push({q: current, wait: s==='ng' ? 3 : 7});
+  scheduleSave(); renderStats(); next();
+}
+function renderStats(){
+  const qs = questions();
+  let ok=0, mid=0, ng=0;
+  qs.forEach(q=>{ const st=status[keyQ(q)]; if(!st||!st.s) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else ng++; });
+  document.getElementById('stats').innerHTML = KATA.length+'型 ・ この条件 '+qs.length+'問 ・ <b style="color:var(--green)">○'+ok+'</b> <b style="color:var(--yellow)">△'+mid+'</b> <b style="color:var(--red)">×'+ng+'</b> 未'+(qs.length-ok-mid-ng);
+}
+function buildGrpChips(boxId, after){
+  const box = document.getElementById(boxId); box.innerHTML = '';
+  const all = document.createElement('div');
+  all.className = 'chip' + (activeGrps.size===GROUPS.length?' on':''); all.textContent = 'すべて';
+  all.onclick = ()=>{ activeGrps = new Set(GROUPS.map((g,i)=>i)); after(); };
+  box.appendChild(all);
+  GROUPS.forEach((g,i)=>{
+    const el = document.createElement('div');
+    el.className = 'chip' + (activeGrps.has(i)?' on':'');
+    el.textContent = g+' ('+KATA.filter(k=>k.grp===i).length+'型)';
+    el.onclick = ()=>{
+      if (activeGrps.size===GROUPS.length) activeGrps = new Set([i]);
+      else if (activeGrps.has(i)) { if (activeGrps.size>1) activeGrps.delete(i); }
+      else activeGrps.add(i);
+      after();
+    };
+    box.appendChild(el);
+  });
+}
+function drillRefresh(){ buildGrpChips('grpChips', drillRefresh); buildKataSel(); rebuild(); next(); }
+function buildKataSel(){
+  const sel = document.getElementById('kataSel');
+  const ks = KATA.filter(k=>activeGrps.has(k.grp));
+  if (kataF!=='all' && !ks.some(k=>k.id===kataF)) kataF = 'all';
+  sel.innerHTML = '<option value="all">すべての型</option>' + ks.map(k=>'<option value="'+k.id+'">'+esc(k.tpl)+'</option>').join('');
+  sel.value = kataF;
+}
+document.getElementById('kataSel').onchange = ev=>{ kataF = ev.target.value; rebuild(); next(); };
+['lenSel','orderSel'].forEach(id=>document.getElementById(id).onchange = ()=>{ rebuild(); next(); });
+document.getElementById('hintSel').onchange = ()=>render(false);
+document.addEventListener('keydown', ev=>{
+  if (curTab !== 'drill') return;
+  if (ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'INPUT' || ev.target.tagName === 'SELECT') return;
+  if (ev.key==='1') judge('ok'); if (ev.key==='2') judge('mid'); if (ev.key==='3') judge('ng');
+  if (ev.key===' ') { ev.preventDefault(); const b=document.getElementById('showModel'); if (b) b.click(); }
+});
+
+// ===== 型一覧 =====
+function listRefresh(){ buildGrpChips('grpChips2', listRefresh); renderKataList(); }
+function renderKataList(){
+  const box = document.getElementById('kataList');
+  box.innerHTML = KATA.filter(k=>activeGrps.has(k.grp)).map(K=>{
+    const its = ITEMS.filter(it=>it.k===K.id);
+    return '<div class="kcard"><div class="kcard-h"><span class="tpl">'+esc(K.tpl)+'</span><span class="mean">'+esc(K.mean)+' ・ '+its.length+'個</span>' +
+      '<button data-drill="'+K.id+'">この型でドリル</button><button data-all="'+K.id+'">短い文ぜんぶ☆</button></div>' +
+      its.map(it=>'<div class="krow">' +
+        '<label><input type="checkbox" data-i="'+it.i+'" data-long="0"'+(memo[it.en]?' checked':'')+'><span><span class="e">'+hlBase(it.en,it.k)+'</span> <span class="sp" data-say="'+esc(it.en)+'">🔊</span><br><span class="j">'+esc(it.jp)+' ・ '+esc(it.sc)+'</span></span></label>' +
+        '<label class="x"><input type="checkbox" data-i="'+it.i+'" data-long="1"'+(memo[xPlain(it)]?' checked':'')+'><span><span class="e">'+hlExt(it)+'</span> <span class="sp" data-say="'+esc(xPlain(it))+'">🔊</span><br><span class="j">'+esc(it.xj)+'</span></span></label>' +
+      '</div>').join('') + '</div>';
+  }).join('');
+  box.querySelectorAll('input').forEach(cb=>cb.onchange = ()=>{
+    const it = ITEMS[+cb.dataset.i], long = cb.dataset.long==='1', key = long ? xPlain(it) : it.en;
+    if (!!memo[key] !== cb.checked) toggleMemo(it, long, true);
+  });
+  box.querySelectorAll('.sp').forEach(s=>s.onclick = ev=>{ ev.preventDefault(); ev.stopPropagation(); speakEn(s.dataset.say); });
+  box.querySelectorAll('[data-drill]').forEach(b=>b.onclick = ()=>{ kataF = b.dataset.drill; switchTab('drill'); buildKataSel(); document.getElementById('kataSel').value = kataF; rebuild(); next(); });
+  box.querySelectorAll('[data-all]').forEach(b=>b.onclick = ()=>{ ITEMS.filter(it=>it.k===b.dataset.all).forEach(it=>{ if (!memo[it.en]) toggleMemo(it, false, true); }); renderKataList(); });
+}
+function renderAddons(){
+  const used = ADDONS.map(a=>({a, ex: ITEMS.filter(it=>a.re.test(addOf(it)) && ADDONS.find(x=>x.re.test(addOf(it)))===a)}));
+  document.getElementById('addonTbl').innerHTML = used.filter(u=>u.ex.length).map(u=>
+    '<tr><td>'+esc(u.a.t)+'</td><td>'+esc(u.a.jp)+'<div class="ex">'+u.ex.slice(0,3).map(it=>esc(xPlain(it))).join(' ／ ')+'</div></td></tr>').join('');
+}
+
+// ===== 覚えるリスト =====
+function toggleMemo(it, long, quiet){
+  const key = long ? xPlain(it) : it.en;
+  let on;
+  if (memo[key]) { delete memo[key]; on = false; }
+  else { memo[key] = {en:key, jp: long?it.xj:it.jp, sc: it.sc, k: it.k, long: !!long, i: it.i, added: Date.now(), w: 1.5, n: 0}; on = true; }
+  scheduleSave(); renderMemoAll();
+  return on;
+}
+function memoItems(){ return Object.keys(memo).map(k=>Object.assign({key:k}, memo[k])); }
+function memoHtml(d){ const it = ITEMS[d.i]; if (!it) return esc(d.en); return d.long ? hlExt(it) : hlBase(it.en, it.k); }
+
+const MP = {queue:[], qi:0, cur:null, playing:false, token:0, cycle:1, waiting:false, timers:[], raf:null};
+const mpVal = id => document.getElementById(id).value;
+function mpSettings(){ return { mode: mpVal('mpMode'), think: +mpVal('mpThink'), rep: +mpVal('mpRep'), rate: +mpVal('mpRate'), jp: mpVal('mpJp')==='on', judge: mpVal('mpJudgeMode')==='on', review: +mpVal('mpReview') }; }
+function mpBuild(){
+  const order = mpVal('mpOrder');
+  let arr = memoItems();
+  if (order === 'added') arr.sort((a,b)=>a.added-b.added);
+  else if (order === 'weak') arr = arr.map(d=>({d, k: Math.random() - Math.min(d.w==null?1.5:d.w, 5)*0.3})).sort((a,b)=>a.k-b.k).map(x=>x.d);
+  else shuffle(arr);
+  MP.queue = arr.map(d=>d.key); MP.qi = 0;
+}
+function mpClear(){ MP.token++; MP.timers.forEach(clearTimeout); MP.timers = []; if (MP.raf) cancelAnimationFrame(MP.raf); MP.raf = null; try { speechSynthesis.cancel(); } catch(e){} }
+function mpWait(ms, tok){ return new Promise(res=>{ MP.timers.push(setTimeout(()=>res(tok===MP.token), ms)); }); }
+function mpSay(text, lang, rate, tok){
+  return new Promise(res=>{
+    if (tok !== MP.token) return res(false);
+    let done = false; const fin = ()=>{ if (done) return; done = true; res(tok === MP.token); };
+    const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = rate;
+    if (lang === 'en-US' && enVoice) u.voice = enVoice;
+    u.onend = fin; u.onerror = fin;
+    MP.timers.push(setTimeout(fin, 2500 + text.length * (lang==='ja-JP' ? 260 : 110) / rate));
+    speechSynthesis.speak(u);
+  });
+}
+function mpBar(ms, tok){
+  const bar = document.getElementById('mpBar'); if (!bar) return;
+  const t0 = performance.now();
+  const step = ()=>{ if (tok !== MP.token) return; const r = Math.min(1, (performance.now()-t0)/ms); bar.style.width = (r*100)+'%'; if (r < 1) MP.raf = requestAnimationFrame(step); };
+  step();
+}
+function mpRender(show){
+  const box = document.getElementById('mpStage');
+  const d = MP.cur && memo[MP.cur];
+  if (!d) {
+    box.innerHTML = memoItems().length
+      ? '<div class="scene" style="margin-top:30px">▶ を押すとスタート</div>'
+      : '<div class="say" style="font-size:18px">まだ何もチェックしていません</div><div class="scene">ドリルの「答えを見る」で <b style="color:var(--yellow)">☆ 覚える</b> をタップするか、「📖 型一覧」でチェックを入れてください。</div>';
+    mpRenderCtl(); return;
+  }
+  const st = d.s ? {ok:['st-ok','○'], mid:['st-mid','△'], ng:['st-ng','×']}[d.s] : null;
+  const listen = mpVal('mpMode') === 'listen', K = KMAP[d.k];
+  box.innerHTML =
+    '<div class="tags"><span class="tag kata">'+esc(K?K.tpl:'')+'</span>'+(d.long?'<span class="tag long">付け足しあり</span>':'') + (st ? '<span class="tag '+st[0]+'">'+st[1]+' ('+d.n+'回)</span>' : '<span class="tag">未</span>') + '</div>' +
+    '<div class="scene-label">状況</div><div class="scene">'+esc(d.sc)+'</div>' +
+    '<div class="scene-label">言いたいこと</div><div class="mp-say">「'+esc(d.jp)+'」</div>' +
+    (listen ? '' : '<div class="think"><i id="mpBar"></i></div>') +
+    '<div class="mp-ans'+(show?' show':'')+'" id="mpAns"><div class="mp-en" id="mpEn">🔊 '+memoHtml(d)+'</div>' +
+      (K ? '<div class="mp-sub">型: <span class="kh">'+esc(K.tpl)+'</span> '+esc(K.mean)+'</div>' : '') + '</div>' +
+    (show ? '' : '<div class="btns"><button class="btn sub" id="mpReveal">答えを見る</button></div>');
+  document.getElementById('mpEn').onclick = ()=>speakEn(d.en);
+  const rv = document.getElementById('mpReveal');
+  if (rv) rv.onclick = ()=>{ mpClear(); mpReveal(); speakEn(d.en); if (mpSettings().judge) MP.waiting = true; mpRenderCtl(); };
+  mpRenderCtl();
+}
+function mpReveal(){
+  const a = document.getElementById('mpAns'); if (a) a.classList.add('show');
+  const rv = document.getElementById('mpReveal'); if (rv) rv.remove();
+  const bar = document.getElementById('mpBar'); if (bar) bar.style.width = '100%';
+}
+function mpRenderCtl(){
+  document.getElementById('mpPlay').textContent = MP.playing ? '⏸' : '▶';
+  document.getElementById('mpJudgeRow').style.display = (MP.cur && memo[MP.cur] && mpVal('mpJudgeMode')==='on') ? 'flex' : 'none';
+  document.getElementById('mpCycle').textContent = MP.cycle;
+  document.getElementById('mpDone').textContent = Math.min(MP.qi, MP.queue.length);
+  document.getElementById('mpTotal').textContent = MP.queue.length || memoItems().length;
+}
+async function mpSequence(){
+  mpClear();
+  const tok = MP.token, s = mpSettings(), d = MP.cur && memo[MP.cur];
+  if (!d) return;
+  MP.waiting = false;
+  if (s.mode === 'test') {
+    mpRender(false);
+    if (s.jp && !await mpSay(d.jp, 'ja-JP', 1, tok)) return;
+    mpBar(s.think, tok);
+    if (!await mpWait(s.think, tok)) return;
+    mpReveal();
+    for (let r = 0; r < s.rep; r++) { if (!await mpSay(d.en, 'en-US', s.rate, tok)) return; if (r < s.rep - 1 && !await mpWait(600, tok)) return; }
+  } else {
+    mpRender(true);
+    for (let r = 0; r < s.rep; r++) { if (!await mpSay(d.en, 'en-US', s.rate, tok)) return; if (!await mpWait(600, tok)) return; }
+    if (s.jp && !await mpSay(d.jp, 'ja-JP', 1, tok)) return;
+  }
+  if (s.judge) { MP.waiting = true; mpRenderCtl(); return; }
+  if (!await mpWait(s.review, tok)) return;
+  if (MP.playing && tok === MP.token) mpNext();
+}
+function mpLoad(){
+  while (MP.qi < MP.queue.length && !memo[MP.queue[MP.qi]]) MP.qi++;
+  if (MP.qi >= MP.queue.length) {
+    if (!memoItems().length) { MP.cur = null; return false; }
+    if (MP.queue.length) MP.cycle++;
+    mpBuild();
+  }
+  MP.cur = MP.queue[MP.qi++];
+  return true;
+}
+function mpNext(){
+  mpClear(); MP.waiting = false;
+  if (!mpLoad()) { MP.playing = false; mpRender(false); return; }
+  if (MP.playing) mpSequence(); else mpRender(mpVal('mpMode')==='listen');
+}
+function mpPrev(){
+  if (MP.qi < 2) return;
+  mpClear(); MP.waiting = false; MP.qi -= 2; MP.cur = MP.queue[MP.qi++];
+  if (MP.playing) mpSequence(); else mpRender(mpVal('mpMode')==='listen');
+}
+function mpStop(){ MP.playing = false; mpClear(); mpRenderCtl(); }
+function mpToggle(){
+  if (MP.playing) { mpStop(); return; }
+  if (!memoItems().length) { mpRender(false); return; }
+  MP.playing = true;
+  if (!MP.cur || !memo[MP.cur] || MP.waiting) mpNext(); else mpSequence();
+}
+function mpJudge(s){
+  const d = MP.cur && memo[MP.cur];
+  if (!d) return;
+  d.s = s; d.n = (d.n||0) + 1; d.t = Date.now();
+  const w = d.w == null ? 1.5 : d.w;
+  d.w = s==='ok' ? Math.max(0, w-1) : s==='mid' ? w+1 : w+2;
+  if (s !== 'ok') MP.queue.splice(Math.min(MP.qi + (s==='ng' ? 3 : 6), MP.queue.length), 0, MP.cur);
+  scheduleSave(); renderMemoStats(); renderMemoList();
+  mpNext();
+}
+function renderMemoStats(){
+  const items = memoItems();
+  let ok=0, mid=0, ng=0;
+  items.forEach(d=>{ if(d.s==='ok')ok++; else if(d.s==='mid')mid++; else if(d.s==='ng')ng++; });
+  document.getElementById('mpStats').innerHTML = 'チェック '+items.length+'個 ・ <b style="color:var(--green)">○'+ok+'</b> <b style="color:var(--yellow)">△'+mid+'</b> <b style="color:var(--red)">×'+ng+'</b> 未'+(items.length-ok-mid-ng);
+  document.getElementById('memoCount').textContent = items.length;
+  document.getElementById('memoCount2').textContent = items.length;
+}
+function renderMemoList(){
+  const box = document.getElementById('memoList');
+  const items = memoItems().sort((a,b)=>a.added-b.added);
+  if (!items.length) { box.innerHTML = '<div class="check-msg">まだありません。</div>'; return; }
+  box.innerHTML = items.map(d=>{
+    const st = d.s ? {ok:'○', mid:'△', ng:'×'}[d.s] : '未';
+    return '<div class="memo-row"><span class="tag">'+st+'</span><span class="t"><b>'+memoHtml(d)+'</b><br>「'+esc(d.jp)+'」 '+esc(d.sc)+'</span><button data-k="'+esc(d.key)+'">外す</button></div>';
+  }).join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick = ()=>{ delete memo[b.dataset.k]; scheduleSave(); renderMemoAll(); });
+}
+function renderMemoAll(){
+  renderMemoStats(); renderMemoList();
+  if (!MP.playing) mpRender(MP.cur && memo[MP.cur] ? (mpVal('mpMode')==='listen') : false);
+  else mpRenderCtl();
+}
+document.getElementById('mpPlay').onclick = mpToggle;
+document.getElementById('mpNext').onclick = mpNext;
+document.getElementById('mpPrev').onclick = mpPrev;
+document.getElementById('mpOk').onclick = ()=>mpJudge('ok');
+document.getElementById('mpMid').onclick = ()=>mpJudge('mid');
+document.getElementById('mpNg').onclick = ()=>mpJudge('ng');
+document.getElementById('mpOrder').onchange = ()=>{ mpStop(); mpBuild(); MP.cur = null; MP.cycle = 1; mpRender(false); };
+document.getElementById('mpMode').onchange = ()=>{ const p = MP.playing; mpStop(); if (p) { MP.playing = true; mpSequence(); } else mpRender(MP.cur ? mpVal('mpMode')==='listen' : false); };
+document.getElementById('mpJudgeMode').onchange = ()=>{ mpRenderCtl(); if (MP.waiting && mpVal('mpJudgeMode')==='off' && MP.playing) mpNext(); };
+document.addEventListener('keydown', ev=>{
+  if (curTab !== 'memo') return;
+  if (ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'INPUT' || ev.target.tagName === 'SELECT') return;
+  if (ev.key === ' ') { ev.preventDefault(); mpToggle(); }
+  else if (ev.key === 'ArrowRight') mpNext();
+  else if (ev.key === 'ArrowLeft') mpPrev();
+  else if (mpVal('mpJudgeMode')==='on' && MP.cur && memo[MP.cur]) { if (ev.key==='1') mpJudge('ok'); if (ev.key==='2') mpJudge('mid'); if (ev.key==='3') mpJudge('ng'); }
+});
+
+// ===== タブ =====
+function switchTab(t){
+  curTab = t;
+  document.querySelectorAll('.tabbtn').forEach(x=>x.classList.toggle('on', x.dataset.tab===t));
+  document.getElementById('tabDrill').style.display = t==='drill' ? '' : 'none';
+  document.getElementById('tabList').style.display = t==='list' ? '' : 'none';
+  document.getElementById('tabMemo').style.display = t==='memo' ? '' : 'none';
+  if (t !== 'memo') mpStop();
+  if (t === 'drill') { buildGrpChips('grpChips', drillRefresh); if (current) render(false); }
+  else if (t === 'list') listRefresh();
+  else renderMemoAll();
+  try { localStorage.setItem('kata_tab', t); } catch(e){}
+}
+document.querySelectorAll('.tabbtn').forEach(b=>b.onclick = ()=>switchTab(b.dataset.tab));
+
+// ===== 音声 =====
+let enVoice = null;
+function loadVoices(){ const vs = speechSynthesis.getVoices(); enVoice = vs.find(v=>v.lang==='en-US') || vs.find(v=>v.lang.startsWith('en')) || null; }
+loadVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+function speakEn(t){ const u = new SpeechSynthesisUtterance(t); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recOn = false;
+function toggleMic(){
+  const btn = document.getElementById('micBtn');
+  if (!SR) { document.getElementById('checkMsg').textContent = 'このブラウザは音声入力に未対応です(Chrome / Safari で開いてね)'; return; }
+  if (recOn) { rec && rec.stop(); return; }
+  rec = new SR(); rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = false;
+  const box = document.getElementById('myEn');
+  rec.onresult = e=>{ let t=''; for (let i=0;i<e.results.length;i++) t += e.results[i][0].transcript; box.value = t; };
+  rec.onerror = e=>{ if (e.error!=='no-speech' && e.error!=='aborted') document.getElementById('checkMsg').textContent = '音声入力エラー: '+e.error; };
+  rec.onend = ()=>{ recOn=false; const b=document.getElementById('micBtn'); if(b){ b.classList.remove('rec'); b.textContent='🎤 話す'; } };
+  recOn = true; btn.classList.add('rec'); btn.textContent = '■ 止める';
+  try { rec.start(); } catch(err) { recOn=false; }
+}
+
+// ===== 同期(他アプリと同じGAS) =====
+function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
+function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); saveTimer = setTimeout(()=>saveAll(), 600); }
+function saveAll(retryFlag){
+  if (!currentUser) return;
+  fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status, _memo: memo})})
+  }).then(r=>r.json()).then(res=>{ if (res && res.error) throw new Error(res.error); setSyncBadge('保存済み'); })
+  .catch(()=>{ if (!retryFlag) { setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true), 1500); } else setSyncBadge('⚠保存失敗 タップで再試行'); });
+}
+function loadFromServer(user){
+  return fetch(GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY+':'+user)).then(r=>r.json()).then(res=>{
+    try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; memo = p._memo || {}; } catch(e){ status = {}; memo = {}; }
+  });
+}
+function initApp(){
+  mpStop(); MP.queue=[]; MP.qi=0; MP.cur=null; MP.cycle=1;
+  renderAddons(); drillRefresh(); renderMemoAll();
+  let t = 'drill'; try { t = localStorage.getItem('kata_tab') || 'drill'; } catch(e){}
+  if (t !== 'drill') switchTab(t);
+}
+function startSession(user){
+  currentUser = user;
+  try { localStorage.setItem(LOCAL_USER_KEY, user); } catch(e){}
+  document.getElementById('loginStatus').textContent = '読み込み中...';
+  loadFromServer(user).then(()=>{
+    document.getElementById('loginOverlay').style.display = 'none';
+    setSyncBadge(user + ' で同期中');
+    initApp();
+  }).catch(()=>{ document.getElementById('loginStatus').textContent = '通信に失敗しました。もう一度お試しください。'; });
+}
+document.getElementById('loginBtn').onclick = ()=>{
+  const v = document.getElementById('passInput').value.trim();
+  if (!v) { document.getElementById('loginStatus').textContent = '合言葉を入力してください'; return; }
+  startSession(v);
+};
+document.getElementById('passInput').onkeydown = e=>{ if (e.key==='Enter') document.getElementById('loginBtn').click(); };
+document.getElementById('syncBadge').onclick = ()=>{
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗') !== -1) { saveAll(); return; }
+  if (currentUser) loadFromServer(currentUser).then(()=>{ setSyncBadge(currentUser+' で同期中(更新済み)'); initApp(); });
+};
+const savedUser = (()=>{ try { return localStorage.getItem(LOCAL_USER_KEY); } catch(e){ return null; } })();
+if (savedUser) { document.getElementById('passInput').value = savedUser; startSession(savedUser); }
+</script>
+</body>
+</html>
