@@ -110,6 +110,8 @@
   .mp-say{font-size:26px;font-weight:800;line-height:1.4;margin:2px 0 4px;}
   .mp-ans{margin-top:14px;padding:14px;background:var(--panel2);border-radius:12px;visibility:hidden;}
   .mp-ans.show{visibility:visible;}
+  .mp-swaps{display:none;margin-top:4px;padding:0 4px;}
+  .mp-swaps.show{display:block;}
   .mp-en{font-size:24px;font-weight:800;line-height:1.4;cursor:pointer;}
   .mp-sub{font-size:13px;color:var(--text-dim);margin-top:6px;}
   .mp-other{margin-top:12px;padding-top:10px;border-top:1px dashed var(--amber-deep);font-size:19px;font-weight:700;line-height:1.4;cursor:pointer;}
@@ -1996,16 +1998,20 @@ function mpRender(show){
     '<div class="mp-ans'+(show?' show':'')+'" id="mpAns"><div class="mp-en" id="mpEn">🔊 '+memoHtml(d)+'</div>' +
       (it0 ? '<div class="mp-other" id="mpOther"><span class="sp">🔊</span> <span class="lbl2">'+(d.long?'短い文':'＋付け足し')+'</span> '+(d.long?hlBase(it0.en,it0.k):hlExt(it0))+'<div class="mp-sub">'+esc(d.long?it0.jp:it0.xj)+'</div></div>' : '') +
       (K ? '<div class="mp-sub">型: <span class="kh">'+esc(K.tpl)+'</span> '+esc(K.mean)+'</div>' : '') + '</div>' +
+    (K && it0 ? '<div class="mp-swaps'+(show?' show':'')+'" id="mpSwaps"><div class="swap-h">この型の入れ替え ・ <span class="kh">'+esc(K.tpl)+'</span> '+esc(K.mean)+'</div>' +
+      ITEMS.filter(x=>x.k===d.k).map(x=>'<div class="swap'+(x===it0?' cur':'')+'" data-i="'+x.i+'"><span class="sp">🔊</span><span>'+hlBase(x.en, x.k)+'</span><span class="j">'+esc(x.jp)+'</span></div>').join('') + '</div>' : '') +
     (show ? '' : '<div class="btns"><button class="btn sub" id="mpReveal">答えを見る</button></div>');
   document.getElementById('mpEn').onclick = ()=>speakEn(d.en);
   const ot = document.getElementById('mpOther');
   if (ot) ot.onclick = ()=>speakEn(d.long ? it0.en : xPlain(it0));
+  box.querySelectorAll('.swap').forEach(x=>x.onclick = ()=>speakEn(ITEMS[+x.dataset.i].en));
   const rv = document.getElementById('mpReveal');
   if (rv) rv.onclick = ()=>{ mpClear(); mpReveal(); speakEn(d.en); if (mpSettings().judge) MP.waiting = true; mpRenderCtl(); };
   mpRenderCtl();
 }
 function mpReveal(){
   const a = document.getElementById('mpAns'); if (a) a.classList.add('show');
+  const sw = document.getElementById('mpSwaps'); if (sw) sw.classList.add('show');
   const rv = document.getElementById('mpReveal'); if (rv) rv.remove();
   const bar = document.getElementById('mpBar'); if (bar) bar.style.width = '100%';
 }
