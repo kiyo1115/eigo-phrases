@@ -220,6 +220,22 @@
     <div class="chips" id="grpChips2"></div>
     <div class="stats">チェックを入れると「★ 覚える」に入ります。🔊で読み上げ。</div>
     <div class="btns" style="margin:-4px 0 12px;"><button class="btn sub" id="allShortBtn2">短い文を全部チェック(<span class="nAll"></span>)</button></div>
+    <details class="panel" id="mikawake" open>
+      <summary>？ まぎらわしい型の見分け方</summary>
+      <table class="addon-tbl">
+        <tr><td><span class="kh">I don't know if</span></td><td>「〜か<b>微妙</b>」＝ どっちか迷ってる(50:50)。はい／いいえ のどっちか分からない<div class="ex">できるか微妙 → I don't know if I can do this.</div></td></tr>
+        <tr><td><span class="kh">I have no idea</span></td><td>「<b>全然分からん</b>」＝ お手上げ(0%)。手がかりゼロ。後ろに where / what / who / how<div class="ex">ここどこか全然分からん → I have no idea where I am.</div></td></tr>
+        <tr><td><span class="kh">What if</span></td><td>「<b>もし</b>〜たら？」＝ まだ起きてないことを想像する<div class="ex">もし見られたら？ → What if he sees me?</div></td></tr>
+        <tr><td><span class="kh">I should have</span><br><span class="kh">Good thing</span></td><td>「〜すれ<b>ば</b>よかった」＝ しなかった後悔<br>「〜して<b>助かった</b>」＝ してたからラッキー<div class="ex">セーブしとけばよかった → I should have saved. ／ セーブしといて助かった → Good thing I saved.</div></td></tr>
+        <tr><td><span class="kh">I need</span><br><span class="kh">There's</span></td><td>「〜が<b>必要</b>」＝ 欲しい物<br>「〜が<b>いる／ある</b>」＝ そこに見えてる<div class="ex">車が必要 → I need a car. ／ 後ろに車いる → There's a car behind me.</div></td></tr>
+        <tr><td><span class="kh">I just</span><br><span class="kh">That was</span></td><td>「〜した<b>ばっか</b>」＝ 自分がさっきしたこと<br>「<b>今の</b>〜だった」＝ 今起きたことの感想<div class="ex">来たばっか → I just got here. ／ 今の危なかった！ → That was close!</div></td></tr>
+        <tr><td><span class="kh">I can't</span><br><span class="kh">I'm not going to</span></td><td>「止ま<b>れ</b>ない」＝ できない(したいのに無理)<br>「止まらない<b>ぞ</b>」＝ わざとしない<div class="ex">止まれない！ → I can't stop! ／ 止まらないぞ → I'm not going to stop.</div></td></tr>
+        <tr><td><span class="kh">This is</span><br><span class="kh">It's</span></td><td>「<b>これ</b>、〜」＝ 今の状況・目の前のこと<br>「<b>それ</b>、〜」＝ 物の状態<div class="ex">これ、完璧 → This is perfect. ／ それ、壊れてる → It's broken.</div></td></tr>
+        <tr><td><span class="kh">Why is he</span><br><span class="kh">Why would I</span></td><td>「なんで<b>あいつ</b>〜の？」＝ 相手の行動に驚く<br>「なんで<b>俺が</b>〜んだよ」＝ 俺はやらないぞ<div class="ex">なんであいつ走ってるの？ → Why is he running? ／ なんで俺が戻るんだよ → Why would I go back?</div></td></tr>
+        <tr><td><span class="kh">How do I</span></td><td>「<b>どうやって</b>〜の？」＝ やり方を聞く(質問)<div class="ex">どうやってこれ開けるの？ → How do I open this?</div></td></tr>
+      </table>
+      <div class="check-msg">迷ったら：「微妙」→ I don't know if ／「全然」→ I have no idea ／「もし」→ What if ／「どうやって」→ How do I</div>
+    </details>
     <div id="kataList"></div>
     <details class="panel" id="addonPanel" open>
       <summary>＋ 付け足しパーツ一覧(どの型にも付けられる)</summary>
@@ -316,45 +332,45 @@ const GROUPS = ['命令・呼びかけ','自分の状態','したい・ほしい
 const KATA = [
   {id:'get',    grp:0, head:"Get",            tpl:"Get ___",            mean:"〜しろ(体の動き)"},
   {id:'dont',   grp:0, head:"Don't",          tpl:"Don't ___",          mean:"〜するな"},
-  {id:'stop',   grp:0, head:"Stop",           tpl:"Stop ___",           mean:"〜をやめろ／止まれ"},
+  {id:'stop',   grp:0, head:"Stop",           tpl:"Stop ___",           mean:"〜のやめろ／止まれ"},
   {id:'lets',   grp:0, head:"Let's",          tpl:"Let's ___",          mean:"〜しよう", mk:'lets'},
   {id:'letme',  grp:0, head:"Let me",         tpl:"Let me ___",         mean:"俺に〜させて", mk:'let_me'},
   {id:'give',   grp:0, head:"Give me",        tpl:"Give me ___",        mean:"〜をくれ"},
-  {id:'im',     grp:1, head:"I'm",            tpl:"I'm ___",            mean:"今〜な状態"},
-  {id:'igot',   grp:1, head:"I got",          tpl:"I got ___",          mean:"〜された／〜を手に入れた"},
-  {id:'ijust',  grp:1, head:"I just",         tpl:"I just ___",         mean:"今〜したばかり／〜しただけ"},
+  {id:'im',     grp:1, head:"I'm",            tpl:"I'm ___",            mean:"俺、〜(今の状態)"},
+  {id:'igot',   grp:1, head:"I got",          tpl:"I got ___",          mean:"〜された／〜ゲット"},
+  {id:'ijust',  grp:1, head:"I just",         tpl:"I just ___",         mean:"〜したばっか／〜しただけ"},
   {id:'icant',  grp:1, head:"I can't",        tpl:"I can't ___",        mean:"〜できない"},
   {id:'ididnt', grp:1, head:"I didn't",       tpl:"I didn't ___",       mean:"〜してない"},
-  {id:'ineed',  grp:2, head:"I need",         tpl:"I need ___",         mean:"〜がいる(物)"},
+  {id:'ineed',  grp:2, head:"I need",         tpl:"I need ___",         mean:"〜が必要(物)"},
   {id:'ineedto',grp:2, head:"I need to",      tpl:"I need to ___",      mean:"〜しなきゃ(動き)", mk:'need_to'},
   {id:'iwantto',grp:2, head:"I want to",      tpl:"I want to ___",      mean:"〜したい", mk:'i_want_to'},
-  {id:'canget', grp:2, head:"Can I get",      tpl:"Can I get ___?",     mean:"〜もらえる？／〜取れる？(予約・注文も)"},
-  {id:'howdoi', grp:2, head:"How do I",       tpl:"How do I ___?",      mean:"どうやって〜するの？", mk:'how_do_i'},
+  {id:'canget', grp:2, head:"Can I get",      tpl:"Can I get ___?",     mean:"〜もらえる？(予約・注文も)"},
+  {id:'howdoi', grp:2, head:"How do I",       tpl:"How do I ___?",      mean:"どうやって〜するの？(聞く)", mk:'how_do_i'},
   {id:'theres', grp:3, head:"There's",        tpl:"There's ___",        mean:"〜がいる／ある"},
   {id:'too',    grp:3, head:"Too",            tpl:"Too ___!",           mean:"〜すぎ"},
-  {id:'thisis', grp:3, head:"This is",        tpl:"This is ___",        mean:"これは〜だ(今のこと)"},
-  {id:'thatwas',grp:3, head:"That was",       tpl:"That was ___",       mean:"今のは〜だった(終わったこと)"},
-  {id:'its',    grp:3, head:"It's",           tpl:"It's ___",           mean:"それ〜だ(物の状態)"},
+  {id:'thisis', grp:3, head:"This is",        tpl:"This is ___",        mean:"これ、〜(今のこと)"},
+  {id:'thatwas',grp:3, head:"That was",       tpl:"That was ___",       mean:"今の〜だった(終わったこと)"},
+  {id:'its',    grp:3, head:"It's",           tpl:"It's ___",           mean:"それ、〜(物の状態)"},
   {id:'where',  grp:3, head:"Where's",        tpl:"Where's ___?",       mean:"〜どこ？"},
   {id:'why',    grp:3, head:"Why is he",      tpl:"Why is he ___?",     mean:"なんであいつ〜してるの？"},
-  {id:'think',  grp:3, head:"I think",        tpl:"I think ___",        mean:"〜だと思う／〜かも", mk:'i_think'},
-  {id:'noidea', grp:3, head:"I have no idea", tpl:"I have no idea ___", mean:"〜が全然分からない(単体でもOK)"},
-  {id:'mk_goingto', grp:4, head:"I'm going to",     tpl:"I'm going to ___",     mean:"〜するぞ／今から〜する", mk:'im_going_to'},
-  {id:'mk_notgoing',grp:4, head:"I'm not going to", tpl:"I'm not going to ___", mean:"〜しないぞ／〜なんてしない", mk:'not_going_to'},
+  {id:'think',  grp:3, head:"I think",        tpl:"I think ___",        mean:"〜と思う", mk:'i_think'},
+  {id:'noidea', grp:3, head:"I have no idea", tpl:"I have no idea ___", mean:"全然分からん(お手上げ・0%。単体でもOK)"},
+  {id:'mk_goingto', grp:4, head:"I'm going to",     tpl:"I'm going to ___",     mean:"〜するぞ", mk:'im_going_to'},
+  {id:'mk_notgoing',grp:4, head:"I'm not going to", tpl:"I'm not going to ___", mean:"〜しないぞ", mk:'not_going_to'},
   {id:'mk_just',    grp:4, head:"I'm just going to",tpl:"I'm just going to ___",mean:"とりあえず〜しとく", mk:'im_just_going_to'},
   {id:'mk_feel',    grp:4, head:"I feel like",      tpl:"I feel like ___",      mean:"〜な気がする", mk:'i_feel_like'},
-  {id:'mk_looks',   grp:4, head:"It looks like",    tpl:"It looks like ___",    mean:"〜っぽい／〜みたい", mk:'looks_like'},
+  {id:'mk_looks',   grp:4, head:"It looks like",    tpl:"It looks like ___",    mean:"〜っぽい", mk:'looks_like'},
   {id:'mk_should',  grp:4, head:"I should have",    tpl:"I should have ___",    mean:"〜すればよかった(後悔)", mk:'should_have'},
-  {id:'mk_whatif',  grp:4, head:"What if",          tpl:"What if ___?",         mean:"もし〜だったら？", mk:'what_if'},
-  {id:'mk_dkif',    grp:4, head:"I don't know if",  tpl:"I don't know if ___",  mean:"〜かどうか分からない", mk:'i_dont_know_if'},
+  {id:'mk_whatif',  grp:4, head:"What if",          tpl:"What if ___?",         mean:"もし〜たら？", mk:'what_if'},
+  {id:'mk_dkif',    grp:4, head:"I don't know if",  tpl:"I don't know if ___",  mean:"〜か微妙(どっちか迷ってる・50:50)", mk:'i_dont_know_if'},
   {id:'mk_why',     grp:4, head:"Why would I",      tpl:"Why would I ___?",     mean:"なんで俺が〜するんだよ", mk:'why_would'},
-  {id:'mk_good',    grp:4, head:"Good thing",       tpl:"Good thing ___",       mean:"〜でよかった", mk:'good_thing'},
+  {id:'mk_good',    grp:4, head:"Good thing",       tpl:"Good thing ___",       mean:"〜て助かった", mk:'good_thing'},
   {id:'mk_trying',  grp:4, head:"I'm trying to",    tpl:"I'm trying to ___",    mean:"〜しようとしてるんだけど", mk:'trying_to'},
   {id:'mk_supposed',grp:4, head:"It's supposed to", tpl:"It's supposed to ___", mean:"本当は〜のはずなんだけど", mk:'supposed_to'},
   {id:'mk_look',    grp:4, head:"Look at",          tpl:"Look at ___!",         mean:"〜見て！(視聴者に)", mk:'look_at'},
 ];
 // Markiplier語録(RE7〜RE8)からの本人の実際のセリフ: id -> {n:出てきた回数, ex:[[英,日],...]}
-const MKEX = {"im_going_to": {"n": 631, "ex": [["This isn't going to work, is it?", "これ、うまくいかないよね？"], ["I'm going to need more of those.", "あれがもっと必要になるな。"], ["I'm going to go up the stairs.", "階段を上がるぞ。"]]}, "all_right": {"n": 497, "ex": [["All right, so what was I doing?", "よし、で、何してたっけ？"], ["All right, I'm going for it.", "よし、行くぞ。"], ["All right, let's see what's happening.", "よし、何が起きてるか見てみよう。"]]}, "oh_my_god": {"n": 239, "ex": [["Oh my god, they got bullets.", "マジか、弾持ってるじゃん。"], ["Oh my god, it worked.", "うわ、うまくいった。"], ["Oh my god, I might have missed the door.", "うわ、ドア見逃したかも。"]]}, "i_dont_know_if": {"n": 145, "ex": [["I don't know how to use it.", "使い方が分からない。"], ["I don't know if I needed that.", "あれが必要だったか分からない。"], ["I don't know where I'm going.", "どこに向かってるのか分からない。"]]}, "you_know": {"n": 138, "ex": [["It's pretty damn good, you know.", "かなりいいよ、ほんとに。"], ["You know, I don't need to be there.", "ほら、俺がそこにいる必要ないし。"], ["You're not like other people, you know.", "君は他の人とは違うんだよ、ね。"]]}, "i_think": {"n": 130, "ex": [["But I think we should move on.", "でも先に進んだ方がいいと思う。"], ["I think I see ammo up there.", "上に弾がある気がする。"], ["I think I can do that.", "それならできると思う。"]]}, "right_tag": {"n": 110, "ex": [["There was another door over here, right?", "こっちにもう1つドアがあったよね？"], ["They made a bunch of these, right?", "これ、たくさん作ったんだよね？"], ["Wait, at least we're in it together, right?", "待って、少なくとも俺らは一緒だよな？"]]}, "what_the_hell": {"n": 98, "ex": [["Also, what the hell is going on here?", "それと、ここで何が起きてんだよ？"], ["What the hell, man?", "なんだよ、おい？"], ["Wait, what the hell?", "待って、は？"]]}, "lets": {"n": 93, "ex": [["Let's see how many bullets I got.", "弾がいくつあるか見てみよう。"], ["All right, let's go for it.", "よし、突っ込もう。"], ["All right, so let's use that.", "よし、じゃあそれを使おう。"]]}, "need_to": {"n": 87, "ex": [["I need to save that for myself.", "それは自分のために取っておかないと。"], ["We need to keep our voices down.", "声を小さくしないと。"], ["Okay, here's what I need to do.", "よし、やるべきことはこれだ。"]]}, "i_guess": {"n": 86, "ex": [["I guess I'm out of options here.", "もう打つ手がないみたいだ。"], ["Okay, we're done, I guess.", "オッケー、これで終わりかな。"], ["I guess I could get rid of the green herb.", "緑のハーブは捨ててもいいかな。"]]}, "hold_on": {"n": 74, "ex": [["Hey, wait a minute.", "おい、ちょっと待て。"], ["All right, hold on.", "よし、ちょっと待って。"], ["Wait a minute.", "ちょっと待って。"]]}, "let_me": {"n": 73, "ex": [["Let me see if he's going the correct way.", "あいつが正しい方に行ってるか見てみよう。"], ["Let me do my storage first and then I'll save.", "先に整理させて、それからセーブする。"], ["Let me pick it.", "ちょっと開けさせて。"]]}, "i_feel_like": {"n": 52, "ex": [["I feel like that every night.", "毎晩そんな気分だよ。"], ["Mom, I feel like I'm going to throw up.", "ママ、吐きそうな気がする。"], ["I've saved 16 times thus far, but I feel like it was necessary.", "16回もセーブしたけど、必要だった気がする。"]]}, "looks_like": {"n": 51, "ex": [["Looks like it measures vital signs.", "生命反応を測るものみたい。"], ["Just looks like a screwdriver of some kind.", "なんかのドライバーに見える。"], ["This looks like it leads outside.", "ここから外に出られそう。"]]}, "not_going_to": {"n": 51, "ex": [["Ooh, I'm not going to listen to that.", "うわ、あれは聞かないでおく。"], ["I'm not going to need it.", "それは要らないな。"], ["It's not going to work.", "うまくいかないよ。"]]}, "i_want_to": {"n": 44, "ex": [["Uh I want to report a murder.", "あの、殺人事件を通報したいんですが。"], ["I don't want to read.", "読みたくない。"], ["I want to talk to you for a second.", "ちょっと話がしたい。"]]}, "should_have": {"n": 44, "ex": [["I should have taken a bigger breath.", "もっと大きく息を吸っておけばよかった。"], ["I should have grabbed that first.", "先にあれを取っておけばよかった。"], ["That was scarier than it should have been.", "本来より怖かった。"]]}, "oh_boy": {"n": 43, "ex": [["Oh boy, I'm Yeah, don't shine anything else.", "うわぁ…うん、もう何も照らさないで。"]]}, "you_know_what": {"n": 41, "ex": [["You know what I'm saying?", "分かる？"], ["Okay, you know what?", "よし、あのさ。"], ["You know what?", "あのさ。"]]}, "or_something": {"n": 41, "ex": [["Wait, is it auto saving or something?", "待って、オートセーブか何か？"], ["Okay, maybe that's upgrades or something.", "じゃあ、それはアップグレードか何かかな。"], ["Thought there might be a goodie or something.", "何かいい物があると思ったんだけど。"]]}, "pretty": {"n": 41, "ex": [["Oh my god, that was pretty good.", "うわ、今のかなり良かった。"], ["Pretty sure that was his voice.", "たぶんあいつの声だった。"], ["I'm pretty sure we haven't left anything behind.", "何も置いてきてないはず、たぶん。"]]}, "of_course": {"n": 39, "ex": [["Ah, of course it is.", "ああ、そりゃそうだよな。"], ["YEAH, OF COURSE.", "うん、もちろん。"]]}, "look_at": {"n": 37, "ex": [["Grace, look at me.", "グレース、こっち見て。"], ["Look at him go.", "あいつの動き見てよ。"], ["Look at that power.", "あの威力見てよ。"]]}, "supposed_to": {"n": 33, "ex": [["Now, what was I supposed to do?", "で、何をすればよかったんだっけ？"], ["How am I supposed to kill you?", "どうやってお前を倒せばいいんだよ？"], ["That's not where I'm supposed to go.", "そっちは行くべき場所じゃない。"]]}, "good_thing": {"n": 32, "ex": [["Okay, good thing I have this.", "よし、これ持っててよかった。"], ["OH, Good thing he didn't see me, right?", "あいつに見つからなくてよかった、だろ？"], ["Good thing no one heard that.", "誰にも聞かれなくてよかった。"]]}, "im_just_going_to": {"n": 31, "ex": [["I'm just going to go for it.", "とりあえず突っ込むわ。"], ["I'm just going to run for it.", "とりあえず走って逃げる。"], ["But I'm just going to get more bullets.", "でもとりあえず弾をもっと取っとく。"]]}, "trying_to": {"n": 28, "ex": [["Oh, Leon, I know what you trying to tell me.", "レオン、何が言いたいか分かるよ。"], ["It's I I'm not trying to be, you know, bothersome.", "うざくするつもりはないんだけど。"]]}, "here_we_go": {"n": 26, "ex": [["Here we go, baby.", "さあ行くぞ、ベイビー。"], ["Here we go.", "さあ行くぞ。"]]}, "how_do_i": {"n": 24, "ex": [["So, how do I get further up?", "で、どうやってもっと上に行くんだ？"], ["How do you even turn around?", "どうやって振り向くんだよ？"], ["How do I run faster?", "どうやってもっと速く走るの？"]]}, "why_would": {"n": 24, "ex": [["Why would they send her here alone?", "なんで彼女を1人でここに送るんだ？"], ["Why would I ever do that?", "なんで俺がそんなことするんだよ？"], ["Why would I want that?", "なんでそんなもの欲しがるんだよ？"]]}, "what_if": {"n": 11, "ex": [["What if I use a the gun?", "銃を使ったらどうなる？"], ["What if I didn't find them?", "見つけられなかったらどうする？"], ["What if we put this here and then over there?", "これをここに置いて、それからあそこに置いたら？"]]}};
+const MKEX = {"im_going_to": {"n": 631, "ex": [["This isn't going to work, is it?", "これ、うまくいかないよね？"], ["I'm going to need more of those.", "あれがもっと必要になるな。"], ["I'm going to go up the stairs.", "階段を上がるぞ。"]]}, "all_right": {"n": 497, "ex": [["All right, so what was I doing?", "よし、で、何してたっけ？"], ["All right, I'm going for it.", "よし、行くぞ。"], ["All right, let's see what's happening.", "よし、何が起きてるか見てみよう。"]]}, "oh_my_god": {"n": 239, "ex": [["Oh my god, they got bullets.", "マジか、弾持ってるじゃん。"], ["Oh my god, it worked.", "うわ、うまくいった。"], ["Oh my god, I might have missed the door.", "うわ、ドア見逃したかも。"]]}, "i_dont_know_if": {"n": 145, "ex": [["I don't know if I needed that.", "あれ要ったか微妙。"]]}, "you_know": {"n": 138, "ex": [["It's pretty damn good, you know.", "かなりいいよ、ほんとに。"], ["You know, I don't need to be there.", "ほら、俺がそこにいる必要ないし。"], ["You're not like other people, you know.", "君は他の人とは違うんだよ、ね。"]]}, "i_think": {"n": 130, "ex": [["But I think we should move on.", "でも先に進んだ方がいいと思う。"], ["I think I see ammo up there.", "上に弾がある気がする。"], ["I think I can do that.", "それならできると思う。"]]}, "right_tag": {"n": 110, "ex": [["There was another door over here, right?", "こっちにもう1つドアがあったよね？"], ["They made a bunch of these, right?", "これ、たくさん作ったんだよね？"], ["Wait, at least we're in it together, right?", "待って、少なくとも俺らは一緒だよな？"]]}, "what_the_hell": {"n": 98, "ex": [["Also, what the hell is going on here?", "それと、ここで何が起きてんだよ？"], ["What the hell, man?", "なんだよ、おい？"], ["Wait, what the hell?", "待って、は？"]]}, "lets": {"n": 93, "ex": [["Let's see how many bullets I got.", "弾がいくつあるか見てみよう。"], ["All right, let's go for it.", "よし、突っ込もう。"], ["All right, so let's use that.", "よし、じゃあそれを使おう。"]]}, "need_to": {"n": 87, "ex": [["I need to save that for myself.", "それは自分のために取っておかないと。"], ["We need to keep our voices down.", "声を小さくしないと。"], ["Okay, here's what I need to do.", "よし、やるべきことはこれだ。"]]}, "i_guess": {"n": 86, "ex": [["I guess I'm out of options here.", "もう打つ手がないみたいだ。"], ["Okay, we're done, I guess.", "オッケー、これで終わりかな。"], ["I guess I could get rid of the green herb.", "緑のハーブは捨ててもいいかな。"]]}, "hold_on": {"n": 74, "ex": [["Hey, wait a minute.", "おい、ちょっと待て。"], ["All right, hold on.", "よし、ちょっと待って。"], ["Wait a minute.", "ちょっと待って。"]]}, "let_me": {"n": 73, "ex": [["Let me see if he's going the correct way.", "あいつが正しい方に行ってるか見てみよう。"], ["Let me do my storage first and then I'll save.", "先に整理させて、それからセーブする。"], ["Let me pick it.", "ちょっと開けさせて。"]]}, "i_feel_like": {"n": 52, "ex": [["I feel like that every night.", "毎晩そんな気分だよ。"], ["Mom, I feel like I'm going to throw up.", "ママ、吐きそうな気がする。"], ["I've saved 16 times thus far, but I feel like it was necessary.", "16回もセーブしたけど、必要だった気がする。"]]}, "looks_like": {"n": 51, "ex": [["Looks like it measures vital signs.", "生命反応を測るものみたい。"], ["Just looks like a screwdriver of some kind.", "なんかのドライバーに見える。"], ["This looks like it leads outside.", "ここから外に出られそう。"]]}, "not_going_to": {"n": 51, "ex": [["Ooh, I'm not going to listen to that.", "うわ、あれは聞かないでおく。"], ["I'm not going to need it.", "それは要らないな。"], ["It's not going to work.", "うまくいかないよ。"]]}, "i_want_to": {"n": 44, "ex": [["Uh I want to report a murder.", "あの、殺人事件を通報したいんですが。"], ["I don't want to read.", "読みたくない。"], ["I want to talk to you for a second.", "ちょっと話がしたい。"]]}, "should_have": {"n": 44, "ex": [["I should have taken a bigger breath.", "もっと大きく息を吸っておけばよかった。"], ["I should have grabbed that first.", "先にあれを取っておけばよかった。"], ["That was scarier than it should have been.", "本来より怖かった。"]]}, "oh_boy": {"n": 43, "ex": [["Oh boy, I'm Yeah, don't shine anything else.", "うわぁ…うん、もう何も照らさないで。"]]}, "you_know_what": {"n": 41, "ex": [["You know what I'm saying?", "分かる？"], ["Okay, you know what?", "よし、あのさ。"], ["You know what?", "あのさ。"]]}, "or_something": {"n": 41, "ex": [["Wait, is it auto saving or something?", "待って、オートセーブか何か？"], ["Okay, maybe that's upgrades or something.", "じゃあ、それはアップグレードか何かかな。"], ["Thought there might be a goodie or something.", "何かいい物があると思ったんだけど。"]]}, "pretty": {"n": 41, "ex": [["Oh my god, that was pretty good.", "うわ、今のかなり良かった。"], ["Pretty sure that was his voice.", "たぶんあいつの声だった。"], ["I'm pretty sure we haven't left anything behind.", "何も置いてきてないはず、たぶん。"]]}, "of_course": {"n": 39, "ex": [["Ah, of course it is.", "ああ、そりゃそうだよな。"], ["YEAH, OF COURSE.", "うん、もちろん。"]]}, "look_at": {"n": 37, "ex": [["Grace, look at me.", "グレース、こっち見て。"], ["Look at him go.", "あいつの動き見てよ。"], ["Look at that power.", "あの威力見てよ。"]]}, "supposed_to": {"n": 33, "ex": [["Now, what was I supposed to do?", "で、何をするはずだったっけ？"], ["That's not where I'm supposed to go.", "そっちは行くはずの場所じゃない。"]]}, "good_thing": {"n": 32, "ex": [["Okay, good thing I have this.", "よし、これ持ってて助かった。"], ["OH, Good thing he didn't see me, right?", "あいつに見つからなくて助かった、だろ？"], ["Good thing no one heard that.", "誰にも聞かれなくて助かった。"]]}, "im_just_going_to": {"n": 31, "ex": [["I'm just going to go for it.", "とりあえず突っ込むわ。"], ["I'm just going to run for it.", "とりあえず走って逃げる。"], ["But I'm just going to get more bullets.", "でもとりあえず弾をもっと取っとく。"]]}, "trying_to": {"n": 28, "ex": [["Oh, Leon, I know what you trying to tell me.", "レオン、何が言いたいか分かるよ。"], ["It's I I'm not trying to be, you know, bothersome.", "うざくするつもりはないんだけど。"]]}, "here_we_go": {"n": 26, "ex": [["Here we go, baby.", "さあ行くぞ、ベイビー。"], ["Here we go.", "さあ行くぞ。"]]}, "how_do_i": {"n": 24, "ex": [["So, how do I get further up?", "で、どうやってもっと上に行くんだ？"], ["How do you even turn around?", "どうやって振り向くの？"], ["How do I run faster?", "どうやってもっと速く走るの？"]]}, "why_would": {"n": 24, "ex": [["Why would they send her here alone?", "なんで彼女を1人でここに送るんだ？"], ["Why would I ever do that?", "なんで俺がそんなことするんだよ？"], ["Why would I want that?", "なんでそんなもの欲しがるんだよ？"]]}, "what_if": {"n": 11, "ex": [["What if I use a the gun?", "もし銃を使ったら？"], ["What if I didn't find them?", "もし見つけられなかったら？"], ["What if we put this here and then over there?", "もしこれをここに置いて、それからあそこに置いたら？"]]}};
 const KMAP = Object.fromEntries(KATA.map(k=>[k.id,k]));
 
 // ===== 付け足しパーツ =====
@@ -384,7 +400,7 @@ const ADDONS = [
   {t:'What? / Seriously? / Really?', jp:'は？／マジかよ／マジ？', re:/^(what|seriously|really)$/i},
   {t:'Help! / Look! / Yes!', jp:'助けて！／見て！／よっしゃ！', re:/^(help|look|yes)$/i},
   {t:'〜, man / Man, 〜', jp:'〜って！／あー、〜(グチ・強め)', re:/^man$/i},
-  {t:'Phew, / Hmm, / Uh-oh, / Oh, / Nope.', jp:'ふう／うーん／あっ、やば／あ、／無理', re:/^(phew|hmm|uh-oh|oh|nope)$/i},
+  {t:'Phew, / Hmm, / Uh-oh, / Oh, / Nope.', jp:'ふう／うーん／あっ、やば／あ、／やだ', re:/^(phew|hmm|uh-oh|oh|nope)$/i},
   {t:'〜, please',      jp:'お願い／〜ください',   re:/^please$/i},
   {t:'〜 right now / 〜, now', jp:'今すぐ〜',     re:/^(right )?now$/i},
   {t:'〜 again / Not again.', jp:'また〜／またかよ', re:/^again$|^not again$/i},
@@ -455,7 +471,7 @@ const RAW = [
 "jp": "どけ！",
 "sc": "道のど真ん中に人が立っている",
 "x": "Get out of the way[, please]!",
-"xj": "どいてください！"
+"xj": "頼むから、どけ！"
 },
 {
 "k": "get",
@@ -479,7 +495,7 @@ const RAW = [
 "jp": "撃つな！",
 "sc": "警察に銃を向けられた",
 "x": "Don't shoot! [I'm sorry!]",
-"xj": "撃たないで！ごめんって！"
+"xj": "撃つな！ごめんって！"
 },
 {
 "k": "dont",
@@ -503,12 +519,12 @@ const RAW = [
 "jp": "車に触るな！",
 "sc": "NPCが自分の車をベタベタ触る",
 "x": "Don't touch my car[, man]!",
-"xj": "俺の車触んなって！"
+"xj": "俺の車触るなって！"
 },
 {
 "k": "dont",
 "en": "Don't look at me.",
-"jp": "こっち見んな",
+"jp": "こっち見るな",
 "sc": "NPCにじっと見られている",
 "x": "Don't look at me [like that].",
 "xj": "そんな目で見るな"
@@ -516,10 +532,10 @@ const RAW = [
 {
 "k": "dont",
 "en": "Don't do that!",
-"jp": "それやめろ！",
+"jp": "それするな！",
 "sc": "仲間が勝手に撃ち始めた",
 "x": "[No no no,] don't do that!",
-"xj": "いやいやいや、やめろ！"
+"xj": "いやいやいや、それするな！"
 },
 {
 "k": "dont",
@@ -535,15 +551,15 @@ const RAW = [
 "jp": "やめろ！",
 "sc": "NPCが殴りかかってくる",
 "x": "Stop it[, please]!",
-"xj": "お願いだからやめて！"
+"xj": "頼むからやめろ！"
 },
 {
 "k": "stop",
 "en": "Stop the car!",
-"jp": "車止めて！",
+"jp": "車止めろ！",
 "sc": "助手席に乗っていて降りたい",
 "x": "Stop the car [right now]!",
-"xj": "今すぐ車止めて！"
+"xj": "今すぐ車止めろ！"
 },
 {
 "k": "stop",
@@ -556,18 +572,18 @@ const RAW = [
 {
 "k": "stop",
 "en": "Stop running!",
-"jp": "走るな！",
+"jp": "走るのやめろ！",
 "sc": "逃げる奴を追いかけている",
 "x": "Stop running[, man]!",
-"xj": "走るなって！"
+"xj": "走るのやめろって！"
 },
 {
 "k": "stop",
 "en": "Stop talking.",
-"jp": "しゃべるな",
+"jp": "しゃべるのやめろ",
 "sc": "NPCがずっとうるさい",
 "x": "Stop talking [for a second].",
-"xj": "ちょっと黙ってて"
+"xj": "ちょっとしゃべるのやめろ"
 },
 {
 "k": "stop",
@@ -644,18 +660,18 @@ const RAW = [
 {
 "k": "letme",
 "en": "Let me see.",
-"jp": "見せて",
+"jp": "見させて",
 "sc": "仲間が何か見つけた",
 "x": "[Wait,] let me see.",
-"xj": "待って、見せて"
+"xj": "待って、見させて"
 },
 {
 "k": "letme",
 "en": "Let me drive.",
-"jp": "俺が運転する",
+"jp": "俺に運転させて",
 "sc": "仲間の運転がひどい",
 "x": "[No,] let me drive.",
-"xj": "いや、俺が運転する"
+"xj": "いや、俺に運転させて"
 },
 {
 "k": "letme",
@@ -668,58 +684,58 @@ const RAW = [
 {
 "k": "letme",
 "en": "Let me check the map.",
-"jp": "地図見せて",
+"jp": "地図見させて",
 "sc": "道が分からなくなった",
 "x": "Let me check the map [real quick].",
-"xj": "サッと地図見せて"
+"xj": "サッと地図見させて"
 },
 {
 "k": "letme",
 "en": "Let me out!",
-"jp": "出して！",
+"jp": "出させて！",
 "sc": "部屋に閉じ込められた",
 "x": "Let me out [of here]!",
-"xj": "ここから出して！"
+"xj": "ここから出させて！"
 },
 {
 "k": "letme",
 "en": "Let me go!",
-"jp": "離して！",
+"jp": "行かせて！",
 "sc": "警察に捕まった",
 "x": "Let me go! [I didn't do anything!]",
-"xj": "離せ！何もしてないって！"
+"xj": "行かせて！何もしてないって！"
 },
 {
 "k": "give",
 "en": "Give me the money!",
-"jp": "金をよこせ！",
+"jp": "金をくれ！",
 "sc": "銀行強盗でカウンターに",
 "x": "Give me the money [right now]!",
-"xj": "今すぐ金をよこせ！"
+"xj": "今すぐ金をくれ！"
 },
 {
 "k": "give",
 "en": "Give me your car!",
-"jp": "車よこせ！",
+"jp": "車をくれ！",
 "sc": "信号待ちの車に近づく",
 "x": "Give me your car[, please]!",
-"xj": "車ください！(丁寧な強盗)"
+"xj": "車をください！(丁寧な強盗)"
 },
 {
 "k": "give",
 "en": "Give me a second.",
-"jp": "ちょっと待って",
+"jp": "ちょっと時間くれ",
 "sc": "操作が分からなくて確認したい",
 "x": "[Wait,] give me a second.",
-"xj": "待って、ちょっと待って"
+"xj": "待って、ちょっと時間くれ"
 },
 {
 "k": "give",
 "en": "Give me that!",
-"jp": "それよこせ！",
+"jp": "それくれ！",
 "sc": "NPCが良い銃を持っている",
 "x": "[Hey,] give me that!",
-"xj": "おい、それよこせ！"
+"xj": "おい、それくれ！"
 },
 {
 "k": "give",
@@ -740,74 +756,74 @@ const RAW = [
 {
 "k": "im",
 "en": "I'm dead.",
-"jp": "死んだ",
+"jp": "俺、死んだ",
 "sc": "撃たれて倒れた",
 "x": "[Oh no,] I'm dead.",
-"xj": "うわ、死んだ"
+"xj": "うわ、俺死んだ"
 },
 {
 "k": "im",
 "en": "I'm lost.",
-"jp": "迷った",
+"jp": "俺、迷った",
 "sc": "知らない街で道が分からない",
 "x": "I'm lost [again].",
-"xj": "また迷った"
+"xj": "俺、また迷った"
 },
 {
 "k": "im",
 "en": "I'm stuck.",
-"jp": "ハマった",
+"jp": "俺、ハマった",
 "sc": "車が溝にハマって動けない",
 "x": "I'm stuck [for real].",
-"xj": "マジでハマった"
+"xj": "俺、マジでハマった"
 },
 {
 "k": "im",
 "en": "I'm out of ammo!",
-"jp": "弾切れ！",
+"jp": "俺、弾切れ！",
 "sc": "撃とうとしたらカチッと鳴った",
 "x": "I'm out of ammo [already]!",
-"xj": "もう弾切れ！"
+"xj": "俺、もう弾切れ！"
 },
 {
 "k": "im",
-"en": "I'm almost dead!",
-"jp": "死にそう！",
-"sc": "体力ゲージが真っ赤",
-"x": "[Help!] I'm almost dead!",
-"xj": "助けて！死にそう！"
+"en": "I'm hurt!",
+"jp": "俺、ケガしてる！",
+"sc": "撃たれて血が出ている",
+"x": "[Help!] I'm hurt!",
+"xj": "助けて！俺、ケガしてる！"
 },
 {
 "k": "im",
 "en": "I'm done.",
-"jp": "もう無理",
+"jp": "俺、もうやめた",
 "sc": "同じところで5回失敗した",
 "x": "I'm done [for today].",
-"xj": "今日はもう無理"
+"xj": "俺、今日はもうやめとく"
 },
 {
 "k": "im",
 "en": "I'm back!",
-"jp": "戻ってきた！",
+"jp": "俺、戻ってきた！",
 "sc": "死んで病院から復活した",
 "x": "[Okay,] I'm back!",
-"xj": "よし、戻ってきた！"
+"xj": "よし、俺戻ってきた！"
 },
 {
 "k": "im",
 "en": "I'm so sorry!",
-"jp": "本当にごめん！",
+"jp": "俺、ほんとごめん！",
 "sc": "手配度を上げながら暴れている",
 "x": "[Oh no,] I'm so sorry!",
-"xj": "うわ、本当にごめん！"
+"xj": "うわ、俺ほんとごめん！"
 },
 {
 "k": "im",
 "en": "I'm on my way.",
-"jp": "今向かってる",
+"jp": "俺、今向かってる",
 "sc": "ミッションの依頼人から電話",
 "x": "I'm on my way [right now].",
-"xj": "今すぐ向かう"
+"xj": "俺、今すぐ向かう"
 },
 {
 "k": "igot",
@@ -820,10 +836,10 @@ const RAW = [
 {
 "k": "igot",
 "en": "I got caught.",
-"jp": "捕まった",
+"jp": "捕まえられた",
 "sc": "警察に逮捕された",
 "x": "[Seriously?] I got caught.",
-"xj": "マジかよ、捕まった"
+"xj": "マジかよ、捕まえられた"
 },
 {
 "k": "igot",
@@ -847,39 +863,39 @@ const RAW = [
 "jp": "新しい車ゲット！",
 "sc": "高級車を手に入れた",
 "x": "I got a new car! [Look at this!]",
-"xj": "新しい車！これ見て！"
+"xj": "新しい車ゲット！これ見て！"
 },
 {
 "k": "igot",
 "en": "I got it!",
-"jp": "分かった！",
+"jp": "コツゲット！",
 "sc": "やり方がやっと分かった",
 "x": "[Okay,] I got it!",
-"xj": "よし、分かった！"
+"xj": "よし、コツゲット！"
 },
 {
 "k": "igot",
 "en": "I got away!",
-"jp": "逃げ切った！",
+"jp": "逃げ切れた！",
 "sc": "警察をまいた",
 "x": "I got away! [Finally!]",
-"xj": "逃げ切った！やっと！"
+"xj": "逃げ切れた！やっと！"
 },
 {
 "k": "ijust",
-"en": "I just died.",
-"jp": "今死んだ",
-"sc": "一瞬で何が起きたか分からない",
-"x": "[What?] I just died.",
-"xj": "は？今死んだ"
+"en": "I just got out of the hospital.",
+"jp": "病院出たばっか",
+"sc": "病院から出た直後にまた撃たれた",
+"x": "[Come on,] I just got out of the hospital!",
+"xj": "おい、病院出たばっかなのに！"
 },
 {
 "k": "ijust",
 "en": "I just got here.",
-"jp": "今来たとこ",
+"jp": "来たばっか",
 "sc": "目的地に着いた直後に敵が来た",
 "x": "[Wait,] I just got here!",
-"xj": "待って、今来たとこ！"
+"xj": "待って、来たばっか！"
 },
 {
 "k": "ijust",
@@ -887,7 +903,7 @@ const RAW = [
 "jp": "車ぶつけたばっか",
 "sc": "出発してすぐ事故った",
 "x": "I just crashed my car [again].",
-"xj": "また車ぶつけた"
+"xj": "また車ぶつけたばっか"
 },
 {
 "k": "ijust",
@@ -908,10 +924,10 @@ const RAW = [
 {
 "k": "ijust",
 "en": "I just lost everything.",
-"jp": "全部失った",
+"jp": "全部なくしたばっか",
 "sc": "死んで金も武器もなくなった",
 "x": "I just lost everything[, man].",
-"xj": "全部失ったよ…"
+"xj": "全部なくしたばっかだよ…"
 },
 {
 "k": "icant",
@@ -935,7 +951,7 @@ const RAW = [
 "jp": "見つからない",
 "sc": "目的地のマークを探している",
 "x": "I can't find it [anywhere].",
-"xj": "どこにもない"
+"xj": "どこにも見つからない"
 },
 {
 "k": "icant",
@@ -948,10 +964,10 @@ const RAW = [
 {
 "k": "icant",
 "en": "I can't do this.",
-"jp": "これ無理",
+"jp": "こんなのできない",
 "sc": "難しいミニゲームが始まった",
 "x": "I can't do this [anymore].",
-"xj": "もう無理"
+"xj": "もうこんなのできない"
 },
 {
 "k": "icant",
@@ -972,18 +988,18 @@ const RAW = [
 {
 "k": "ididnt",
 "en": "I didn't see that.",
-"jp": "見えなかった",
+"jp": "見てなかった",
 "sc": "角から急に車が出てきた",
 "x": "[Sorry,] I didn't see that.",
-"xj": "ごめん、見えなかった"
+"xj": "ごめん、見てなかった"
 },
 {
 "k": "ididnt",
 "en": "I didn't mean to!",
-"jp": "わざとじゃない！",
+"jp": "わざとやってない！",
 "sc": "通行人を轢いてしまった",
 "x": "[I'm sorry,] I didn't mean to!",
-"xj": "ごめん、わざとじゃない！"
+"xj": "ごめん、わざとやってない！"
 },
 {
 "k": "ididnt",
@@ -1007,7 +1023,7 @@ const RAW = [
 "jp": "あいつの話聞いてなかった",
 "sc": "ミッションのセリフを聞き逃した",
 "x": "[Wait,] I didn't hear him.",
-"xj": "待って、聞いてなかった"
+"xj": "待って、あいつの話聞いてなかった"
 },
 {
 "k": "ididnt",
@@ -1020,50 +1036,50 @@ const RAW = [
 {
 "k": "ineed",
 "en": "I need a car.",
-"jp": "車がいる",
+"jp": "車が必要",
 "sc": "歩いて移動するには遠すぎる",
 "x": "I need a car [right now].",
-"xj": "今すぐ車がいる"
+"xj": "今すぐ車が必要"
 },
 {
 "k": "ineed",
 "en": "I need a gun.",
-"jp": "銃がいる",
+"jp": "銃が必要",
 "sc": "丸腰で敵の拠点に来てしまった",
 "x": "I need a gun [first].",
-"xj": "まず銃がいる"
+"xj": "まず銃が必要"
 },
 {
 "k": "ineed",
 "en": "I need help!",
-"jp": "助けて！",
+"jp": "助けが必要！",
 "sc": "一人で敵に囲まれた",
 "x": "I need help [over here]!",
-"xj": "こっち助けて！"
+"xj": "こっち助けが必要！"
 },
 {
 "k": "ineed",
 "en": "I need money.",
-"jp": "金がいる",
+"jp": "金が必要",
 "sc": "欲しい物があるのに金がない",
 "x": "I need money [so bad].",
-"xj": "金がめちゃくちゃ欲しい"
+"xj": "金がめちゃくちゃ必要"
 },
 {
 "k": "ineed",
 "en": "I need a doctor.",
-"jp": "医者がいる",
+"jp": "医者が必要",
 "sc": "撃たれて体力が少ない",
 "x": "I need a doctor[, now]!",
-"xj": "今すぐ医者を！"
+"xj": "今すぐ医者が必要！"
 },
 {
 "k": "ineed",
 "en": "I need a faster car.",
-"jp": "もっと速い車がいる",
+"jp": "もっと速い車が必要",
 "sc": "逃げる車に追いつけない",
 "x": "I need a faster car [to catch him].",
-"xj": "あいつに追いつくにはもっと速い車がいる"
+"xj": "あいつに追いつくにはもっと速い車が必要"
 },
 {
 "k": "ineedto",
@@ -1087,7 +1103,7 @@ const RAW = [
 "jp": "急がなきゃ",
 "sc": "制限時間が残りわずか",
 "x": "I need to hurry[, or I'll be late].",
-"xj": "急がないと遅れる"
+"xj": "急がなきゃ、遅れる"
 },
 {
 "k": "ineedto",
@@ -1164,58 +1180,58 @@ const RAW = [
 {
 "k": "canget",
 "en": "Can I get a table?",
-"jp": "席とれる？",
+"jp": "席もらえる？",
 "sc": "レストランに入った(予約を取りたい)",
 "x": "Can I get a table [for two]?",
-"xj": "2人で席とれる？"
+"xj": "2人で席もらえる？"
 },
 {
 "k": "canget",
 "en": "Can I get a room?",
-"jp": "部屋とれる？",
+"jp": "部屋もらえる？",
 "sc": "ホテルのフロント",
 "x": "Can I get a room [for tonight]?",
-"xj": "今夜の部屋とれる？"
+"xj": "今夜の部屋もらえる？"
 },
 {
 "k": "canget",
 "en": "Can I get a coffee?",
-"jp": "コーヒー1つください",
+"jp": "コーヒー1つもらえる？",
 "sc": "カフェで注文",
 "x": "Can I get a coffee[, please]?",
-"xj": "コーヒー1つお願いします"
+"xj": "コーヒー1つもらえます？"
 },
 {
 "k": "canget",
 "en": "Can I get some help?",
-"jp": "手伝ってくれる？",
-"sc": "一人じゃ無理なミッション",
+"jp": "手伝ってもらえる？",
+"sc": "一人じゃきついミッション",
 "x": "[Hey,] can I get some help?",
-"xj": "なあ、手伝ってくれる？"
+"xj": "なあ、手伝ってもらえる？"
 },
 {
 "k": "canget",
 "en": "Can I get a ride?",
-"jp": "乗せてくれる？",
+"jp": "乗せてもらえる？",
 "sc": "車がなくて仲間に頼む",
 "x": "Can I get a ride [to the bank]?",
-"xj": "銀行まで乗せてくれる？"
+"xj": "銀行まで乗せてもらえる？"
 },
 {
 "k": "canget",
 "en": "Can I get this one?",
-"jp": "これにしていい？",
+"jp": "これもらえる？",
 "sc": "店で服を選んだ",
 "x": "Can I get this one [instead]?",
-"xj": "代わりにこれにしていい？"
+"xj": "代わりにこれもらえる？"
 },
 {
 "k": "canget",
 "en": "Can I get a discount?",
-"jp": "まけてくれる？",
+"jp": "まけてもらえる？",
 "sc": "車の値段が高すぎる",
 "x": "Can I get a discount[, please]?",
-"xj": "まけてくれません？"
+"xj": "まけてもらえません？"
 },
 {
 "k": "howdoi",
@@ -1228,18 +1244,18 @@ const RAW = [
 {
 "k": "howdoi",
 "en": "How do I open this?",
-"jp": "これどう開けるの？",
+"jp": "どうやってこれ開けるの？",
 "sc": "ドアが開かない",
 "x": "How do I open this [thing]?",
-"xj": "これ、どうやって開けんの？"
+"xj": "どうやってこれ開けんの？"
 },
 {
 "k": "howdoi",
 "en": "How do I start the mission?",
-"jp": "ミッションどう始めるの？",
+"jp": "どうやってミッション始めるの？",
 "sc": "マークの所に来たけど何も起きない",
 "x": "[Okay,] how do I start the mission?",
-"xj": "で、ミッションどう始めるの？"
+"xj": "で、どうやってミッション始めるの？"
 },
 {
 "k": "howdoi",
@@ -1252,10 +1268,10 @@ const RAW = [
 {
 "k": "howdoi",
 "en": "How do I fix this?",
-"jp": "これどう直すの？",
+"jp": "どうやってこれ直すの？",
 "sc": "車が壊れた",
 "x": "How do I fix this[, man]?",
-"xj": "これどう直すんだよ"
+"xj": "どうやってこれ直すの、おい？"
 },
 {
 "k": "howdoi",
@@ -1276,18 +1292,18 @@ const RAW = [
 {
 "k": "theres",
 "en": "There's someone in the car.",
-"jp": "車に誰か乗ってる",
+"jp": "車に誰かいる",
 "sc": "奪おうとした車に人がいた",
 "x": "[Wait,] there's someone in the car.",
-"xj": "待って、車に誰か乗ってる"
+"xj": "待って、車に誰かいる"
 },
 {
 "k": "theres",
 "en": "There's no way!",
-"jp": "無理だろ！",
+"jp": "ありえない！",
 "sc": "届くはずのない距離をジャンプしようとしている",
 "x": "There's no way [I can do that]!",
-"xj": "そんなの無理だろ！"
+"xj": "俺にできるなんて、ありえない！"
 },
 {
 "k": "theres",
@@ -1308,10 +1324,10 @@ const RAW = [
 {
 "k": "theres",
 "en": "There's money on the floor!",
-"jp": "床に金落ちてる！",
+"jp": "床に金がある！",
 "sc": "強盗のあと札が散らばっている",
 "x": "[Look!] There's money on the floor!",
-"xj": "見て！床に金落ちてる！"
+"xj": "見て！床に金がある！"
 },
 {
 "k": "theres",
@@ -1332,10 +1348,10 @@ const RAW = [
 {
 "k": "too",
 "en": "Too late.",
-"jp": "遅かった",
+"jp": "遅すぎ",
 "sc": "着いた時にはもうターゲットがいない",
 "x": "[Oh no,] too late.",
-"xj": "あー、遅かった"
+"xj": "あー、遅すぎた"
 },
 {
 "k": "too",
@@ -1388,10 +1404,10 @@ const RAW = [
 {
 "k": "thisis",
 "en": "This is my car now.",
-"jp": "今から俺の車",
+"jp": "これ、もう俺の車",
 "sc": "車を奪った直後",
 "x": "This is my car now. [Thank you!]",
-"xj": "今から俺の車。ありがとね！"
+"xj": "これ、もう俺の車。ありがとね！"
 },
 {
 "k": "thisis",
@@ -1404,18 +1420,18 @@ const RAW = [
 {
 "k": "thisis",
 "en": "This is perfect.",
-"jp": "完璧",
+"jp": "これ、完璧",
 "sc": "理想どおりの車を見つけた",
 "x": "This is perfect. [I love it.]",
-"xj": "完璧。最高"
+"xj": "これ、完璧。最高"
 },
 {
 "k": "thisis",
 "en": "This is the place.",
-"jp": "ここだ",
+"jp": "ここだ、この場所",
 "sc": "目的地に着いた",
 "x": "[Okay,] this is the place.",
-"xj": "よし、ここだ"
+"xj": "よし、ここだ、この場所"
 },
 {
 "k": "thisis",
@@ -1428,114 +1444,114 @@ const RAW = [
 {
 "k": "thatwas",
 "en": "That was close!",
-"jp": "危なかった！",
+"jp": "今の危なかった！",
 "sc": "ギリギリで車をよけた",
 "x": "That was close! [Too close!]",
-"xj": "危なかった！近すぎ！"
+"xj": "今の危なかった！近すぎ！"
 },
 {
 "k": "thatwas",
 "en": "That was stupid.",
-"jp": "バカだった",
+"jp": "今のバカだった",
 "sc": "自分から崖に突っ込んだ",
 "x": "That was stupid. [I'm sorry.]",
-"xj": "バカだった。ごめん"
+"xj": "今のバカだった。ごめん"
 },
 {
 "k": "thatwas",
 "en": "That was fun!",
-"jp": "楽しかった！",
+"jp": "今の楽しかった！",
 "sc": "ミッションが終わった",
 "x": "That was fun! [Let's do it again!]",
-"xj": "楽しかった！もう一回やろう！"
+"xj": "今の楽しかった！もう一回やろう！"
 },
 {
 "k": "thatwas",
 "en": "That was my fault.",
-"jp": "俺のせいだ",
+"jp": "今の俺のせいだった",
 "sc": "自分のミスで仲間が死んだ",
 "x": "[Sorry,] that was my fault.",
-"xj": "ごめん、俺のせいだ"
+"xj": "ごめん、今の俺のせいだった"
 },
 {
 "k": "thatwas",
 "en": "That was easy.",
-"jp": "楽勝だった",
+"jp": "今の楽勝だった",
 "sc": "一発でクリアした",
 "x": "That was easy. [Too easy.]",
-"xj": "楽勝。楽勝すぎ"
+"xj": "今の楽勝だった。楽勝すぎ"
 },
 {
 "k": "thatwas",
 "en": "That was so lucky!",
-"jp": "超ラッキーだった！",
-"sc": "奇跡的に助かった",
+"jp": "今の超ラッキーだった！",
+"sc": "奇跡的に生き残った",
 "x": "That was so lucky! [I can't believe it!]",
-"xj": "超ラッキー！信じられない！"
+"xj": "今の超ラッキーだった！信じられない！"
 },
 {
 "k": "thatwas",
 "en": "That was a bad idea.",
-"jp": "悪いアイデアだった",
+"jp": "今の悪いアイデアだった",
 "sc": "作戦が完全に失敗した",
 "x": "[Okay,] that was a bad idea.",
-"xj": "うん、悪いアイデアだった"
+"xj": "うん、今の悪いアイデアだった"
 },
 {
 "k": "its",
 "en": "It's mine!",
-"jp": "俺のだ！",
+"jp": "それ、俺のだ！",
 "sc": "NPCに金を取られそう",
 "x": "It's mine! [Don't touch it!]",
-"xj": "俺のだ！触るな！"
+"xj": "それ、俺のだ！触るな！"
 },
 {
 "k": "its",
 "en": "It's over.",
-"jp": "終わった",
+"jp": "もう終わりだ",
 "sc": "ミッション失敗の画面が出た",
 "x": "It's over. [I'm done.]",
-"xj": "終わった。もう無理"
+"xj": "もう終わりだ。俺、もうやめた"
 },
 {
 "k": "its",
 "en": "It's broken.",
-"jp": "壊れてる",
+"jp": "それ、壊れてる",
 "sc": "車がもう動かない",
 "x": "It's broken [again].",
-"xj": "また壊れた"
+"xj": "それ、また壊れてる"
 },
 {
 "k": "its",
 "en": "It's locked.",
-"jp": "鍵かかってる",
+"jp": "それ、鍵かかってる",
 "sc": "ドアが開かない",
 "x": "[Oh no,] it's locked.",
-"xj": "うわ、鍵かかってる"
+"xj": "うわ、それ鍵かかってる"
 },
 {
 "k": "its",
 "en": "It's not working.",
-"jp": "動かない",
+"jp": "それ、動いてない",
 "sc": "ボタンを押しても何も起きない",
 "x": "It's not working [at all].",
-"xj": "全然動かない"
+"xj": "それ、全然動いてない"
 },
 {
 "k": "its",
 "en": "It's okay.",
-"jp": "大丈夫",
+"jp": "それ、大丈夫",
 "sc": "ちょっとぶつけたけど平気",
 "x": "It's okay. [I'm okay.]",
-"xj": "大丈夫。俺は平気"
+"xj": "それ、大丈夫。俺は平気"
 },
 {
 "k": "its",
 "en": "It's on fire!",
-"jp": "燃えてる！",
+"jp": "それ、燃えてる！",
 "sc": "車から火が出た",
 "x": "It's on fire! [Get out!]",
-"xj": "燃えてる！降りろ！"
+"xj": "それ、燃えてる！降りろ！"
 },
 {
 "k": "where",
@@ -1567,7 +1583,7 @@ const RAW = [
 "jp": "病院どこ？",
 "sc": "ケガをした",
 "x": "Where's the hospital? [I need a doctor!]",
-"xj": "病院どこ？医者がいる！"
+"xj": "病院どこ？医者が必要！"
 },
 {
 "k": "where",
@@ -1588,50 +1604,50 @@ const RAW = [
 {
 "k": "why",
 "en": "Why is he running?",
-"jp": "なんで走ってるの？",
+"jp": "なんであいつ走ってるの？",
 "sc": "NPCがいきなり走り出した",
 "x": "Why is he running? [I didn't do anything!]",
-"xj": "なんで走ってるの？何もしてないのに！"
+"xj": "なんであいつ走ってるの？何もしてないのに！"
 },
 {
 "k": "why",
 "en": "Why is he so angry?",
-"jp": "なんでそんな怒ってるの？",
+"jp": "なんであいつそんな怒ってるの？",
 "sc": "ちょっとぶつかっただけでキレられた",
 "x": "Why is he so angry? [I just touched his car.]",
-"xj": "なんでそんな怒ってるの？車にちょっと触っただけなのに"
+"xj": "なんであいつそんな怒ってるの？車にちょっと触っただけなのに"
 },
 {
 "k": "why",
 "en": "Why is he following me?",
-"jp": "なんでついてくるの？",
+"jp": "なんであいつついてくるの？",
 "sc": "知らない車がずっと後ろにいる",
 "x": "Why is he following me? [Stop it!]",
-"xj": "なんでついてくるの？やめろ！"
+"xj": "なんであいつついてくるの？やめろ！"
 },
 {
 "k": "why",
 "en": "Why is he shooting at me?",
-"jp": "なんで撃ってくるの？",
+"jp": "なんであいつ撃ってくるの？",
 "sc": "何もしてないのに撃たれた",
 "x": "Why is he shooting at me? [What did I do?]",
-"xj": "なんで撃ってくるの？俺何した？"
+"xj": "なんであいつ撃ってくるの？俺何した？"
 },
 {
 "k": "why",
 "en": "Why is he here?",
-"jp": "なんでここにいるの？",
+"jp": "なんであいつここにいるの？",
 "sc": "死んだはずのキャラが出てきた",
 "x": "[Wait,] why is he here?",
-"xj": "待って、なんでここにいるの？"
+"xj": "待って、なんであいつここにいるの？"
 },
 {
 "k": "why",
 "en": "Why is he naked?",
-"jp": "なんで裸なの？",
+"jp": "なんであいつ裸なの？",
 "sc": "街に変なNPCがいる",
 "x": "Why is he naked? [What is this game?]",
-"xj": "なんで裸なの？何このゲーム？"
+"xj": "なんであいつ裸なの？何このゲーム？"
 },
 {
 "k": "think",
@@ -1660,10 +1676,10 @@ const RAW = [
 {
 "k": "think",
 "en": "I think I broke it.",
-"jp": "壊したかも",
+"jp": "壊したと思う",
 "sc": "ボタンを連打したら止まった",
 "x": "[Oh no,] I think I broke it.",
-"xj": "やば、壊したかも"
+"xj": "やば、壊したと思う"
 },
 {
 "k": "think",
@@ -1692,42 +1708,42 @@ const RAW = [
 {
 "k": "noidea",
 "en": "I have no idea where I am.",
-"jp": "ここどこか分からん",
+"jp": "ここどこか全然分からん",
 "sc": "迷ってマップも見てない",
 "x": "I have no idea where I am [right now].",
-"xj": "今どこにいるか分からん"
+"xj": "今どこにいるか全然分からん"
 },
 {
 "k": "noidea",
 "en": "I have no idea what he said.",
-"jp": "何言ったか分からん",
+"jp": "何言ったか全然分からん",
 "sc": "NPCのセリフが速すぎた",
 "x": "[Sorry,] I have no idea what he said.",
-"xj": "ごめん、何言ったか分からん"
+"xj": "ごめん、何言ったか全然分からん"
 },
 {
 "k": "noidea",
 "en": "I have no idea what to do.",
-"jp": "何すればいいか分からん",
+"jp": "何すればいいか全然分からん",
 "sc": "ミッションの目的が分からない",
 "x": "I have no idea what to do [now].",
-"xj": "今何すればいいか分からん"
+"xj": "今何すればいいか全然分からん"
 },
 {
 "k": "noidea",
 "en": "I have no idea how to do this.",
-"jp": "これのやり方分からん",
+"jp": "これのやり方、全然分からん",
 "sc": "初めてのミニゲーム",
 "x": "I have no idea how to do this[, man].",
-"xj": "これのやり方マジで分からん"
+"xj": "これのやり方、マジで全然分からん"
 },
 {
 "k": "noidea",
 "en": "I have no idea who he is.",
-"jp": "あいつ誰か分からん",
+"jp": "あいつ誰か全然分からん",
 "sc": "知らないキャラが話しかけてきた",
 "x": "[Wait,] I have no idea who he is.",
-"xj": "待って、あいつ誰か分からん"
+"xj": "待って、あいつ誰か全然分からん"
 },
 {
 "k": "mk_goingto",
@@ -1740,10 +1756,10 @@ const RAW = [
 {
 "k": "mk_goingto",
 "en": "I'm going to die.",
-"jp": "死ぬ…",
+"jp": "死ぬぞ…",
 "sc": "体力ゲージが点滅している",
 "x": "[Oh my god,] I'm going to die.",
-"xj": "うわ、死ぬ"
+"xj": "うわ、死ぬぞ"
 },
 {
 "k": "mk_goingto",
@@ -1764,10 +1780,10 @@ const RAW = [
 {
 "k": "mk_goingto",
 "en": "I'm going to crash.",
-"jp": "ぶつかる！",
+"jp": "ぶつかるぞ！",
 "sc": "スピードを出しすぎてカーブに入った",
 "x": "[Oh no,] I'm going to crash!",
-"xj": "やばい、ぶつかる！"
+"xj": "やばい、ぶつかるぞ！"
 },
 {
 "k": "mk_goingto",
@@ -1780,10 +1796,10 @@ const RAW = [
 {
 "k": "mk_goingto",
 "en": "I'm going to need a bigger gun.",
-"jp": "もっとデカい銃がいるな",
+"jp": "もっとデカい銃が必要になるぞ",
 "sc": "敵がめちゃくちゃ硬い",
 "x": "I'm going to need a bigger gun[, I guess].",
-"xj": "もっとデカい銃がいるかな"
+"xj": "もっとデカい銃が必要になるぞ、たぶん"
 },
 {
 "k": "mk_notgoing",
@@ -1812,18 +1828,18 @@ const RAW = [
 {
 "k": "mk_notgoing",
 "en": "I'm not going to make it.",
-"jp": "間に合わない",
+"jp": "間に合わないぞ",
 "sc": "制限時間が残り3秒",
 "x": "[Oh my god,] I'm not going to make it!",
-"xj": "うわ、間に合わない！"
+"xj": "うわ、間に合わないぞ！"
 },
 {
 "k": "mk_notgoing",
 "en": "I'm not going to lie.",
-"jp": "正直に言うと",
+"jp": "嘘はつかないぞ",
 "sc": "本音を言う前",
 "x": "I'm not going to lie, [this is pretty fun].",
-"xj": "正直、これ結構楽しい"
+"xj": "嘘はつかないぞ、これ結構楽しい"
 },
 {
 "k": "mk_notgoing",
@@ -1831,7 +1847,7 @@ const RAW = [
 "jp": "あそこには入らないぞ",
 "sc": "真っ暗で不気味な建物",
 "x": "[Nope.] I'm not going to go in there.",
-"xj": "無理。あそこには入らない"
+"xj": "やだ。あそこには入らないぞ"
 },
 {
 "k": "mk_just",
@@ -1844,42 +1860,42 @@ const RAW = [
 {
 "k": "mk_just",
 "en": "I'm just going to drive.",
-"jp": "とりあえず走る",
+"jp": "とりあえず走っとく",
 "sc": "目的地がよく分からない",
 "x": "I'm just going to drive[, I guess].",
-"xj": "とりあえず走るか"
+"xj": "とりあえず走っとくか"
 },
 {
 "k": "mk_just",
 "en": "I'm just going to run.",
-"jp": "とりあえず逃げる",
+"jp": "とりあえず逃げとく",
 "sc": "何が起きてるか分からないけど撃たれてる",
 "x": "[Okay,] I'm just going to run.",
-"xj": "よし、とりあえず逃げる"
+"xj": "よし、とりあえず逃げとく"
 },
 {
 "k": "mk_just",
 "en": "I'm just going to wait here.",
-"jp": "とりあえずここで待つ",
+"jp": "とりあえずここで待っとく",
 "sc": "仲間がまだ来ない",
 "x": "I'm just going to wait here [for a little bit].",
-"xj": "ちょっとここで待っとく"
+"xj": "とりあえずここでちょっと待っとく"
 },
 {
 "k": "mk_just",
 "en": "I'm just going to leave.",
-"jp": "もう帰る",
+"jp": "とりあえず帰っとく",
 "sc": "NPCがキレてきた",
 "x": "I'm just going to leave. [Bye!]",
-"xj": "もう帰る。じゃあね！"
+"xj": "とりあえず帰っとく。じゃあね！"
 },
 {
 "k": "mk_just",
 "en": "I'm just going to shoot everyone.",
-"jp": "もう全員撃つ",
+"jp": "とりあえず全員撃っとく",
 "sc": "作戦が全部失敗した",
 "x": "[All right,] I'm just going to shoot everyone.",
-"xj": "よし、もう全員撃つ"
+"xj": "よし、とりあえず全員撃っとく"
 },
 {
 "k": "mk_feel",
@@ -1895,7 +1911,7 @@ const RAW = [
 "jp": "あいつ嘘ついてる気がする",
 "sc": "NPCの話が怪しい",
 "x": "I feel like he's lying[, you know?]",
-"xj": "あいつ嘘ついてる気がするんだよね"
+"xj": "あいつ嘘ついてる気がするよね"
 },
 {
 "k": "mk_feel",
@@ -1932,18 +1948,18 @@ const RAW = [
 {
 "k": "mk_looks",
 "en": "It looks like a movie.",
-"jp": "映画みたい",
+"jp": "映画っぽい",
 "sc": "グラフィックがすごい",
 "x": "It looks like a movie[, right?]",
-"xj": "映画みたいじゃない？"
+"xj": "映画っぽくない？"
 },
 {
 "k": "mk_looks",
 "en": "It looks like rain.",
-"jp": "雨降りそう",
+"jp": "雨っぽい",
 "sc": "空が暗くなってきた",
 "x": "[Oh,] it looks like rain.",
-"xj": "あ、雨降りそう"
+"xj": "あ、雨っぽい"
 },
 {
 "k": "mk_looks",
@@ -2028,210 +2044,210 @@ const RAW = [
 {
 "k": "mk_whatif",
 "en": "What if he sees me?",
-"jp": "見られたらどうする？",
+"jp": "もし見られたら？",
 "sc": "こっそり近づいている",
 "x": "[Hold on,] what if he sees me?",
-"xj": "待って、見られたらどうする？"
+"xj": "待って、もし見られたら？"
 },
 {
 "k": "mk_whatif",
 "en": "What if I jump?",
-"jp": "飛んだらどうなる？",
+"jp": "もし飛んだら？",
 "sc": "高い橋の上にいる",
 "x": "What if I jump? [Let's find out!]",
-"xj": "飛んだらどうなる？試してみよう！"
+"xj": "もし飛んだら？試してみよう！"
 },
 {
 "k": "mk_whatif",
 "en": "What if it's a trap?",
-"jp": "罠だったらどうする？",
+"jp": "もし罠だったら？",
 "sc": "怪しい依頼が来た",
 "x": "What if it's a trap[, though]?",
-"xj": "でも罠だったらどうする？"
+"xj": "でも、もし罠だったら？"
 },
 {
 "k": "mk_whatif",
 "en": "What if I shoot him?",
-"jp": "あいつ撃ったらどうなる？",
+"jp": "もしあいつ撃ったら？",
 "sc": "目の前に警察官がいる",
 "x": "What if I shoot him? [Just kidding.]",
-"xj": "あいつ撃ったら？冗談だよ"
+"xj": "もしあいつ撃ったら？冗談だよ"
 },
 {
 "k": "mk_whatif",
 "en": "What if we lose?",
-"jp": "負けたらどうする？",
+"jp": "もし負けたら？",
 "sc": "ボス戦の前",
 "x": "What if we lose? [Oh boy.]",
-"xj": "負けたらどうする？うわー"
+"xj": "もし負けたら？うわー"
 },
 {
 "k": "mk_whatif",
 "en": "What if there's no gas?",
-"jp": "ガソリンなかったらどうする？",
+"jp": "もしガソリンなかったら？",
 "sc": "何もない砂漠を走っている",
 "x": "[Wait,] what if there's no gas?",
-"xj": "待って、ガソリンなかったら？"
+"xj": "待って、もしガソリンなかったら？"
 },
 {
 "k": "mk_dkif",
 "en": "I don't know if this works.",
-"jp": "これ効くか分からない",
+"jp": "これ効くか微妙",
 "sc": "新しい作戦を試す",
 "x": "I don't know if this works, [but let's try].",
-"xj": "うまくいくか分からないけど、やってみよう"
+"xj": "うまくいくか微妙だけど、やってみよう"
 },
 {
 "k": "mk_dkif",
 "en": "I don't know if he's dead.",
-"jp": "あいつ死んだか分からない",
+"jp": "あいつ死んだか微妙",
 "sc": "敵が倒れたけどまだ怪しい",
 "x": "[Hmm,] I don't know if he's dead.",
-"xj": "うーん、死んだか分からない"
+"xj": "うーん、死んだか微妙"
 },
 {
 "k": "mk_dkif",
 "en": "I don't know if I can do this.",
-"jp": "できるか分からない",
+"jp": "できるか微妙",
 "sc": "難しいミッションが始まる",
 "x": "[Oh boy,] I don't know if I can do this.",
-"xj": "うわー、できるか分からない"
+"xj": "うわー、できるか微妙"
 },
 {
 "k": "mk_dkif",
 "en": "I don't know if this is the right way.",
-"jp": "この道で合ってるか分からない",
+"jp": "この道で合ってるか微妙",
 "sc": "地図を見ないで進んでいる",
 "x": "I don't know if this is the right way[, you know].",
-"xj": "この道で合ってるか分かんないんだよね"
+"xj": "この道で合ってるか微妙だよね"
 },
 {
 "k": "mk_dkif",
 "en": "I don't know if I want to go in there.",
-"jp": "あそこ入りたくないんだけど",
+"jp": "あそこ入りたいか微妙",
 "sc": "不気味な地下室の前",
 "x": "I don't know if I want to go in there[, man].",
-"xj": "あそこマジで入りたくないんだけど"
+"xj": "あそこマジで入りたいか微妙"
 },
 {
 "k": "mk_dkif",
 "en": "I don't know if we have time.",
-"jp": "時間あるか分からない",
+"jp": "時間あるか微妙",
 "sc": "制限時間がギリギリ",
 "x": "[Hold on,] I don't know if we have time.",
-"xj": "待って、時間あるか分からない"
+"xj": "待って、時間あるか微妙"
 },
 {
 "k": "mk_why",
 "en": "Why would I do that?",
-"jp": "なんでそんなことするんだよ",
+"jp": "なんで俺がそんなことするんだよ",
 "sc": "視聴者に変なことを勧められた",
 "x": "Why would I do that? [No way!]",
-"xj": "なんでそんなことすんの？ありえない！"
+"xj": "なんで俺がそんなことすんの？ありえない！"
 },
 {
 "k": "mk_why",
 "en": "Why would I go back?",
-"jp": "なんで戻るんだよ",
+"jp": "なんで俺が戻るんだよ",
 "sc": "ミッションの指示で戻れと言われた",
 "x": "Why would I go back[, though]?",
-"xj": "でも、なんで戻るの？"
+"xj": "でも、なんで俺が戻るんだよ？"
 },
 {
 "k": "mk_why",
 "en": "Why would I pay for this?",
-"jp": "なんでこれに金払うんだよ",
+"jp": "なんで俺がこれに金払うんだよ",
 "sc": "盗めそうな物を店で売っている",
 "x": "Why would I pay for this? [I'm just going to take it.]",
-"xj": "なんで金払うの？もらっとくわ"
+"xj": "なんで俺が金払うんだよ？もらっとくわ"
 },
 {
 "k": "mk_why",
 "en": "Why would I lie?",
-"jp": "なんで嘘つくんだよ",
+"jp": "なんで俺が嘘つくんだよ",
 "sc": "仲間に疑われた",
 "x": "[Come on,] why would I lie?",
-"xj": "おいおい、なんで嘘つくんだよ"
+"xj": "おいおい、なんで俺が嘘つくんだよ"
 },
 {
 "k": "mk_why",
 "en": "Why would I help you?",
-"jp": "なんでお前を助けるんだよ",
+"jp": "なんで俺がお前を助けるんだよ",
 "sc": "敵だったNPCに助けを頼まれた",
 "x": "Why would I help you? [Get out of here.]",
-"xj": "なんで助けるんだよ。あっち行け"
+"xj": "なんで俺が助けるんだよ。あっち行け"
 },
 {
 "k": "mk_why",
 "en": "Why would I stop?",
-"jp": "なんで止まるんだよ",
+"jp": "なんで俺が止まるんだよ",
 "sc": "仲間に「止まれ」と言われた",
 "x": "Why would I stop? [This is fun!]",
-"xj": "なんで止まるの？楽しいのに！"
+"xj": "なんで俺が止まるんだよ？楽しいのに！"
 },
 {
 "k": "mk_good",
 "en": "Good thing I saved.",
-"jp": "セーブしといてよかった",
+"jp": "セーブしといて助かった",
 "sc": "死んだけどすぐ戻れた",
 "x": "[Phew,] good thing I saved.",
-"xj": "ふう、セーブしといてよかった"
+"xj": "ふう、セーブしといて助かった"
 },
 {
 "k": "mk_good",
 "en": "Good thing I had a gun.",
-"jp": "銃持っててよかった",
+"jp": "銃持ってて助かった",
 "sc": "急に敵が来た",
 "x": "Good thing I had a gun[, right?]",
-"xj": "銃持っててよかったよな？"
+"xj": "銃持ってて助かったよな？"
 },
 {
 "k": "mk_good",
 "en": "Good thing nobody saw that.",
-"jp": "誰にも見られなくてよかった",
+"jp": "誰にも見られなくて助かった",
 "sc": "恥ずかしいミスをした",
 "x": "Good thing nobody saw that. [Except you guys.]",
-"xj": "誰も見てなくてよかった。お前ら以外な"
+"xj": "誰も見てなくて助かった。お前ら以外な"
 },
 {
 "k": "mk_good",
 "en": "Good thing I'm rich.",
-"jp": "金持っててよかった",
+"jp": "金持ってて助かった",
 "sc": "車を壊して修理代が高い",
 "x": "Good thing I'm rich[, I guess].",
-"xj": "金持っててよかった、たぶん"
+"xj": "金持ってて助かった、たぶん"
 },
 {
 "k": "mk_good",
 "en": "Good thing the cops didn't see me.",
-"jp": "警察に見られなくてよかった",
+"jp": "警察に見られなくて助かった",
 "sc": "信号無視したけどパトカーが通り過ぎた",
 "x": "[Oh my god,] good thing the cops didn't see me.",
-"xj": "うわ、警察に見られなくてよかった"
+"xj": "うわ、警察に見られなくて助かった"
 },
 {
 "k": "mk_good",
 "en": "Good thing it didn't explode.",
-"jp": "爆発しなくてよかった",
+"jp": "爆発しなくて助かった",
 "sc": "燃えてる車から降りた",
 "x": "Good thing it didn't explode. [That was close.]",
-"xj": "爆発しなくてよかった。危なかった"
+"xj": "爆発しなくて助かった。危なかった"
 },
 {
 "k": "mk_trying",
 "en": "I'm trying to drive.",
-"jp": "運転してるんだけど",
+"jp": "運転しようとしてるんだけど",
 "sc": "仲間が話しかけてきて邪魔",
 "x": "[Hey,] I'm trying to drive!",
-"xj": "おい、運転中なんだけど！"
+"xj": "おい、運転しようとしてるんだけど！"
 },
 {
 "k": "mk_trying",
 "en": "I'm trying to find the mission.",
-"jp": "ミッション探してるんだけど",
+"jp": "ミッション探そうとしてるんだけど",
 "sc": "マップを見ている",
 "x": "I'm trying to find the mission[, okay?]",
-"xj": "ミッション探してるんだって、いい？"
+"xj": "ミッション探そうとしてるんだって、いい？"
 },
 {
 "k": "mk_trying",
@@ -2239,7 +2255,7 @@ const RAW = [
 "jp": "助けようとしてるんだって",
 "sc": "助けたNPCが攻撃してくる",
 "x": "I'm trying to help you! [Stop it!]",
-"xj": "助けようとしてんだよ！やめろ！"
+"xj": "助けようとしてるんだって！やめろ！"
 },
 {
 "k": "mk_trying",
@@ -2247,7 +2263,7 @@ const RAW = [
 "jp": "駐車しようとしてるんだけど",
 "sc": "狭い所に車を止める",
 "x": "[Hold on,] I'm trying to park.",
-"xj": "待って、駐車してるとこ"
+"xj": "待って、駐車しようとしてるんだけど"
 },
 {
 "k": "mk_trying",
@@ -2271,7 +2287,7 @@ const RAW = [
 "jp": "簡単なはずなんだけど",
 "sc": "簡単なミッションで何度も失敗",
 "x": "It's supposed to be easy[, right?]",
-"xj": "簡単なはずだよね？"
+"xj": "簡単なはずなんだけどな"
 },
 {
 "k": "mk_supposed",
@@ -2287,7 +2303,7 @@ const RAW = [
 "jp": "開くはずなんだけど",
 "sc": "ドアが開かない",
 "x": "It's supposed to open. [What the hell?]",
-"xj": "開くはずなのに。なんでだよ？"
+"xj": "開くはずなんだけど。なんでだよ？"
 },
 {
 "k": "mk_supposed",
@@ -2311,7 +2327,7 @@ const RAW = [
 "jp": "秘密のはずなんだけど",
 "sc": "NPCが計画を大声で話している",
 "x": "It's supposed to be a secret[, man]!",
-"xj": "秘密のはずだろ！"
+"xj": "秘密のはずなんだけど！"
 },
 {
 "k": "mk_look",
@@ -2351,7 +2367,7 @@ const RAW = [
 "jp": "俺を見て！",
 "sc": "視聴者にキャラの服を見せたい",
 "x": "Look at me! [Pretty cool, right?]",
-"xj": "俺見て！結構かっこよくない？"
+"xj": "俺を見て！結構かっこよくない？"
 },
 {
 "k": "mk_look",
@@ -2869,6 +2885,13 @@ function loadFromServer(user){
 }
 function initApp(){
   mpStop(); MP.queue=[]; MP.qi=0; MP.cur=null; MP.cycle=1;
+  // 一時的に I have no idea にまとめた版で付いた記録を、元の I don't know if の文に戻す
+  const RENAMED = {"I have no idea if this works.": "I don't know if this works.", "I have no idea if this works, but let's try.": "I don't know if this works, but let's try.", "I have no idea if he's dead.": "I don't know if he's dead.", "Hmm, I have no idea if he's dead.": "Hmm, I don't know if he's dead.", "I have no idea if I can do this.": "I don't know if I can do this.", "Oh boy, I have no idea if I can do this.": "Oh boy, I don't know if I can do this.", "I have no idea if this is the right way.": "I don't know if this is the right way.", "I have no idea if this is the right way, you know.": "I don't know if this is the right way, you know.", "I have no idea what's in there.": "I don't know if I want to go in there.", "I have no idea what's in there, man.": "I don't know if I want to go in there, man.", "I have no idea if we have time.": "I don't know if we have time.", "Hold on, I have no idea if we have time.": "Hold on, I don't know if we have time."};
+  Object.keys(RENAMED).forEach(o=>{ const n = RENAMED[o];
+    if (status[o] && !status[n]) status[n] = status[o]; delete status[o];
+    if (memo[o]) { if (!memo[n]) { memo[n] = memo[o]; memo[n].en = n; memo[n].k = 'mk_dkif'; } delete memo[o]; } });
+  // 覚えるリストに保存された日本語・状況を最新の内容に合わせる(訳を直した時用)
+  Object.keys(memo).forEach(key=>{ const d = memo[key], it = ITEMS[d.i]; if (!it) return; const k2 = d.long ? xPlain(it) : it.en; if (k2 !== key) { if (!memo[k2]) memo[k2] = {en:k2, jp: d.long ? it.xj : it.jp, sc: it.sc, k:it.k, long:!!d.long, i:it.i, added:d.added, w:1.5, n:0}; delete memo[key]; return; } d.jp = d.long ? it.xj : it.jp; d.sc = it.sc; });
   if (!autoShortDone) { ITEMS.forEach(it=>addMemo(it, false)); autoShortDone = true; autoMkDone = true; scheduleSave(); }
   if (!autoMkDone) { ITEMS.filter(it=>it.grp===4).forEach(it=>addMemo(it, false)); autoMkDone = true; scheduleSave(); }
   document.querySelectorAll('.nAll').forEach(x=>x.textContent = ITEMS.length);
