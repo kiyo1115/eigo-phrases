@@ -97,6 +97,7 @@
         <option value="core">優先50語</option>
         <option value="tsukkomi">ツッコミ55</option>
         <option value="verb">動詞フレーズ54</option>
+        <option value="pair">2文セット62</option>
       </select>
     </div>
     <div class="set">
@@ -312,7 +313,72 @@ const DATA_ALL = (()=>{
   });
   return out;
 })();
-const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI, verb: DATA_VERB };
+// 2文セット：1文目=何が起きた／2文目=どうする・気持ち。どの文も38型の文頭で始まる
+const DATA_PAIR = [
+  {"cat": "会話・ミッションが分からない", "scene": "会話が全然分からなかった", "en": "I have no idea what he said. I'm just going to go with it.", "jp": "何言ったか全然分からん → とりあえず合わせとく", "e1": "I have no idea what he said.", "e2": "I'm just going to go with it.", "j1": "何言ったか全然分からん", "j2": "とりあえず合わせとく"},
+  {"cat": "会話・ミッションが分からない", "scene": "聞き取れた単語から推測する", "en": "I think he said \"money.\" It looks like he wants money.", "jp": "「金」って言ったと思う → 金が欲しいっぽい", "e1": "I think he said \"money.\"", "e2": "It looks like he wants money.", "j1": "「金」って言ったと思う", "j2": "金が欲しいっぽい"},
+  {"cat": "会話・ミッションが分からない", "scene": "ミッションのやり方が分からない", "en": "How do I do this? I feel like I'm missing something.", "jp": "これどうやってやるの？ → なんか見落としてる気がする", "e1": "How do I do this?", "e2": "I feel like I'm missing something.", "j1": "これどうやってやるの？", "j2": "なんか見落としてる気がする"},
+  {"cat": "会話・ミッションが分からない", "scene": "ムービーが長く続く", "en": "This is too long. Let me play the game!", "jp": "これ、長すぎ → ゲームさせて！", "e1": "This is too long.", "e2": "Let me play the game!", "j1": "これ、長すぎ", "j2": "ゲームさせて！"},
+  {"cat": "会話・ミッションが分からない", "scene": "相手が怒っている理由が分からない", "en": "Why is he angry? I didn't do anything!", "jp": "なんであいつ怒ってるの？ → 何もしてない！", "e1": "Why is he angry?", "e2": "I didn't do anything!", "j1": "なんであいつ怒ってるの？", "j2": "何もしてない！"},
+  {"cat": "会話・ミッションが分からない", "scene": "よく分からないまま返事した", "en": "I'm just going to say yes. I don't know if it was right.", "jp": "とりあえずイエスって言っとく → 合ってたか微妙", "e1": "I'm just going to say yes.", "e2": "I don't know if it was right.", "j1": "とりあえずイエスって言っとく", "j2": "合ってたか微妙"},
+  {"cat": "警察・★", "scene": "★が付いた", "en": "I got a star. I'm so sorry, officer!", "jp": "★ゲット → 俺、ほんとごめん、おまわりさん！", "e1": "I got a star.", "e2": "I'm so sorry, officer!", "j1": "★ゲット", "j2": "俺、ほんとごめん、おまわりさん！"},
+  {"cat": "警察・★", "scene": "★3で車が使えない（NO CAR）", "en": "I can't use a car. I need to walk.", "jp": "車使えない → 歩かなきゃ", "e1": "I can't use a car.", "e2": "I need to walk.", "j1": "車使えない", "j2": "歩かなきゃ"},
+  {"cat": "警察・★", "scene": "ヘリが来た", "en": "There's a helicopter! Let me hide under the bridge.", "jp": "ヘリがいる！ → 橋の下に隠れさせて", "e1": "There's a helicopter!", "e2": "Let me hide under the bridge.", "j1": "ヘリがいる！", "j2": "橋の下に隠れさせて"},
+  {"cat": "警察・★", "scene": "警察犬に追われる", "en": "There's a police dog! Don't bite me!", "jp": "警察犬がいる！ → 噛むな！", "e1": "There's a police dog!", "e2": "Don't bite me!", "j1": "警察犬がいる！", "j2": "噛むな！"},
+  {"cat": "警察・★", "scene": "隠れている", "en": "I'm trying to hide. Don't look at me.", "jp": "隠れようとしてるんだけど → こっち見るな", "e1": "I'm trying to hide.", "e2": "Don't look at me.", "j1": "隠れようとしてるんだけど", "j2": "こっち見るな"},
+  {"cat": "警察・★", "scene": "警察を振り切った", "en": "Good thing I lost them. I'm going to be careful now.", "jp": "まけて助かった → これからは気をつけるぞ", "e1": "Good thing I lost them.", "e2": "I'm going to be careful now.", "j1": "まけて助かった", "j2": "これからは気をつけるぞ"},
+  {"cat": "警察・★", "scene": "捕まった", "en": "I got caught! Let me go! I didn't do anything!", "jp": "捕まえられた → 放させて！何もしてない！", "e1": "I got caught!", "e2": "Let me go! I didn't do anything!", "j1": "捕まえられた", "j2": "放させて！何もしてない！"},
+  {"cat": "警察・★", "scene": "警察に囲まれた", "en": "Too many cops! I should have stayed home.", "jp": "警察多すぎ！ → 家にいればよかった", "e1": "Too many cops!", "e2": "I should have stayed home.", "j1": "警察多すぎ！", "j2": "家にいればよかった"},
+  {"cat": "撃ち合い", "scene": "敵が次々出てくる", "en": "There's too many of them! I need to hide.", "jp": "敵がめっちゃいる！ → 隠れなきゃ", "e1": "There's too many of them!", "e2": "I need to hide.", "j1": "敵がめっちゃいる！", "j2": "隠れなきゃ"},
+  {"cat": "撃ち合い", "scene": "撃ち合いが難しい", "en": "This is too hard. I should have bought a better gun.", "jp": "これ、難しすぎ → もっといい銃買えばよかった", "e1": "This is too hard.", "e2": "I should have bought a better gun.", "j1": "これ、難しすぎ", "j2": "もっといい銃買えばよかった"},
+  {"cat": "撃ち合い", "scene": "弾が切れた", "en": "I'm out of ammo! Give me a gun!", "jp": "俺、弾切れ！ → 銃くれ！", "e1": "I'm out of ammo!", "e2": "Give me a gun!", "j1": "俺、弾切れ！", "j2": "銃くれ！"},
+  {"cat": "撃ち合い", "scene": "ヘッドショットが決まった", "en": "Look at this! I'm a pro now.", "jp": "これ見て！ → 俺、もうプロ", "e1": "Look at this!", "e2": "I'm a pro now.", "j1": "これ見て！", "j2": "俺、もうプロ"},
+  {"cat": "撃ち合い", "scene": "撃たれまくる", "en": "I got shot! Stop shooting me!", "jp": "撃たれた！ → 撃つのやめろ！", "e1": "I got shot!", "e2": "Stop shooting me!", "j1": "撃たれた！", "j2": "撃つのやめろ！"},
+  {"cat": "撃ち合い", "scene": "★5で素手しかない（FISTS ONLY）", "en": "I can't use my gun. I'm going to punch them all.", "jp": "銃使えない → 全員殴るぞ", "e1": "I can't use my gun.", "e2": "I'm going to punch them all.", "j1": "銃使えない", "j2": "全員殴るぞ"},
+  {"cat": "死亡・失敗", "scene": "体力が少ない", "en": "I'm going to die. I need help!", "jp": "死ぬぞ → 助けが必要！", "e1": "I'm going to die.", "e2": "I need help!", "j1": "死ぬぞ", "j2": "助けが必要！"},
+  {"cat": "死亡・失敗", "scene": "死んだ", "en": "I just died. Why would I go in there?", "jp": "死んだばっか → なんで俺あそこ行くんだよ", "e1": "I just died.", "e2": "Why would I go in there?", "j1": "死んだばっか", "j2": "なんで俺あそこ行くんだよ"},
+  {"cat": "死亡・失敗", "scene": "仲間を死なせた", "en": "I just killed my friend. I'm so sorry, bro.", "jp": "友達やっちゃったばっか → 俺、ほんとごめん、兄弟", "e1": "I just killed my friend.", "e2": "I'm so sorry, bro.", "j1": "友達やっちゃったばっか", "j2": "俺、ほんとごめん、兄弟"},
+  {"cat": "死亡・失敗", "scene": "ミッション失敗", "en": "That was terrible. Let's try again.", "jp": "今のひどかった → もう一回やろう", "e1": "That was terrible.", "e2": "Let's try again.", "j1": "今のひどかった", "j2": "もう一回やろう"},
+  {"cat": "死亡・失敗", "scene": "同じ所で何度も死ぬ", "en": "This is the fifth time. I feel like the game hates me.", "jp": "これ、5回目 → ゲームに嫌われてる気がする", "e1": "This is the fifth time.", "e2": "I feel like the game hates me.", "j1": "これ、5回目", "j2": "ゲームに嫌われてる気がする"},
+  {"cat": "死亡・失敗", "scene": "死んで★が消えた（NO ESCAPE）", "en": "I'm back. Let me get my star back.", "jp": "俺、復活 → ★取り戻させて", "e1": "I'm back.", "e2": "Let me get my star back.", "j1": "俺、復活", "j2": "★取り戻させて"},
+  {"cat": "運転・事故", "scene": "人をはねた", "en": "I just hit someone. I didn't mean it!", "jp": "人はねたばっか → わざとしてない！", "e1": "I just hit someone.", "e2": "I didn't mean it!", "j1": "人はねたばっか", "j2": "わざとしてない！"},
+  {"cat": "運転・事故", "scene": "車が壊れた", "en": "It's broken. I need a new car.", "jp": "それ、壊れてる → 新しい車が必要", "e1": "It's broken.", "e2": "I need a new car.", "j1": "それ、壊れてる", "j2": "新しい車が必要"},
+  {"cat": "運転・事故", "scene": "飛行機やボートを操縦する", "en": "How do I fly this? I'm trying to land.", "jp": "これどうやって飛ばすの？ → 着陸しようとしてるんだけど", "e1": "How do I fly this?", "e2": "I'm trying to land.", "j1": "これどうやって飛ばすの？", "j2": "着陸しようとしてるんだけど"},
+  {"cat": "運転・事故", "scene": "スピードが出すぎ", "en": "Too fast! Stop the car!", "jp": "速すぎ！ → 車止めろ！", "e1": "Too fast!", "e2": "Stop the car!", "j1": "速すぎ！", "j2": "車止めろ！"},
+  {"cat": "運転・事故", "scene": "車を盗む", "en": "Let me borrow this car. I'm going to bring it back.", "jp": "この車借りさせて → 返すぞ", "e1": "Let me borrow this car.", "e2": "I'm going to bring it back.", "j1": "この車借りさせて", "j2": "返すぞ"},
+  {"cat": "運転・事故", "scene": "事故ったけど無事", "en": "I just crashed. Good thing I'm alive.", "jp": "ぶつけたばっか → 生きてて助かった", "e1": "I just crashed.", "e2": "Good thing I'm alive.", "j1": "ぶつけたばっか", "j2": "生きてて助かった"},
+  {"cat": "迷う・探す", "scene": "目的地が分からない", "en": "I have no idea where to go. It looks like I'm lost.", "jp": "どこ行くか全然分からん → 迷ったっぽい", "e1": "I have no idea where to go.", "e2": "It looks like I'm lost.", "j1": "どこ行くか全然分からん", "j2": "迷ったっぽい"},
+  {"cat": "迷う・探す", "scene": "物が見つからない", "en": "Where's the package? It's supposed to be here.", "jp": "荷物どこ？ → 本当はここにあるはずなんだけど", "e1": "Where's the package?", "e2": "It's supposed to be here.", "j1": "荷物どこ？", "j2": "本当はここにあるはずなんだけど"},
+  {"cat": "迷う・探す", "scene": "道を間違えた", "en": "I think this is the wrong way. Let's go back.", "jp": "これ逆だと思う → 戻ろう", "e1": "I think this is the wrong way.", "e2": "Let's go back.", "j1": "これ逆だと思う", "j2": "戻ろう"},
+  {"cat": "迷う・探す", "scene": "目的地に着いた", "en": "This is it. I'm going to go in.", "jp": "これ、ここだ → 入るぞ", "e1": "This is it.", "e2": "I'm going to go in.", "j1": "これ、ここだ", "j2": "入るぞ"},
+  {"cat": "迷う・探す", "scene": "マップを見る", "en": "Let me check the map. It looks like it's far.", "jp": "マップ見させて → 遠いっぽい", "e1": "Let me check the map.", "e2": "It looks like it's far.", "j1": "マップ見させて", "j2": "遠いっぽい"},
+  {"cat": "キャラに返事", "scene": "相手が好きなことを話した", "en": "I want to go fishing too. Let's go together!", "jp": "俺も釣り行きたい → 一緒に行こう！", "e1": "I want to go fishing too.", "e2": "Let's go together!", "j1": "俺も釣り行きたい", "j2": "一緒に行こう！"},
+  {"cat": "キャラに返事", "scene": "疑われた", "en": "I didn't do it! Why would I do it?", "jp": "やってない！ → なんで俺がやるんだよ", "e1": "I didn't do it!", "e2": "Why would I do it?", "j1": "やってない！", "j2": "なんで俺がやるんだよ"},
+  {"cat": "キャラに返事", "scene": "褒められた", "en": "I'm the best. Give me more money.", "jp": "俺、最強 → もっと金くれ", "e1": "I'm the best.", "e2": "Give me more money.", "j1": "俺、最強", "j2": "もっと金くれ"},
+  {"cat": "キャラに返事", "scene": "仕事を頼まれた", "en": "I'm going to do it. Give me five minutes.", "jp": "やるぞ → 5分くれ", "e1": "I'm going to do it.", "e2": "Give me five minutes.", "j1": "やるぞ", "j2": "5分くれ"},
+  {"cat": "キャラに返事", "scene": "変なことを言うキャラ", "en": "Why is he so weird? I feel like he's crazy.", "jp": "なんであいつこんな変なの？ → あいつヤバい気がする", "e1": "Why is he so weird?", "e2": "I feel like he's crazy.", "j1": "なんであいつこんな変なの？", "j2": "あいつヤバい気がする"},
+  {"cat": "女性・距離が近い", "scene": "距離が近い", "en": "Too close! Can I get a kiss?", "jp": "近すぎ！ → キスもらえる？", "e1": "Too close!", "e2": "Can I get a kiss?", "j1": "近すぎ！", "j2": "キスもらえる？"},
+  {"cat": "女性・距離が近い", "scene": "きれいな女性がいた", "en": "Look at her! I think I'm in love.", "jp": "あの人見て！ → 惚れたと思う", "e1": "Look at her!", "e2": "I think I'm in love.", "j1": "あの人見て！", "j2": "惚れたと思う"},
+  {"cat": "女性・距離が近い", "scene": "写真を撮りたい", "en": "I want to take a picture. Let me get closer.", "jp": "写真撮りたい → 近づかせて", "e1": "I want to take a picture.", "e2": "Let me get closer.", "j1": "写真撮りたい", "j2": "近づかせて"},
+  {"cat": "女性・距離が近い", "scene": "振られた", "en": "I got rejected. I'm not going to cry.", "jp": "振られた → 泣かないぞ", "e1": "I got rejected.", "e2": "I'm not going to cry.", "j1": "振られた", "j2": "泣かないぞ"},
+  {"cat": "女性・距離が近い", "scene": "えっちな場面", "en": "This is too much. I'm trying to look away.", "jp": "これ、やりすぎ → 目そらそうとしてるんだけど", "e1": "This is too much.", "e2": "I'm trying to look away.", "j1": "これ、やりすぎ", "j2": "目そらそうとしてるんだけど"},
+  {"cat": "家・買い物・着替え", "scene": "着替え・筋トレ", "en": "I'm trying to get big. It looks like I'm a model now.", "jp": "デカくなろうとしてる → もうモデルっぽい", "e1": "I'm trying to get big.", "e2": "It looks like I'm a model now.", "j1": "デカくなろうとしてる", "j2": "もうモデルっぽい"},
+  {"cat": "家・買い物・着替え", "scene": "服を選ぶ", "en": "I want to look cool. Let me try this one.", "jp": "かっこよく見せたい → これ着させて", "e1": "I want to look cool.", "e2": "Let me try this one.", "j1": "かっこよく見せたい", "j2": "これ着させて"},
+  {"cat": "家・買い物・着替え", "scene": "店で買い物", "en": "Can I get this? It's too expensive!", "jp": "これもらえる？ → それ、高すぎ！", "e1": "Can I get this?", "e2": "It's too expensive!", "j1": "これもらえる？", "j2": "それ、高すぎ！"},
+  {"cat": "家・買い物・着替え", "scene": "金がない", "en": "I need money. I'm going to rob a store.", "jp": "金が必要 → 店襲うぞ", "e1": "I need money.", "e2": "I'm going to rob a store.", "j1": "金が必要", "j2": "店襲うぞ"},
+  {"cat": "家・買い物・着替え", "scene": "家に帰りたい", "en": "I want to go home. I'm just going to sleep.", "jp": "家帰りたい → とりあえず寝とく", "e1": "I want to go home.", "e2": "I'm just going to sleep.", "j1": "家帰りたい", "j2": "とりあえず寝とく"},
+  {"cat": "家・買い物・着替え", "scene": "銃屋に来た", "en": "Give me the biggest gun. I'm going to need it.", "jp": "一番デカい銃くれ → 必要になるぞ", "e1": "Give me the biggest gun.", "e2": "I'm going to need it.", "j1": "一番デカい銃くれ", "j2": "必要になるぞ"},
+  {"cat": "成功・驚き", "scene": "ミッション成功", "en": "I just did it! Good thing I didn't die.", "jp": "やったばっか！ → 死ななくて助かった", "e1": "I just did it!", "e2": "Good thing I didn't die.", "j1": "やったばっか！", "j2": "死ななくて助かった"},
+  {"cat": "成功・驚き", "scene": "判定でYES", "en": "I think I'm getting better. Let's go!", "jp": "上手くなってると思う → 行こう！", "e1": "I think I'm getting better.", "e2": "Let's go!", "j1": "上手くなってると思う", "j2": "行こう！"},
+  {"cat": "成功・驚き", "scene": "判定でNO", "en": "I got a NO. I should have listened better.", "jp": "NOされた → もっとちゃんと聞けばよかった", "e1": "I got a NO.", "e2": "I should have listened better.", "j1": "NOされた", "j2": "もっとちゃんと聞けばよかった"},
+  {"cat": "成功・驚き", "scene": "きれいな景色", "en": "This is beautiful. I want to live here.", "jp": "これ、きれい → ここ住みたい", "e1": "This is beautiful.", "e2": "I want to live here.", "j1": "これ、きれい", "j2": "ここ住みたい"},
+  {"cat": "成功・驚き", "scene": "派手な爆発", "en": "That was crazy! I want to see it again!", "jp": "今のヤバかった！ → もう一回見たい！", "e1": "That was crazy!", "e2": "I want to see it again!", "j1": "今のヤバかった！", "j2": "もう一回見たい！"},
+  {"cat": "成功・驚き", "scene": "悪いことをしたのに誰も見てない", "en": "Good thing nobody saw me. I'm just going to walk away.", "jp": "誰にも見られなくて助かった → とりあえず立ち去っとく", "e1": "Good thing nobody saw me.", "e2": "I'm just going to walk away.", "j1": "誰にも見られなくて助かった", "j2": "とりあえず立ち去っとく"},
+  {"cat": "警察・★", "scene": "パトカーが近くに来た", "en": "What if they see me? Get down!", "jp": "もし見つかったら？ → 伏せろ！", "e1": "What if they see me?", "e2": "Get down!", "j1": "もし見つかったら？", "j2": "伏せろ！"},
+  {"cat": "撃ち合い", "scene": "仲間が撃たれそう", "en": "Get behind the car! I'm going to help you.", "jp": "車の後ろに行け！ → 助けるぞ", "e1": "Get behind the car!", "e2": "I'm going to help you.", "j1": "車の後ろに行け！", "j2": "助けるぞ"},
+  {"cat": "迷う・探す", "scene": "あやしい建物に入る", "en": "What if it's a trap? I'm not going to go in.", "jp": "もしワナだったら？ → 入らないぞ", "e1": "What if it's a trap?", "e2": "I'm not going to go in.", "j1": "もしワナだったら？", "j2": "入らないぞ"}
+];
+const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI, verb: DATA_VERB, pair: DATA_PAIR };
 let DATA = DATA_ALL;
 let active = new Set(DATA.map(d=>d.cat));
 let queue = [], qi = 0;
@@ -391,10 +457,13 @@ function showScene(item, isRetry){
   stageInner.innerHTML =
     '<div class="cat">'+esc(item.cat)+'</div>' + (isRetry ? '<span class="retry-tag">もう一回</span>' : '') +
     '<div class="scene">'+esc(item.scene)+'</div>' +
-    '<div class="hint">'+(DATA===DATA_TSUKKOMI?'英語でツッコんでみる':DATA===DATA_VERB?'動詞フレーズで言ってみる':'英語で何か言ってみる')+'</div>' +
+    '<div class="hint">'+(DATA===DATA_TSUKKOMI?'英語でツッコんでみる':DATA===DATA_VERB?'動詞フレーズで言ってみる':DATA===DATA_PAIR?'2文で言ってみる（何が起きた → どうする）':'英語で何か言ってみる')+'</div>' +
     '<div class="answer" id="ansBox">' +
-      '<div class="en" style="cursor:pointer" onclick="playCurrentEn()">🔊 '+esc(item.en)+'</div>' +
-      '<div class="jp">'+esc(item.jp)+'</div>' +
+      (item.e1
+        ? '<div class="en" style="cursor:pointer" onclick="playCurrentEn()">🔊 ①'+esc(item.e1)+'<br>②'+esc(item.e2)+'</div>' +
+          '<div class="jp">①'+esc(item.j1)+'<br>②'+esc(item.j2)+'</div>'
+        : '<div class="en" style="cursor:pointer" onclick="playCurrentEn()">🔊 '+esc(item.en)+'</div>' +
+          '<div class="jp">'+esc(item.jp)+'</div>') +
     '</div>';
   count++;
   countEl.textContent = count;
