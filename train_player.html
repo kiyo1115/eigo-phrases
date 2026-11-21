@@ -98,6 +98,7 @@
         <option value="tsukkomi">ツッコミ55</option>
         <option value="verb">動詞フレーズ54</option>
         <option value="pair">2文セット91</option>
+        <option value="link">つながり46（2文目を続ける）</option>
       </select>
     </div>
     <div class="set">
@@ -106,7 +107,8 @@
         <option value="3000">3秒(速い)</option>
         <option value="5000" selected>5秒</option>
         <option value="8000">8秒</option>
-        <option value="12000">12秒(じっくり)</option>
+        <option value="12000">12秒</option>
+        <option value="20000">20秒(じっくり)</option>
       </select>
     </div>
     <div class="set">
@@ -407,7 +409,56 @@ const DATA_PAIR = [
   {"cat": "物が動かない", "scene": "ボタンを押しても何も起きない", "en": "It's not working. I think I broke it.", "jp": "それ、動いてない → 壊したと思う", "e1": "It's not working.", "e2": "I think I broke it.", "j1": "それ、動いてない", "j2": "壊したと思う"},
   {"cat": "物が動かない", "scene": "爆弾を置いたのに何も起きない", "en": "It's supposed to explode. Give me a break.", "jp": "爆発するはずなんだけど → 勘弁してくれ", "e1": "It's supposed to explode.", "e2": "Give me a break.", "j1": "爆発するはずなんだけど", "j2": "勘弁してくれ"}
 ];
-const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI, verb: DATA_VERB, pair: DATA_PAIR };
+// つながり：1文目は言える前提。2文目は答えが1つじゃない。全部 型ドリル(244文)の文
+const DATA_LINK = [
+  {"cat": "今回の録画", "scene": "強盗の相手を探してピストルを構える", "en": "Don't move! ⇢", "first": "Don't move!", "firstJp": "動くな！", "nexts": [{"d": "どうする", "en": "Give me the money!", "jp": "金をくれ！"}, {"d": "どうする", "en": "Stop right there!", "jp": "そこで止まれ！"}, {"d": "ツッコミ・疑問", "en": "What if I shoot him?", "jp": "もしあいつ撃ったら？"}, {"d": "ツッコミ・疑問", "en": "Why is he running?", "jp": "なんであいつ走ってるの？"}, {"d": "後悔・ホッと", "en": "Good thing I had a gun.", "jp": "銃持ってて助かった"}, {"d": "気持ち・強がり", "en": "I feel like he's lying.", "jp": "あいつ嘘ついてる気がする"}, {"d": "気持ち・強がり", "en": "I think he's a cop.", "jp": "あいつ警察だと思う"}]},
+  {"cat": "今回の録画", "scene": "ステルス中、動物がうるさい", "en": "Stop it! ⇢", "first": "Stop it!", "firstJp": "やめろ！", "nexts": [{"d": "どうする", "en": "I need to hide.", "jp": "隠れなきゃ"}, {"d": "どうする", "en": "I'm just going to wait here.", "jp": "とりあえずここで待っとく"}, {"d": "ツッコミ・疑問", "en": "What if he sees me?", "jp": "もし見られたら？"}, {"d": "ツッコミ・疑問", "en": "Why is he so angry?", "jp": "なんであいつそんな怒ってるの？"}, {"d": "後悔・ホッと", "en": "That was a bad idea.", "jp": "今の悪いアイデアだった"}, {"d": "気持ち・強がり", "en": "This is crazy!", "jp": "これヤバい！"}, {"d": "気持ち・強がり", "en": "I feel like something is wrong.", "jp": "何かおかしい気がする"}]},
+  {"cat": "今回の録画", "scene": "1対1の殴り合い", "en": "Get off me! ⇢", "first": "Get off me!", "firstJp": "離れろ！", "nexts": [{"d": "どうする", "en": "Get back here!", "jp": "戻ってこい！"}, {"d": "どうする", "en": "I'm just going to shoot everyone.", "jp": "とりあえず全員撃っとく"}, {"d": "ツッコミ・疑問", "en": "Why is he so angry?", "jp": "なんであいつそんな怒ってるの？"}, {"d": "ツッコミ・疑問", "en": "What if we lose?", "jp": "もし負けたら？"}, {"d": "後悔・ホッと", "en": "That was close!", "jp": "今の危なかった！"}, {"d": "気持ち・強がり", "en": "I'm not going to die.", "jp": "死なないぞ"}, {"d": "気持ち・強がり", "en": "I feel like a god.", "jp": "神になった気分"}]},
+  {"cat": "今回の録画", "scene": "入ったら急に敵が出てきた", "en": "That was close! ⇢", "first": "That was close!", "firstJp": "今の危なかった！", "nexts": [{"d": "どうする", "en": "Get down!", "jp": "伏せろ！"}, {"d": "どうする", "en": "I need to hide.", "jp": "隠れなきゃ"}, {"d": "ツッコミ・疑問", "en": "Why is he here?", "jp": "なんであいつここにいるの？"}, {"d": "ツッコミ・疑問", "en": "Why is he shooting at me?", "jp": "なんであいつ撃ってくるの？"}, {"d": "後悔・ホッと", "en": "Good thing I had a gun.", "jp": "銃持ってて助かった"}, {"d": "後悔・ホッと", "en": "That was so lucky!", "jp": "今の超ラッキーだった！"}, {"d": "気持ち・強がり", "en": "I'm going to die.", "jp": "死ぬぞ…"}, {"d": "気持ち・強がり", "en": "This is crazy!", "jp": "これヤバい！"}]},
+  {"cat": "今回の録画", "scene": "裸のポスターを見つけた", "en": "This is so fun! ⇢", "first": "This is so fun!", "firstJp": "これ楽しい！", "nexts": [{"d": "どうする", "en": "I want to try this.", "jp": "これ試したい"}, {"d": "どうする", "en": "Let me see.", "jp": "見させて"}, {"d": "後悔・ホッと", "en": "Good thing nobody saw that.", "jp": "誰にも見られなくて助かった"}, {"d": "気持ち・強がり", "en": "It looks like a movie.", "jp": "映画っぽい"}, {"d": "気持ち・強がり", "en": "I'm not going to lie.", "jp": "嘘はつかないぞ"}]},
+  {"cat": "今回の録画", "scene": "車の乗り方が分からない", "en": "I have no idea how to do this. ⇢", "first": "I have no idea how to do this.", "firstJp": "これのやり方、全然分からん", "nexts": [{"d": "どうする", "en": "Can I get a ride?", "jp": "乗せてもらえる？"}, {"d": "どうする", "en": "Let me try.", "jp": "俺にやらせて"}, {"d": "ツッコミ・疑問", "en": "How do I open this?", "jp": "どうやってこれ開けるの？"}, {"d": "ツッコミ・疑問", "en": "Where's my car?", "jp": "俺の車どこ？"}, {"d": "後悔・ホッと", "en": "I should have listened.", "jp": "ちゃんと聞いとけばよかった"}, {"d": "気持ち・強がり", "en": "I don't know if I can do this.", "jp": "できるか微妙"}, {"d": "気持ち・強がり", "en": "I can't do this.", "jp": "こんなのできない"}]},
+  {"cat": "今回の録画", "scene": "★3でパトカーに囲まれた", "en": "Too many cops! ⇢", "first": "Too many cops!", "firstJp": "警察多すぎ！", "nexts": [{"d": "どうする", "en": "I need to hide.", "jp": "隠れなきゃ"}, {"d": "どうする", "en": "I'm just going to run.", "jp": "とりあえず逃げとく"}, {"d": "ツッコミ・疑問", "en": "What if he sees me?", "jp": "もし見られたら？"}, {"d": "ツッコミ・疑問", "en": "What if we lose?", "jp": "もし負けたら？"}, {"d": "後悔・ホッと", "en": "That was a bad idea.", "jp": "今の悪いアイデアだった"}, {"d": "後悔・ホッと", "en": "That was stupid.", "jp": "今のバカだった"}, {"d": "気持ち・強がり", "en": "I'm not going to die.", "jp": "死なないぞ"}, {"d": "気持ち・強がり", "en": "I'm going to die.", "jp": "死ぬぞ…"}]},
+  {"cat": "今回の録画", "scene": "犬に見つかって殺された", "en": "I'm dead. ⇢", "first": "I'm dead.", "firstJp": "俺、死んだ", "nexts": [{"d": "どうする", "en": "Let's try again.", "jp": "もう一回やろう"}, {"d": "どうする", "en": "Let me try.", "jp": "俺にやらせて"}, {"d": "ツッコミ・疑問", "en": "Why would I do that?", "jp": "なんで俺がそんなことするんだよ"}, {"d": "後悔・ホッと", "en": "I should have saved.", "jp": "セーブしとけばよかった"}, {"d": "後悔・ホッと", "en": "That was a bad idea.", "jp": "今の悪いアイデアだった"}, {"d": "気持ち・強がり", "en": "I'm done.", "jp": "俺、もうやめた"}, {"d": "気持ち・強がり", "en": "This is not fair!", "jp": "これはズルい！"}]},
+  {"cat": "今回の録画", "scene": "NO CARで歩くしかない", "en": "I want to go home. ⇢", "first": "I want to go home.", "firstJp": "家に帰りたい", "nexts": [{"d": "どうする", "en": "I need a car.", "jp": "車が必要"}, {"d": "どうする", "en": "Can I get a ride?", "jp": "乗せてもらえる？"}, {"d": "ツッコミ・疑問", "en": "Where's my car?", "jp": "俺の車どこ？"}, {"d": "後悔・ホッと", "en": "I should have taken the car.", "jp": "車で来ればよかった"}, {"d": "気持ち・強がり", "en": "This is so hard.", "jp": "これ難しすぎ"}, {"d": "気持ち・強がり", "en": "I'm done.", "jp": "俺、もうやめた"}]},
+  {"cat": "今回の録画", "scene": "見たことない赤い★2が出た", "en": "I have no idea. ⇢", "first": "I have no idea.", "firstJp": "全然分からん", "nexts": [{"d": "どうする", "en": "Give me a second.", "jp": "ちょっと時間くれ"}, {"d": "どうする", "en": "Let me think.", "jp": "ちょっと考えさせて"}, {"d": "ツッコミ・疑問", "en": "What if it's a trap?", "jp": "もし罠だったら？"}, {"d": "後悔・ホッと", "en": "I should have listened.", "jp": "ちゃんと聞いとけばよかった"}, {"d": "気持ち・強がり", "en": "I feel like something is wrong.", "jp": "何かおかしい気がする"}, {"d": "気持ち・強がり", "en": "I think this is wrong.", "jp": "これ違うと思う"}]},
+  {"cat": "警察・★", "scene": "角を曲がったらパトカー", "en": "There's a cop! ⇢", "first": "There's a cop!", "firstJp": "警察いる！", "nexts": [{"d": "どうする", "en": "I need to hide.", "jp": "隠れなきゃ"}, {"d": "どうする", "en": "Don't look at me.", "jp": "こっち見るな"}, {"d": "ツッコミ・疑問", "en": "What if he sees me?", "jp": "もし見られたら？"}, {"d": "ツッコミ・疑問", "en": "Why is he following me?", "jp": "なんであいつついてくるの？"}, {"d": "後悔・ホッと", "en": "Good thing the cops didn't see me.", "jp": "警察に見られなくて助かった"}, {"d": "気持ち・強がり", "en": "It looks like he's angry.", "jp": "怒ってるっぽい"}]},
+  {"cat": "警察・★", "scene": "逮捕された", "en": "I got caught. ⇢", "first": "I got caught.", "firstJp": "捕まえられた", "nexts": [{"d": "どうする", "en": "Let me go!", "jp": "行かせて！"}, {"d": "どうする", "en": "Let me out!", "jp": "出させて！"}, {"d": "ツッコミ・疑問", "en": "Why would I lie?", "jp": "なんで俺が嘘つくんだよ"}, {"d": "後悔・ホッと", "en": "I should have stopped.", "jp": "止まっとけばよかった"}, {"d": "後悔・ホッと", "en": "That was my fault.", "jp": "今の俺のせいだった"}, {"d": "気持ち・強がり", "en": "I didn't do anything!", "jp": "何もしてない！"}, {"d": "気持ち・強がり", "en": "This is not fair!", "jp": "これはズルい！"}]},
+  {"cat": "警察・★", "scene": "警察をまいた", "en": "I got away! ⇢", "first": "I got away!", "firstJp": "逃げ切れた！", "nexts": [{"d": "どうする", "en": "I want to go home.", "jp": "家に帰りたい"}, {"d": "どうする", "en": "I'm just going to wait here.", "jp": "とりあえずここで待っとく"}, {"d": "ツッコミ・疑問", "en": "Where's my car?", "jp": "俺の車どこ？"}, {"d": "後悔・ホッと", "en": "Good thing the cops didn't see me.", "jp": "警察に見られなくて助かった"}, {"d": "後悔・ホッと", "en": "That was so lucky!", "jp": "今の超ラッキーだった！"}, {"d": "気持ち・強がり", "en": "I think we're safe.", "jp": "もう安全だと思う"}, {"d": "気持ち・強がり", "en": "I feel like a god.", "jp": "神になった気分"}]},
+  {"cat": "撃ち合い", "scene": "どこからか撃たれた", "en": "I got shot! ⇢", "first": "I got shot!", "firstJp": "撃たれた！", "nexts": [{"d": "どうする", "en": "I need a doctor.", "jp": "医者が必要"}, {"d": "どうする", "en": "I need to hide.", "jp": "隠れなきゃ"}, {"d": "ツッコミ・疑問", "en": "Why is he shooting at me?", "jp": "なんであいつ撃ってくるの？"}, {"d": "ツッコミ・疑問", "en": "Where's the hospital?", "jp": "病院どこ？"}, {"d": "後悔・ホッと", "en": "That was close!", "jp": "今の危なかった！"}, {"d": "気持ち・強がり", "en": "I'm not going to die.", "jp": "死なないぞ"}, {"d": "気持ち・強がり", "en": "I'm hurt!", "jp": "俺、ケガしてる！"}]},
+  {"cat": "撃ち合い", "scene": "撃とうとしたら弾切れ", "en": "I'm out of ammo! ⇢", "first": "I'm out of ammo!", "firstJp": "俺、弾切れ！", "nexts": [{"d": "どうする", "en": "Give me a gun.", "jp": "銃くれ"}, {"d": "どうする", "en": "There's a shop over there.", "jp": "あっちに店ある"}, {"d": "ツッコミ・疑問", "en": "What if we lose?", "jp": "もし負けたら？"}, {"d": "後悔・ホッと", "en": "I should have bought a gun.", "jp": "銃買っとけばよかった"}, {"d": "気持ち・強がり", "en": "I'm going to die.", "jp": "死ぬぞ…"}, {"d": "気持ち・強がり", "en": "This is not fair!", "jp": "これはズルい！"}]},
+  {"cat": "撃ち合い", "scene": "一人で敵に囲まれた", "en": "I need help! ⇢", "first": "I need help!", "firstJp": "助けが必要！", "nexts": [{"d": "どうする", "en": "I'm just going to run.", "jp": "とりあえず逃げとく"}, {"d": "どうする", "en": "Let's get out of here!", "jp": "ここから逃げよう！"}, {"d": "ツッコミ・疑問", "en": "What if we lose?", "jp": "もし負けたら？"}, {"d": "ツッコミ・疑問", "en": "Why is he shooting at me?", "jp": "なんであいつ撃ってくるの？"}, {"d": "後悔・ホッと", "en": "I should have bought a gun.", "jp": "銃買っとけばよかった"}, {"d": "気持ち・強がり", "en": "I'm not going to die.", "jp": "死なないぞ"}, {"d": "気持ち・強がり", "en": "I'm going to die.", "jp": "死ぬぞ…"}]},
+  {"cat": "撃ち合い", "scene": "仲間が撃たれて倒れた", "en": "Don't die! ⇢", "first": "Don't die!", "firstJp": "死ぬな！", "nexts": [{"d": "どうする", "en": "I need help!", "jp": "助けが必要！"}, {"d": "どうする", "en": "I need a doctor.", "jp": "医者が必要"}, {"d": "ツッコミ・疑問", "en": "Where's the hospital?", "jp": "病院どこ？"}, {"d": "ツッコミ・疑問", "en": "Why is he shooting at me?", "jp": "なんであいつ撃ってくるの？"}, {"d": "後悔・ホッと", "en": "That was my fault.", "jp": "今の俺のせいだった"}, {"d": "後悔・ホッと", "en": "I should have listened.", "jp": "ちゃんと聞いとけばよかった"}, {"d": "気持ち・強がり", "en": "I'm so sorry!", "jp": "俺、ほんとごめん！"}, {"d": "気持ち・強がり", "en": "I think he's dead.", "jp": "あいつ死んだと思う"}]},
+  {"cat": "死亡・失敗", "scene": "体力ゲージが点滅", "en": "I'm going to die. ⇢", "first": "I'm going to die.", "firstJp": "死ぬぞ…", "nexts": [{"d": "どうする", "en": "I need help!", "jp": "助けが必要！"}, {"d": "どうする", "en": "I need to hide.", "jp": "隠れなきゃ"}, {"d": "ツッコミ・疑問", "en": "Where's the hospital?", "jp": "病院どこ？"}, {"d": "後悔・ホッと", "en": "I should have saved.", "jp": "セーブしとけばよかった"}, {"d": "気持ち・強がり", "en": "I'm not going to die.", "jp": "死なないぞ"}, {"d": "気持ち・強がり", "en": "This is not fair!", "jp": "これはズルい！"}]},
+  {"cat": "死亡・失敗", "scene": "ミッション失敗の画面", "en": "It's over. ⇢", "first": "It's over.", "firstJp": "もう終わりだ", "nexts": [{"d": "どうする", "en": "Let's try again.", "jp": "もう一回やろう"}, {"d": "どうする", "en": "I'm just going to leave.", "jp": "とりあえず帰っとく"}, {"d": "ツッコミ・疑問", "en": "Why would I do that?", "jp": "なんで俺がそんなことするんだよ"}, {"d": "後悔・ホッと", "en": "That was a bad idea.", "jp": "今の悪いアイデアだった"}, {"d": "後悔・ホッと", "en": "I should have saved.", "jp": "セーブしとけばよかった"}, {"d": "気持ち・強がり", "en": "I'm done.", "jp": "俺、もうやめた"}, {"d": "気持ち・強がり", "en": "This is not fair!", "jp": "これはズルい！"}]},
+  {"cat": "死亡・失敗", "scene": "何度やってもクリアできない", "en": "This is so hard. ⇢", "first": "This is so hard.", "firstJp": "これ難しすぎ", "nexts": [{"d": "どうする", "en": "Can I get some help?", "jp": "手伝ってもらえる？"}, {"d": "どうする", "en": "Let me try.", "jp": "俺にやらせて"}, {"d": "ツッコミ・疑問", "en": "What if we lose?", "jp": "もし負けたら？"}, {"d": "後悔・ホッと", "en": "I should have listened.", "jp": "ちゃんと聞いとけばよかった"}, {"d": "気持ち・強がり", "en": "I don't know if I can do this.", "jp": "できるか微妙"}, {"d": "気持ち・強がり", "en": "It's supposed to be easy.", "jp": "簡単なはずなんだけど"}]},
+  {"cat": "運転・車", "scene": "出発してすぐ事故った", "en": "I just crashed my car. ⇢", "first": "I just crashed my car.", "firstJp": "車ぶつけたばっか", "nexts": [{"d": "どうする", "en": "I need to fix my car.", "jp": "車直さなきゃ"}, {"d": "どうする", "en": "I need a car.", "jp": "車が必要"}, {"d": "ツッコミ・疑問", "en": "How do I fix this?", "jp": "どうやってこれ直すの？"}, {"d": "後悔・ホッと", "en": "I should have stopped.", "jp": "止まっとけばよかった"}, {"d": "後悔・ホッと", "en": "That was stupid.", "jp": "今のバカだった"}, {"d": "気持ち・強がり", "en": "It's okay.", "jp": "それ、大丈夫"}, {"d": "気持ち・強がり", "en": "It's broken.", "jp": "それ、壊れてる"}]},
+  {"cat": "運転・車", "scene": "車から火が出た", "en": "It's on fire! ⇢", "first": "It's on fire!", "firstJp": "それ、燃えてる！", "nexts": [{"d": "どうする", "en": "Let's get out of here!", "jp": "ここから逃げよう！"}, {"d": "どうする", "en": "Get out!", "jp": "降りろ！"}, {"d": "後悔・ホッと", "en": "Good thing it didn't explode.", "jp": "爆発しなくて助かった"}, {"d": "気持ち・強がり", "en": "I can't get out!", "jp": "出られない！"}, {"d": "気持ち・強がり", "en": "This is crazy!", "jp": "これヤバい！"}]},
+  {"cat": "運転・車", "scene": "買ったばかりの車が爆発", "en": "I just bought this car! ⇢", "first": "I just bought this car!", "firstJp": "この車買ったばっかなのに！", "nexts": [{"d": "どうする", "en": "I need to fix my car.", "jp": "車直さなきゃ"}, {"d": "どうする", "en": "I need a car.", "jp": "車が必要"}, {"d": "ツッコミ・疑問", "en": "Why would I do that?", "jp": "なんで俺がそんなことするんだよ"}, {"d": "後悔・ホッと", "en": "Good thing I'm rich.", "jp": "金持ってて助かった"}, {"d": "後悔・ホッと", "en": "That was a bad idea.", "jp": "今の悪いアイデアだった"}, {"d": "気持ち・強がり", "en": "Look at my car.", "jp": "俺の車見て"}, {"d": "気持ち・強がり", "en": "This is not fair!", "jp": "これはズルい！"}]},
+  {"cat": "運転・車", "scene": "通行人を轢いてしまった", "en": "I didn't mean to! ⇢", "first": "I didn't mean to!", "firstJp": "わざとやってない！", "nexts": [{"d": "どうする", "en": "I'm just going to run.", "jp": "とりあえず逃げとく"}, {"d": "どうする", "en": "I'm just going to leave.", "jp": "とりあえず帰っとく"}, {"d": "ツッコミ・疑問", "en": "I don't know if he's dead.", "jp": "あいつ死んだか微妙"}, {"d": "後悔・ホッと", "en": "Good thing nobody saw that.", "jp": "誰にも見られなくて助かった"}, {"d": "後悔・ホッと", "en": "That was my fault.", "jp": "今の俺のせいだった"}, {"d": "気持ち・強がり", "en": "I'm so sorry!", "jp": "俺、ほんとごめん！"}, {"d": "気持ち・強がり", "en": "I think he's dead.", "jp": "あいつ死んだと思う"}]},
+  {"cat": "運転・車", "scene": "車が溝にハマった", "en": "I'm stuck. ⇢", "first": "I'm stuck.", "firstJp": "俺、ハマった", "nexts": [{"d": "どうする", "en": "Can I get a ride?", "jp": "乗せてもらえる？"}, {"d": "どうする", "en": "Can I get some help?", "jp": "手伝ってもらえる？"}, {"d": "ツッコミ・疑問", "en": "How do I get out?", "jp": "どうやって出るの？"}, {"d": "ツッコミ・疑問", "en": "How do I fix this?", "jp": "どうやってこれ直すの？"}, {"d": "後悔・ホッと", "en": "I should have stopped.", "jp": "止まっとけばよかった"}, {"d": "後悔・ホッと", "en": "I should have gone left.", "jp": "左に行けばよかった"}, {"d": "気持ち・強がり", "en": "I can't do this.", "jp": "こんなのできない"}, {"d": "気持ち・強がり", "en": "This is so hard.", "jp": "これ難しすぎ"}]},
+  {"cat": "運転・車", "scene": "超かっこいい車を見つけた", "en": "Look at this car! ⇢", "first": "Look at this car!", "firstJp": "この車見て！", "nexts": [{"d": "どうする", "en": "I'm going to steal this car.", "jp": "この車盗むぞ"}, {"d": "どうする", "en": "I want to buy this car.", "jp": "この車買いたい"}, {"d": "気持ち・強がり", "en": "This is perfect.", "jp": "これ、完璧"}, {"d": "気持ち・強がり", "en": "I'm not going to lie.", "jp": "嘘はつかないぞ"}]},
+  {"cat": "迷う・探す", "scene": "知らない街で道が分からない", "en": "I'm lost. ⇢", "first": "I'm lost.", "firstJp": "俺、迷った", "nexts": [{"d": "どうする", "en": "Let me check the map.", "jp": "地図見させて"}, {"d": "どうする", "en": "I'm just going to drive.", "jp": "とりあえず走っとく"}, {"d": "ツッコミ・疑問", "en": "Where's the mission?", "jp": "ミッションどこ？"}, {"d": "ツッコミ・疑問", "en": "I don't know if this is the right way.", "jp": "この道で合ってるか微妙"}, {"d": "後悔・ホッと", "en": "I should have gone left.", "jp": "左に行けばよかった"}, {"d": "気持ち・強がり", "en": "I feel like I've been here before.", "jp": "ここ来たことある気がする"}, {"d": "気持ち・強がり", "en": "I think it's this way.", "jp": "こっちだと思う"}]},
+  {"cat": "迷う・探す", "scene": "道を間違えた気がする", "en": "I think this is wrong. ⇢", "first": "I think this is wrong.", "firstJp": "これ違うと思う", "nexts": [{"d": "どうする", "en": "I need to go back.", "jp": "戻らなきゃ"}, {"d": "どうする", "en": "Let me check the map.", "jp": "地図見させて"}, {"d": "ツッコミ・疑問", "en": "I don't know if this is the right way.", "jp": "この道で合ってるか微妙"}, {"d": "ツッコミ・疑問", "en": "Where's the mission?", "jp": "ミッションどこ？"}, {"d": "後悔・ホッと", "en": "I should have gone left.", "jp": "左に行けばよかった"}, {"d": "後悔・ホッと", "en": "I should have listened.", "jp": "ちゃんと聞いとけばよかった"}, {"d": "気持ち・強がり", "en": "I feel like I'm lost.", "jp": "迷ってる気がする"}, {"d": "気持ち・強がり", "en": "I feel like something is wrong.", "jp": "何かおかしい気がする"}]},
+  {"cat": "迷う・探す", "scene": "目的地に何もない", "en": "There's nothing here. ⇢", "first": "There's nothing here.", "firstJp": "ここ何もない", "nexts": [{"d": "どうする", "en": "I need to go back.", "jp": "戻らなきゃ"}, {"d": "どうする", "en": "Let me check the map.", "jp": "地図見させて"}, {"d": "ツッコミ・疑問", "en": "Where's the mission?", "jp": "ミッションどこ？"}, {"d": "後悔・ホッと", "en": "I should have listened.", "jp": "ちゃんと聞いとけばよかった"}, {"d": "気持ち・強がり", "en": "It's supposed to be here.", "jp": "ここにあるはずなんだけど"}, {"d": "気持ち・強がり", "en": "I think this is wrong.", "jp": "これ違うと思う"}]},
+  {"cat": "迷う・探す", "scene": "目的地に着いた", "en": "This is the place. ⇢", "first": "This is the place.", "firstJp": "ここだ、この場所", "nexts": [{"d": "どうする", "en": "Let's do this!", "jp": "やってやろう！"}, {"d": "どうする", "en": "Get ready.", "jp": "準備しろ"}, {"d": "ツッコミ・疑問", "en": "What if it's a trap?", "jp": "もし罠だったら？"}, {"d": "ツッコミ・疑問", "en": "What if he sees me?", "jp": "もし見られたら？"}, {"d": "後悔・ホッと", "en": "Good thing I saved.", "jp": "セーブしといて助かった"}, {"d": "気持ち・強がり", "en": "I feel like this is a trap.", "jp": "これ罠な気がする"}, {"d": "気持ち・強がり", "en": "I feel like something is wrong.", "jp": "何かおかしい気がする"}]},
+  {"cat": "迷う・探す", "scene": "真っ暗で不気味な建物", "en": "I feel like something is wrong. ⇢", "first": "I feel like something is wrong.", "firstJp": "何かおかしい気がする", "nexts": [{"d": "どうする", "en": "I'm just going to run.", "jp": "とりあえず逃げとく"}, {"d": "どうする", "en": "I need to hide.", "jp": "隠れなきゃ"}, {"d": "ツッコミ・疑問", "en": "What if it's a trap?", "jp": "もし罠だったら？"}, {"d": "ツッコミ・疑問", "en": "I don't know if I want to go in there.", "jp": "あそこ入りたいか微妙"}, {"d": "気持ち・強がり", "en": "I'm not going to go in there.", "jp": "あそこには入らないぞ"}]},
+  {"cat": "迷う・探す", "scene": "制限時間がギリギリ", "en": "I don't know if we have time. ⇢", "first": "I don't know if we have time.", "firstJp": "時間あるか微妙", "nexts": [{"d": "どうする", "en": "I need to hurry.", "jp": "急がなきゃ"}, {"d": "どうする", "en": "Let's go!", "jp": "行こう！"}, {"d": "気持ち・強がり", "en": "I'm not going to make it.", "jp": "間に合わないぞ"}]},
+  {"cat": "会話・分からない", "scene": "NPCのセリフが速すぎた", "en": "I have no idea what he said. ⇢", "first": "I have no idea what he said.", "firstJp": "何言ったか全然分からん", "nexts": [{"d": "どうする", "en": "Let's go!", "jp": "行こう！"}, {"d": "どうする", "en": "I'm just going to drive.", "jp": "とりあえず走っとく"}, {"d": "後悔・ホッと", "en": "I should have listened.", "jp": "ちゃんと聞いとけばよかった"}, {"d": "気持ち・強がり", "en": "I feel like he's lying.", "jp": "あいつ嘘ついてる気がする"}, {"d": "気持ち・強がり", "en": "I feel like something is wrong.", "jp": "何かおかしい気がする"}]},
+  {"cat": "会話・分からない", "scene": "何をすればいいか分からない", "en": "I have no idea what to do. ⇢", "first": "I have no idea what to do.", "firstJp": "何すればいいか全然分からん", "nexts": [{"d": "どうする", "en": "Can I get some help?", "jp": "手伝ってもらえる？"}, {"d": "どうする", "en": "I'm just going to drive.", "jp": "とりあえず走っとく"}, {"d": "ツッコミ・疑問", "en": "How do I start the mission?", "jp": "どうやってミッション始めるの？"}, {"d": "ツッコミ・疑問", "en": "Where's the mission?", "jp": "ミッションどこ？"}, {"d": "後悔・ホッと", "en": "I should have listened.", "jp": "ちゃんと聞いとけばよかった"}, {"d": "気持ち・強がり", "en": "I don't know if I can do this.", "jp": "できるか微妙"}, {"d": "気持ち・強がり", "en": "This is so hard.", "jp": "これ難しすぎ"}]},
+  {"cat": "会話・分からない", "scene": "知らないキャラが話しかけてきた", "en": "I have no idea who he is. ⇢", "first": "I have no idea who he is.", "firstJp": "あいつ誰か全然分からん", "nexts": [{"d": "どうする", "en": "Let me see.", "jp": "見させて"}, {"d": "ツッコミ・疑問", "en": "Why is he here?", "jp": "なんであいつここにいるの？"}, {"d": "ツッコミ・疑問", "en": "What if I shoot him?", "jp": "もしあいつ撃ったら？"}, {"d": "気持ち・強がり", "en": "I feel like he's lying.", "jp": "あいつ嘘ついてる気がする"}, {"d": "気持ち・強がり", "en": "I think he's a cop.", "jp": "あいつ警察だと思う"}]},
+  {"cat": "NPC", "scene": "NPCが叫んでいる", "en": "It looks like he's angry. ⇢", "first": "It looks like he's angry.", "firstJp": "怒ってるっぽい", "nexts": [{"d": "どうする", "en": "I'm just going to leave.", "jp": "とりあえず帰っとく"}, {"d": "どうする", "en": "I'm just going to run.", "jp": "とりあえず逃げとく"}, {"d": "ツッコミ・疑問", "en": "Why is he so angry?", "jp": "なんであいつそんな怒ってるの？"}, {"d": "気持ち・強がり", "en": "I didn't do anything!", "jp": "何もしてない！"}, {"d": "気持ち・強がり", "en": "I'm trying to be nice.", "jp": "優しくしようとしてるのに"}]},
+  {"cat": "NPC", "scene": "ずっと同じ車がついてくる", "en": "There's a car behind me. ⇢", "first": "There's a car behind me.", "firstJp": "後ろに車いる", "nexts": [{"d": "どうする", "en": "Don't follow me!", "jp": "ついてくるな！"}, {"d": "どうする", "en": "I'm just going to run.", "jp": "とりあえず逃げとく"}, {"d": "ツッコミ・疑問", "en": "Why is he following me?", "jp": "なんであいつついてくるの？"}, {"d": "ツッコミ・疑問", "en": "What if he sees me?", "jp": "もし見られたら？"}, {"d": "気持ち・強がり", "en": "I think he's a cop.", "jp": "あいつ警察だと思う"}, {"d": "気持ち・強がり", "en": "I feel like he's lying.", "jp": "あいつ嘘ついてる気がする"}]},
+  {"cat": "NPC", "scene": "街に変なNPCがいる", "en": "Look at him! ⇢", "first": "Look at him!", "firstJp": "あいつ見て！", "nexts": [{"d": "どうする", "en": "Let me see.", "jp": "見させて"}, {"d": "ツッコミ・疑問", "en": "Why is he naked?", "jp": "なんであいつ裸なの？"}, {"d": "ツッコミ・疑問", "en": "Why is he running?", "jp": "なんであいつ走ってるの？"}, {"d": "気持ち・強がり", "en": "This is crazy!", "jp": "これヤバい！"}]},
+  {"cat": "物が動かない", "scene": "ドアが開かない", "en": "It's locked. ⇢", "first": "It's locked.", "firstJp": "それ、鍵かかってる", "nexts": [{"d": "どうする", "en": "Give me a second.", "jp": "ちょっと時間くれ"}, {"d": "どうする", "en": "Let me try.", "jp": "俺にやらせて"}, {"d": "ツッコミ・疑問", "en": "How do I open this?", "jp": "どうやってこれ開けるの？"}, {"d": "ツッコミ・疑問", "en": "How do I get out?", "jp": "どうやって出るの？"}, {"d": "気持ち・強がり", "en": "It's supposed to open.", "jp": "開くはずなんだけど"}]},
+  {"cat": "物が動かない", "scene": "ボタンを押しても何も起きない", "en": "It's not working. ⇢", "first": "It's not working.", "firstJp": "それ、動いてない", "nexts": [{"d": "どうする", "en": "Let me try.", "jp": "俺にやらせて"}, {"d": "ツッコミ・疑問", "en": "How do I fix this?", "jp": "どうやってこれ直すの？"}, {"d": "気持ち・強がり", "en": "I think I broke it.", "jp": "壊したと思う"}, {"d": "気持ち・強がり", "en": "This is not fair!", "jp": "これはズルい！"}]},
+  {"cat": "物が動かない", "scene": "爆弾を置いたのに何も起きない", "en": "It's supposed to explode. ⇢", "first": "It's supposed to explode.", "firstJp": "爆発するはずなんだけど", "nexts": [{"d": "どうする", "en": "Give me a break.", "jp": "勘弁してくれ"}, {"d": "どうする", "en": "Let me try.", "jp": "俺にやらせて"}, {"d": "ツッコミ・疑問", "en": "How do I fix this?", "jp": "どうやってこれ直すの？"}, {"d": "気持ち・強がり", "en": "I think I broke it.", "jp": "壊したと思う"}, {"d": "気持ち・強がり", "en": "I don't know if this works.", "jp": "これ効くか微妙"}]},
+  {"cat": "お金・成功", "scene": "強盗で金を手に入れた", "en": "I got money! ⇢", "first": "I got money!", "firstJp": "金ゲット！", "nexts": [{"d": "どうする", "en": "Let's get out of here!", "jp": "ここから逃げよう！"}, {"d": "後悔・ホッと", "en": "That was so lucky!", "jp": "今の超ラッキーだった！"}, {"d": "後悔・ホッと", "en": "That was fun!", "jp": "今の楽しかった！"}, {"d": "気持ち・強がり", "en": "Look at all this money!", "jp": "この金見て！"}, {"d": "気持ち・強がり", "en": "I feel like a god.", "jp": "神になった気分"}]},
+  {"cat": "お金・成功", "scene": "値段が高すぎる", "en": "Too expensive. ⇢", "first": "Too expensive.", "firstJp": "高すぎ", "nexts": [{"d": "どうする", "en": "Can I get a discount?", "jp": "まけてもらえる？"}, {"d": "どうする", "en": "I'm just going to take this.", "jp": "とりあえずこれもらっとく"}, {"d": "ツッコミ・疑問", "en": "Why would I pay for this?", "jp": "なんで俺がこれに金払うんだよ"}, {"d": "ツッコミ・疑問", "en": "How do I get money?", "jp": "どうやって金稼ぐの？"}, {"d": "後悔・ホッと", "en": "Good thing I'm rich.", "jp": "金持ってて助かった"}, {"d": "気持ち・強がり", "en": "This is not fair!", "jp": "これはズルい！"}]},
+  {"cat": "お金・成功", "scene": "一発でクリアした", "en": "That was easy. ⇢", "first": "That was easy.", "firstJp": "今の楽勝だった", "nexts": [{"d": "どうする", "en": "Let's go!", "jp": "行こう！"}, {"d": "どうする", "en": "Let's do this!", "jp": "やってやろう！"}, {"d": "気持ち・強がり", "en": "I feel like a god.", "jp": "神になった気分"}, {"d": "気持ち・強がり", "en": "This is so fun!", "jp": "これ楽しい！"}]},
+  {"cat": "お金・成功", "scene": "ミッション完了っぽい表示", "en": "It looks like we did it. ⇢", "first": "It looks like we did it.", "firstJp": "やったっぽい", "nexts": [{"d": "どうする", "en": "I want to go home.", "jp": "家に帰りたい"}, {"d": "どうする", "en": "Let's go!", "jp": "行こう！"}, {"d": "後悔・ホッと", "en": "That was fun!", "jp": "今の楽しかった！"}, {"d": "後悔・ホッと", "en": "That was so lucky!", "jp": "今の超ラッキーだった！"}, {"d": "気持ち・強がり", "en": "I think we're safe.", "jp": "もう安全だと思う"}, {"d": "気持ち・強がり", "en": "I feel like a god.", "jp": "神になった気分"}]},
+  {"cat": "お金・成功", "scene": "山の上から街が見える", "en": "Look at that view! ⇢", "first": "Look at that view!", "firstJp": "この景色見て！", "nexts": [{"d": "どうする", "en": "Let's go to the beach.", "jp": "ビーチ行こう"}, {"d": "どうする", "en": "Let me see.", "jp": "見させて"}, {"d": "気持ち・強がり", "en": "It looks like a movie.", "jp": "映画っぽい"}, {"d": "気持ち・強がり", "en": "This is perfect.", "jp": "これ、完璧"}]}
+];
+const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI, verb: DATA_VERB, pair: DATA_PAIR, link: DATA_LINK };
 let DATA = DATA_ALL;
 let active = new Set(DATA.map(d=>d.cat));
 let queue = [], qi = 0;
@@ -480,9 +531,38 @@ function shuffle(a){
   for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
 }
 
+const DIR_COLOR = {'どうする':'#4caf50','ツッコミ・疑問':'#2196f3','後悔・ホッと':'#ff9800','気持ち・強がり':'#e91e63'};
+function showLink(item, isRetry){
+  const pick = item.nexts[Math.floor(Math.random()*item.nexts.length)];
+  item.say = item.first + ' ' + pick.en;
+  stageInner.innerHTML =
+    '<div class="cat">'+esc(item.cat)+'</div>' + (isRetry ? '<span class="retry-tag">もう一回</span>' : '') +
+    '<div style="font-size:15px;color:#aaa;margin-top:6px">場面：'+esc(item.scene)+'</div>' +
+    '<div class="en" style="margin-top:12px;font-size:34px;font-weight:bold">① '+esc(item.first)+'</div>' +
+    '<div class="jp" style="font-size:16px">'+esc(item.firstJp)+'</div>' +
+    '<div class="hint">② 2文目を続けて言う（どうする／ツッコミ／後悔・ホッと／気持ち・強がり）</div>' +
+    '<div class="answer" id="ansBox">' +
+      item.nexts.map(n =>
+        '<div style="margin:6px 0;cursor:pointer" onclick="speakLink(this.dataset.en)" data-en="'+esc(n.en)+'">' +
+        '<span style="display:inline-block;min-width:7.5em;padding:2px 8px;margin-right:8px;border-radius:10px;font-size:13px;color:#fff;background:'+(DIR_COLOR[n.d]||'#888')+'">'+esc(n.d)+'</span>' +
+        '<span class="en" style="font-size:22px">🔊 '+esc(n.en)+'</span> <span class="jp" style="display:inline">'+esc(n.jp)+'</span></div>'
+      ).join('') +
+    '</div>';
+  count++;
+  countEl.textContent = count;
+  if (document.getElementById('showAns').value === 'always') revealAnswer();
+  if (document.getElementById('speak').value === 'yes') {
+    speakJa(item.scene);
+    const u = new SpeechSynthesisUtterance(item.first);
+    u.lang = 'en-US'; if (enVoice) u.voice = enVoice; u.rate = EN_RATE;
+    speechSynthesis.speak(u);
+  }
+}
+function speakLink(en){ if (current && current.first) speakEn(current.first + ' ' + en); }
 function showScene(item, isRetry){
   current = item;
   document.querySelector('.stage').classList.remove('waiting');
+  if (item.first) { showLink(item, isRetry); return; }
   stageInner.innerHTML =
     '<div class="cat">'+esc(item.cat)+'</div>' + (isRetry ? '<span class="retry-tag">もう一回</span>' : '') +
     '<div class="scene">'+esc(item.scene)+'</div>' +
@@ -556,17 +636,31 @@ function startTimer(){
   }
   clearTimeout(enTimer);
   if (document.getElementById('autoEn').value === 'on' && current){
-    const est = estimateSpeechMs(current.en);
+    const est = estimateSpeechMs(current.say || current.en);
     // 読み終わりが場面の終わりと重なるように逆算。考える時間は最低4割確保
     const startAt = Math.max(gap * 0.4, gap - est - 250);
     const item = current;
-    enTimer = setTimeout(()=>{ if(running && current === item) speakEn(item.en); }, startAt);
+    enTimer = setTimeout(()=>{ if(running && current === item) speakEn(item.say || item.en); }, startAt);
   }
   timer = setTimeout(()=>{ if(running) afterSpeech(()=>{
     if (judgeOn()) {
       waitingJudge = true;
+      revealAnswer();
       document.querySelector('.stage').classList.add('waiting');
-      const h = document.querySelector('.hint'); if (h) h.textContent = '言えた？ ○ か × を押してね';
+      const h = document.querySelector('.hint'); if (h) h.textContent = '答えを見て、言えた？ ○ か × を押してね';
+    } else if (current && current.first) {
+      // つながり：答え(2文目の候補)を出して止まる。英語音声ありの時だけ6秒後に自動で次へ
+      revealAnswer();
+      const h = document.querySelector('.hint');
+      if (document.getElementById('autoEn').value === 'on') {
+        if (h) h.textContent = '答えを見て確認（6秒で次へ）';
+        const item = current;
+        timer = setTimeout(()=>{ if (running && current === item) nextScene(); }, 6000);
+      } else {
+        waitingJudge = true;
+        document.querySelector('.stage').classList.add('waiting');
+        if (h) h.textContent = '答えを見て確認 →「次へ」で進む';
+      }
     } else nextScene();
   }); }, gap);
 }
@@ -637,7 +731,7 @@ function estimateSpeechMs(text){
 function playCurrentEn(){
   if (!current) return;
   revealAnswer();
-  speakEn(current.en);
+  speakEn(current.say || current.en);
 }
 document.getElementById('speakEnBtn').onclick = playCurrentEn;
 function judge(ok){
@@ -675,6 +769,9 @@ document.getElementById('skipBtn').onclick = ()=>{ if(running) nextScene(); else
 
 document.getElementById('setSel').onchange = (ev)=>{
   DATA = SETS[ev.target.value];
+  // 2文を言うセットは考える時間を長めに
+  const g = document.getElementById('gap');
+  if ((ev.target.value === 'pair' || ev.target.value === 'link') && parseInt(g.value) < 8000) g.value = '8000';
   active = new Set(DATA.map(d=>d.cat));
   buildChips(); rebuild();
   if (running) nextScene();
