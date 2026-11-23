@@ -99,6 +99,7 @@
         <option value="verb">動詞フレーズ54</option>
         <option value="pair">2文セット91</option>
         <option value="link">つながり46（2文目を続ける）</option>
+        <option value="particle">句動詞 get ○○（61）</option>
       </select>
     </div>
     <div class="set">
@@ -458,7 +459,71 @@ const DATA_LINK = [
   {"cat": "お金・成功", "scene": "ミッション完了っぽい表示", "en": "It looks like we did it. ⇢", "first": "It looks like we did it.", "firstJp": "やったっぽい", "nexts": [{"d": "どうする", "en": "I want to go home.", "jp": "家に帰りたい"}, {"d": "どうする", "en": "Let's go!", "jp": "行こう！"}, {"d": "後悔・ホッと", "en": "That was fun!", "jp": "今の楽しかった！"}, {"d": "後悔・ホッと", "en": "That was so lucky!", "jp": "今の超ラッキーだった！"}, {"d": "気持ち・強がり", "en": "I think we're safe.", "jp": "もう安全だと思う"}, {"d": "気持ち・強がり", "en": "I feel like a god.", "jp": "神になった気分"}]},
   {"cat": "お金・成功", "scene": "山の上から街が見える", "en": "Look at that view! ⇢", "first": "Look at that view!", "firstJp": "この景色見て！", "nexts": [{"d": "どうする", "en": "Let's go to the beach.", "jp": "ビーチ行こう"}, {"d": "どうする", "en": "Let me see.", "jp": "見させて"}, {"d": "気持ち・強がり", "en": "It looks like a movie.", "jp": "映画っぽい"}, {"d": "気持ち・強がり", "en": "This is perfect.", "jp": "これ、完璧"}]}
 ];
-const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI, verb: DATA_VERB, pair: DATA_PAIR, link: DATA_LINK };
+// 2026-11-24 句動詞（動詞＋小さい語）。GTA6の録画で出た組み合わせ。get ○○ ＋日本語 → 小さい語を答える
+const DATA_PARTICLE = [
+  {"cat": "in＝中へ", "scene": "乗れ", "q": "get ○○", "en": "get in", "jp": "in＝中へ", "ex": [["Get in, we gotta go.", "乗れ、行くぞ"], ["I'm going to get in the car.", "車に乗るぞ"]]},
+  {"cat": "in＝中へ", "scene": "飛び乗る", "q": "hop ○○", "en": "hop in", "jp": "in＝中へ", "ex": [["Let me hop in.", "ちょっと乗せて"], ["Hop in! Hurry!", "飛び乗れ！急げ！"]]},
+  {"cat": "in＝中へ", "scene": "入ってくる", "q": "come ○○", "en": "come in", "jp": "in＝中へ", "ex": [["This is Flamingo, coming in hot!", "こちらフラミンゴ、全速で突っ込む！"], ["Come in, the door is open.", "入れよ、ドア開いてるから"]]},
+  {"cat": "in＝中へ", "scene": "入る", "q": "go ○○", "en": "go in", "jp": "in＝中へ", "ex": [["How's it going in there?", "中はどうだ？"], ["I'm not going to go in there.", "あそこには入らないぞ"]]},
+  {"cat": "in＝中へ", "scene": "入れる", "q": "put ○○", "en": "put in", "jp": "in＝中へ", "ex": [["It's gonna take more than that to put me in a bad mood.", "それくらいじゃ俺は不機嫌にならない"], ["Put the money in the bag.", "金を袋に入れろ"]]},
+  {"cat": "in＝中へ", "scene": "連れてくる", "q": "bring ○○", "en": "bring in", "jp": "in＝中へ", "ex": [["That's why I brought him in here.", "だからあいつをここに連れてきた"], ["Bring him in.", "あいつを連れてこい"]]},
+  {"cat": "in＝中へ", "scene": "おまけで付ける", "q": "throw ○○", "en": "throw in", "jp": "in＝中へ", "ex": [["I'll throw in a respray.", "塗装もおまけしとくよ"], ["Can you throw in a gun?", "銃もおまけしてくれる？"]]},
+  {"cat": "out＝外へ", "scene": "出ろ・降りろ", "q": "get ○○", "en": "get out", "jp": "out＝外へ", "ex": [["Let's get out of here.", "ここから出よう"], ["Get out of the car!", "車から降りろ！"]]},
+  {"cat": "out＝外へ", "scene": "出てくる", "q": "come ○○", "en": "come out", "jp": "out＝外へ", "ex": [["Come out! I know you're in there.", "出てこい！いるのは分かってる"], ["He's coming out of the store.", "あいつが店から出てくる"]]},
+  {"cat": "out＝外へ", "scene": "出かける", "q": "go ○○", "en": "go out", "jp": "out＝外へ", "ex": [["I'll just go out on my own.", "1人で出かけるわ"], ["I don't want to go out tonight.", "今夜は出かけたくない"]]},
+  {"cat": "out＝外へ", "scene": "分かる（調べて）", "q": "find ○○", "en": "find out", "jp": "out＝外へ", "ex": [["I guess we'll find out.", "まあ、そのうち分かるかな"], ["I need to find out where he is.", "あいつの居場所を突き止めないと"]]},
+  {"cat": "out＝外へ", "scene": "解く・分かる", "q": "figure ○○", "en": "figure out", "jp": "out＝外へ", "ex": [["It took me a long time to figure it out.", "分かるまで時間がかかった"], ["I can't figure out this mission.", "このミッションが分からない"]]},
+  {"cat": "out＝外へ", "scene": "つるむ", "q": "hang ○○", "en": "hang out", "jp": "out＝外へ", "ex": [["You don't want me to hang out?", "俺とつるみたくないの？"], ["Let's hang out at the beach.", "ビーチでぶらぶらしよう"]]},
+  {"cat": "out＝外へ", "scene": "見てみる", "q": "check ○○", "en": "check out", "jp": "out＝外へ", "ex": [["I'll go check it out.", "ちょっと見てくる"], ["Check out this car!", "この車見てよ！"]]},
+  {"cat": "out＝外へ", "scene": "関わらない", "q": "stay ○○", "en": "stay out", "jp": "out＝外へ", "ex": [["Let's just head back and stay out of this.", "引き返して、これには関わらないでおこう"], ["Stay out of my way!", "俺の邪魔するな！"]]},
+  {"cat": "out＝外へ", "scene": "結局〜になる", "q": "turn ○○", "en": "turn out", "jp": "out＝外へ", "ex": [["It turned out like this.", "結局こうなった"], ["It turned out he was a cop.", "結局あいつは警察だった"]]},
+  {"cat": "out＝外へ", "scene": "切らす", "q": "run ○○", "en": "run out", "jp": "out＝外へ", "ex": [["I ran out of rum.", "ラムを切らした"], ["I'm running out of ammo!", "弾が切れそう！"]]},
+  {"cat": "out＝外へ", "scene": "気をつけろ", "q": "watch ○○", "en": "watch out", "jp": "out＝外へ", "ex": [["Watch out!", "気をつけろ！"], ["Watch out for the cops.", "警察に気をつけろ"]]},
+  {"cat": "out＝外へ", "scene": "気をつけろ・外を見る", "q": "look ○○", "en": "look out", "jp": "out＝外へ", "ex": [["Look out!", "危ない！"], ["Look out the window.", "窓の外を見て"]]},
+  {"cat": "out＝外へ", "scene": "手を引く", "q": "back ○○", "en": "back out", "jp": "out＝外へ", "ex": [["I had to back out.", "手を引くしかなかった"], ["Don't back out now.", "今さら手を引くなよ"]]},
+  {"cat": "out＝外へ", "scene": "ぶっ倒す", "q": "lay ○○", "en": "lay out", "jp": "out＝外へ", "ex": [["Lay him out.", "あいつをぶっ倒せ"], ["I'm going to lay him out.", "あいつをぶっ倒すぞ"]]},
+  {"cat": "out＝外へ", "scene": "筋トレする・うまくいく", "q": "work ○○", "en": "work out", "jp": "out＝外へ", "ex": [["Where do they work out?", "あいつらどこで筋トレしてる？"], ["It didn't work out.", "うまくいかなかった"]]},
+  {"cat": "out＝外へ", "scene": "落ち着け・気楽に", "q": "chill ○○", "en": "chill out", "jp": "out＝外へ", "ex": [["Okay, just chill out.", "オッケー、まあ落ち着けって"], ["Chill out, it's just a game.", "気楽にいこう、ただのゲームだ"]]},
+  {"cat": "on＝くっつく・続く", "scene": "ほら・頼むよ", "q": "come ○○", "en": "come on", "jp": "on＝くっつく・続く", "ex": [["All right, come on.", "よし、ほら行くぞ"], ["Come on, man!", "頼むよ！"]]},
+  {"cat": "on＝くっつく・続く", "scene": "起きる・続ける", "q": "go ○○", "en": "go on", "jp": "on＝くっつく・続く", "ex": [["What's going on?", "何が起きてる？"], ["Go on, tell me.", "続けて、話して"]]},
+  {"cat": "on＝くっつく・続く", "scene": "待って", "q": "hold ○○", "en": "hold on", "jp": "on＝くっつく・続く", "ex": [["Hold on a second.", "ちょっと待って"], ["Hold on, I see a cop.", "待って、警察がいる"]]},
+  {"cat": "on＝くっつく・続く", "scene": "乗る（バイク・船）", "q": "get ○○", "en": "get on", "jp": "on＝くっつく・続く", "ex": [["Pull up somewhere I can get on.", "乗れる所に寄せて"], ["Get on the bike!", "バイクに乗れ！"]]},
+  {"cat": "on＝くっつく・続く", "scene": "様子を見る", "q": "check ○○", "en": "check on", "jp": "on＝くっつく・続く", "ex": [["We're going to check on a couple things.", "いくつか様子を見に行く"], ["I need to check on Lucia.", "ルシアの様子を見ないと"]]},
+  {"cat": "on＝くっつく・続く", "scene": "着る・つける", "q": "put ○○", "en": "put on", "jp": "on＝くっつく・続く", "ex": [["Put your mask on.", "マスクをつけろ"], ["I'm going to put on a new shirt.", "新しいシャツを着るぞ"]]},
+  {"cat": "on＝くっつく・続く", "scene": "つける", "q": "turn ○○", "en": "turn on", "jp": "on＝くっつく・続く", "ex": [["I'll turn on the radio.", "ラジオつけるわ"], ["Turn on the lights.", "電気つけて"]]},
+  {"cat": "on＝くっつく・続く", "scene": "引き受ける", "q": "take ○○", "en": "take on", "jp": "on＝くっつく・続く", "ex": [["They take the missions no one else will do.", "誰もやらないミッションを引き受ける"], ["I'll take on this job.", "この仕事は俺が引き受ける"]]},
+  {"cat": "on＝くっつく・続く", "scene": "取りかかる", "q": "start ○○", "en": "start on", "jp": "on＝くっつく・続く", "ex": [["You want to start on the engine?", "エンジンから始める？"], ["Let's start on the next mission.", "次のミッションに取りかかろう"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "拾う・迎えに行く", "q": "pick ○○", "en": "pick up", "jp": "up＝上へ・寄って止まる", "ex": [["I need you to drive so I can pick him up.", "あいつを拾うから運転してくれ"], ["Pick up the gun.", "銃を拾え"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "車を寄せて止める", "q": "pull ○○", "en": "pull up", "jp": "up＝上へ・寄って止まる", "ex": [["Pull up somewhere I can get on.", "乗れる所に寄せて"], ["Pull up next to that car.", "あの車の横に止めて"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "起きろ・立て", "q": "get ○○", "en": "get up", "jp": "up＝上へ・寄って止まる", "ex": [["Get up! We have to go.", "起きろ！行くぞ"], ["I can't get up.", "立てない"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "黙れ", "q": "shut ○○", "en": "shut up", "jp": "up＝上へ・寄って止まる", "ex": [["Shut up.", "黙れ"], ["Shut up and drive!", "黙って運転しろ！"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "ちょっと待て", "q": "hold ○○", "en": "hold up", "jp": "up＝上へ・寄って止まる", "ex": [["Hold up a minute.", "ちょっと待て"], ["Hold up, where are you going?", "待て、どこ行くんだ？"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "閉じ込める・刑務所に入れる", "q": "lock ○○", "en": "lock up", "jp": "up＝上へ・寄って止まる", "ex": [["You locked up more of us than you can handle.", "お前らは手に負えないほど俺たちをぶち込んだ"], ["They're going to lock me up.", "俺、刑務所に入れられる"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "上を見ろ", "q": "look ○○", "en": "look up", "jp": "up＝上へ・寄って止まる", "ex": [["Look up.", "上を見ろ"], ["Look up! There's a helicopter!", "上見て！ヘリだ！"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "埋め合わせる", "q": "make ○○", "en": "make up", "jp": "up＝上へ・寄って止まる", "ex": [["Make it up.", "埋め合わせろ"], ["I'll make it up to you.", "この埋め合わせはするよ"]]},
+  {"cat": "up＝上へ・寄って止まる", "scene": "きれいにする", "q": "clean ○○", "en": "clean up", "jp": "up＝上へ・寄って止まる", "ex": [["I clean up nice, right?", "ちゃんとすればイケてるだろ？"], ["Clean up this mess.", "この散らかりを片付けろ"]]},
+  {"cat": "back＝戻る", "scene": "戻ってくる", "q": "come ○○", "en": "come back", "jp": "back＝戻る", "ex": [["You come back with a roll of bills.", "札束持って戻ってくる"], ["I'll come back later.", "あとで戻ってくる"]]},
+  {"cat": "back＝戻る", "scene": "引き返す", "q": "head ○○", "en": "head back", "jp": "back＝戻る", "ex": [["Let's just head back.", "とりあえず引き返そう"], ["We need to head back to Brian's.", "ブライアンの所に戻らないと"]]},
+  {"cat": "back＝戻る", "scene": "取り戻す・戻る", "q": "get ○○", "en": "get back", "jp": "back＝戻る", "ex": [["Can we get back the coke?", "ブツを取り戻せる？"], ["Get back here!", "戻ってこい！"]]},
+  {"cat": "back＝戻る", "scene": "運転して戻る", "q": "drive ○○", "en": "drive back", "jp": "back＝戻る", "ex": [["I was supposed to drive it back.", "それを運転して戻すはずだった"], ["Drive back to the house.", "家まで運転して戻れ"]]},
+  {"cat": "down＝下へ・落ち着く", "scene": "落ち着け", "q": "calm ○○", "en": "calm down", "jp": "down＝下へ・落ち着く", "ex": [["Calm down, calm down.", "落ち着け、落ち着け"], ["I need to calm down.", "落ち着かないと"]]},
+  {"cat": "down＝下へ・落ち着く", "scene": "伏せろ", "q": "get ○○", "en": "get down", "jp": "down＝下へ・落ち着く", "ex": [["Get down!", "伏せろ！"], ["Get down, they're shooting!", "伏せろ、撃ってくる！"]]},
+  {"cat": "down＝下へ・落ち着く", "scene": "（ヤバいことが）起きる", "q": "go ○○", "en": "go down", "jp": "down＝下へ・落ち着く", "ex": [["It's about to go down.", "いよいよ始まるぞ"], ["Something's going down.", "何かヤバいことが起きてる"]]},
+  {"cat": "down＝下へ・落ち着く", "scene": "倒す", "q": "take ○○", "en": "take down", "jp": "down＝下へ・落ち着く", "ex": [["Are you going to take him down now?", "今あいつを倒すの？"], ["Take down the guards.", "見張りを倒せ"]]},
+  {"cat": "down＝下へ・落ち着く", "scene": "下りてくる", "q": "come ○○", "en": "come down", "jp": "down＝下へ・落ち着く", "ex": [["I need to come down and stock up.", "下りて買い出ししないと"], ["Come down here!", "こっちに下りてこい！"]]},
+  {"cat": "down＝下へ・落ち着く", "scene": "（頭を）低くしとく", "q": "keep ○○", "en": "keep down", "jp": "down＝下へ・落ち着く", "ex": [["Keep your head down.", "目立つな（頭を低くしとけ）"], ["Keep it down, they'll hear us.", "静かに、聞こえるぞ"]]},
+  {"cat": "off＝離れる・外れる", "scene": "降りる・離れろ", "q": "get ○○", "en": "get off", "jp": "off＝離れる・外れる", "ex": [["As soon as we get off this boat.", "この船を降りたらすぐ"], ["Get off me!", "離れろ！"]]},
+  {"cat": "off＝離れる・外れる", "scene": "消す", "q": "turn ○○", "en": "turn off", "jp": "off＝離れる・外れる", "ex": [["Turn off the air con.", "エアコン消して"], ["Turn off the lights.", "電気消して"]]},
+  {"cat": "off＝離れる・外れる", "scene": "外す・脱ぐ", "q": "take ○○", "en": "take off", "jp": "off＝離れる・外れる", "ex": [["You can take them off my hands.", "引き取ってくれていいよ"], ["Take off your mask.", "マスクを外せ"]]},
+  {"cat": "off＝離れる・外れる", "scene": "引け・下がれ", "q": "back ○○", "en": "back off", "jp": "off＝離れる・外れる", "ex": [["We saw everything and backed off.", "全部見て、引き下がった"], ["Back off!", "下がれ！"]]},
+  {"cat": "around＝まわり・ぶらぶら", "scene": "ふざける", "q": "mess ○○", "en": "mess around", "jp": "around＝まわり・ぶらぶら", "ex": [["I'm just messing around.", "ちょっとふざけてるだけ"], ["Stop messing around!", "ふざけるのやめろ！"]]},
+  {"cat": "around＝まわり・ぶらぶら", "scene": "見回す", "q": "look ○○", "en": "look around", "jp": "around＝まわり・ぶらぶら", "ex": [["Hey, no looking around.", "おい、キョロキョロするな"], ["Let me look around.", "ちょっと見回させて"]]},
+  {"cat": "around＝まわり・ぶらぶら", "scene": "その辺で待つ", "q": "hang ○○", "en": "hang around", "jp": "around＝まわり・ぶらぶら", "ex": [["We'll hang around.", "その辺で待ってるよ"], ["Don't hang around here.", "ここでうろうろするな"]]},
+  {"cat": "away＝遠くへ", "scene": "取り上げる", "q": "take ○○", "en": "take away", "jp": "away＝遠くへ", "ex": [["Are you gonna take it away from us?", "それを俺たちから取り上げるのか？"], ["Take his gun away.", "あいつの銃を取り上げろ"]]},
+  {"cat": "through＝通り抜ける", "scene": "経験する・通り抜ける", "q": "go ○○", "en": "go through", "jp": "through＝通り抜ける", "ex": [["I went through that training.", "その訓練を経験した"], ["Go through the gate.", "門を通り抜けろ"]]},
+  {"cat": "along＝一緒に・沿って", "scene": "仲良くやる", "q": "get ○○", "en": "get along", "jp": "along＝一緒に・沿って", "ex": [["It makes it easier to get along.", "仲良くやりやすくなる"], ["We don't get along.", "俺たち仲良くない"]]}
+];
+const SETS = { all: DATA_ALL, core: DATA_CORE, tsukkomi: DATA_TSUKKOMI, verb: DATA_VERB, pair: DATA_PAIR, link: DATA_LINK, particle: DATA_PARTICLE };
 let DATA = DATA_ALL;
 let active = new Set(DATA.map(d=>d.cat));
 let queue = [], qi = 0;
@@ -563,6 +628,20 @@ function showScene(item, isRetry){
   current = item;
   document.querySelector('.stage').classList.remove('waiting');
   if (item.first) { showLink(item, isRetry); return; }
+  if (item.q) {   // 句動詞：問題は「get ○○」と日本語だけ。答えに例文2つ
+    stageInner.innerHTML = (isRetry ? '<span class="retry-tag">もう一回</span>' : '') +
+      '<div class="scene" style="font-size:2.2em;letter-spacing:1px">'+esc(item.q)+'</div>' +
+      '<div class="scene">日本語　'+esc(item.scene)+'</div>' +
+      '<div class="answer" id="ansBox">' +
+        '<div class="en" style="cursor:pointer" onclick="playCurrentEn()">🔊 '+esc(item.en)+'</div>' +
+        '<div class="jp">'+esc(item.jp)+'</div>' +
+        (item.ex||[]).map(e=>'<div class="jp" style="margin-top:8px">'+esc(e[0])+'<br><span style="opacity:.75">'+esc(e[1])+'</span></div>').join('') +
+      '</div>';
+    count++; countEl.textContent = count;
+    if (document.getElementById('showAns').value === 'always') revealAnswer();
+    if (document.getElementById('speak').value === 'yes') speakJa(item.scene);
+    return;
+  }
   stageInner.innerHTML =
     '<div class="cat">'+esc(item.cat)+'</div>' + (isRetry ? '<span class="retry-tag">もう一回</span>' : '') +
     '<div class="scene">'+esc(item.scene)+'</div>' +
