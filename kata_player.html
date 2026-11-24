@@ -328,7 +328,7 @@
 
 <script>
 // ===== 型 =====
-const GROUPS = ['命令・呼びかけ','自分の状態','したい・ほしい','状況・感想','Markiplier流'];
+const GROUPS = ['命令・呼びかけ','自分の状態','したい・ほしい','状況・感想','Markiplier流','GTAで聞いた'];
 const KATA = [
   {id:'get',    grp:0, head:"Get",            tpl:"Get ___",            mean:"〜しろ(体の動き)"},
   {id:'dont',   grp:0, head:"Don't",          tpl:"Don't ___",          mean:"〜するな"},
@@ -368,6 +368,11 @@ const KATA = [
   {id:'mk_trying',  grp:4, head:"I'm trying to",    tpl:"I'm trying to ___",    mean:"〜しようとしてるんだけど", mk:'trying_to'},
   {id:'mk_supposed',grp:4, head:"It's supposed to", tpl:"It's supposed to ___", mean:"本当は〜のはずなんだけど", mk:'supposed_to'},
   {id:'mk_look',    grp:4, head:"Look at",          tpl:"Look at ___!",         mean:"〜見て！(視聴者に)", mk:'look_at'},
+  // 2026-11-24 GTA6の録画（ゲームの会話）で何度も出た型を追加
+  {id:'iguess',     grp:5, head:"I guess",          tpl:"I guess ___",          mean:"まあ〜かな(自信なし・仕方ない。I think より弱い)", mk:'i_guess'},
+  {id:'whydontyou', grp:5, head:"Why don't you",    tpl:"Why don't you ___?",   mean:"〜したら？(提案。怒ってない。Why would I とは別)"},
+  {id:'needyouto',  grp:5, head:"I need you to",    tpl:"I need you to ___",    mean:"〜してくれ(頼み。I need to と違い you が入る)"},
+  {id:'whatever',   grp:5, head:"Whatever",         tpl:"Whatever ___",         mean:"〜なら何でも"},
 ];
 // Markiplier語録(RE7〜RE8)からの本人の実際のセリフ: id -> {n:出てきた回数, ex:[[英,日],...]}
 const MKEX = {"im_going_to": {"n": 631, "ex": [["This isn't going to work, is it?", "これ、うまくいかないよね？"], ["I'm going to need more of those.", "あれがもっと必要になるな。"], ["I'm going to go up the stairs.", "階段を上がるぞ。"]]}, "all_right": {"n": 497, "ex": [["All right, so what was I doing?", "よし、で、何してたっけ？"], ["All right, I'm going for it.", "よし、行くぞ。"], ["All right, let's see what's happening.", "よし、何が起きてるか見てみよう。"]]}, "oh_my_god": {"n": 239, "ex": [["Oh my god, they got bullets.", "マジか、弾持ってるじゃん。"], ["Oh my god, it worked.", "うわ、うまくいった。"], ["Oh my god, I might have missed the door.", "うわ、ドア見逃したかも。"]]}, "i_dont_know_if": {"n": 145, "ex": [["I don't know if I needed that.", "あれ要ったか微妙。"]]}, "you_know": {"n": 138, "ex": [["It's pretty damn good, you know.", "かなりいいよ、ほんとに。"], ["You know, I don't need to be there.", "ほら、俺がそこにいる必要ないし。"], ["You're not like other people, you know.", "君は他の人とは違うんだよ、ね。"]]}, "i_think": {"n": 130, "ex": [["But I think we should move on.", "でも先に進んだ方がいいと思う。"], ["I think I see ammo up there.", "上に弾がある気がする。"], ["I think I can do that.", "それならできると思う。"]]}, "right_tag": {"n": 110, "ex": [["There was another door over here, right?", "こっちにもう1つドアがあったよね？"], ["They made a bunch of these, right?", "これ、たくさん作ったんだよね？"], ["Wait, at least we're in it together, right?", "待って、少なくとも俺らは一緒だよな？"]]}, "what_the_hell": {"n": 98, "ex": [["Also, what the hell is going on here?", "それと、ここで何が起きてんだよ？"], ["What the hell, man?", "なんだよ、おい？"], ["Wait, what the hell?", "待って、は？"]]}, "lets": {"n": 93, "ex": [["Let's see how many bullets I got.", "弾がいくつあるか見てみよう。"], ["All right, let's go for it.", "よし、突っ込もう。"], ["All right, so let's use that.", "よし、じゃあそれを使おう。"]]}, "need_to": {"n": 87, "ex": [["I need to save that for myself.", "それは自分のために取っておかないと。"], ["We need to keep our voices down.", "声を小さくしないと。"], ["Okay, here's what I need to do.", "よし、やるべきことはこれだ。"]]}, "i_guess": {"n": 86, "ex": [["I guess I'm out of options here.", "もう打つ手がないみたいだ。"], ["Okay, we're done, I guess.", "オッケー、これで終わりかな。"], ["I guess I could get rid of the green herb.", "緑のハーブは捨ててもいいかな。"]]}, "hold_on": {"n": 74, "ex": [["Hey, wait a minute.", "おい、ちょっと待て。"], ["All right, hold on.", "よし、ちょっと待って。"], ["Wait a minute.", "ちょっと待って。"]]}, "let_me": {"n": 73, "ex": [["Let me see if he's going the correct way.", "あいつが正しい方に行ってるか見てみよう。"], ["Let me do my storage first and then I'll save.", "先に整理させて、それからセーブする。"], ["Let me pick it.", "ちょっと開けさせて。"]]}, "i_feel_like": {"n": 52, "ex": [["I feel like that every night.", "毎晩そんな気分だよ。"], ["Mom, I feel like I'm going to throw up.", "ママ、吐きそうな気がする。"], ["I've saved 16 times thus far, but I feel like it was necessary.", "16回もセーブしたけど、必要だった気がする。"]]}, "looks_like": {"n": 51, "ex": [["Looks like it measures vital signs.", "生命反応を測るものみたい。"], ["Just looks like a screwdriver of some kind.", "なんかのドライバーに見える。"], ["This looks like it leads outside.", "ここから外に出られそう。"]]}, "not_going_to": {"n": 51, "ex": [["Ooh, I'm not going to listen to that.", "うわ、あれは聞かないでおく。"], ["I'm not going to need it.", "それは要らないな。"], ["It's not going to work.", "うまくいかないよ。"]]}, "i_want_to": {"n": 44, "ex": [["Uh I want to report a murder.", "あの、殺人事件を通報したいんですが。"], ["I don't want to read.", "読みたくない。"], ["I want to talk to you for a second.", "ちょっと話がしたい。"]]}, "should_have": {"n": 44, "ex": [["I should have taken a bigger breath.", "もっと大きく息を吸っておけばよかった。"], ["I should have grabbed that first.", "先にあれを取っておけばよかった。"], ["That was scarier than it should have been.", "本来より怖かった。"]]}, "oh_boy": {"n": 43, "ex": [["Oh boy, I'm Yeah, don't shine anything else.", "うわぁ…うん、もう何も照らさないで。"]]}, "you_know_what": {"n": 41, "ex": [["You know what I'm saying?", "分かる？"], ["Okay, you know what?", "よし、あのさ。"], ["You know what?", "あのさ。"]]}, "or_something": {"n": 41, "ex": [["Wait, is it auto saving or something?", "待って、オートセーブか何か？"], ["Okay, maybe that's upgrades or something.", "じゃあ、それはアップグレードか何かかな。"], ["Thought there might be a goodie or something.", "何かいい物があると思ったんだけど。"]]}, "pretty": {"n": 41, "ex": [["Oh my god, that was pretty good.", "うわ、今のかなり良かった。"], ["Pretty sure that was his voice.", "たぶんあいつの声だった。"], ["I'm pretty sure we haven't left anything behind.", "何も置いてきてないはず、たぶん。"]]}, "of_course": {"n": 39, "ex": [["Ah, of course it is.", "ああ、そりゃそうだよな。"], ["YEAH, OF COURSE.", "うん、もちろん。"]]}, "look_at": {"n": 37, "ex": [["Grace, look at me.", "グレース、こっち見て。"], ["Look at him go.", "あいつの動き見てよ。"], ["Look at that power.", "あの威力見てよ。"]]}, "supposed_to": {"n": 33, "ex": [["Now, what was I supposed to do?", "で、何をするはずだったっけ？"], ["That's not where I'm supposed to go.", "そっちは行くはずの場所じゃない。"]]}, "good_thing": {"n": 32, "ex": [["Okay, good thing I have this.", "よし、これ持ってて助かった。"], ["OH, Good thing he didn't see me, right?", "あいつに見つからなくて助かった、だろ？"], ["Good thing no one heard that.", "誰にも聞かれなくて助かった。"]]}, "im_just_going_to": {"n": 31, "ex": [["I'm just going to go for it.", "とりあえず突っ込むわ。"], ["I'm just going to run for it.", "とりあえず走って逃げる。"], ["But I'm just going to get more bullets.", "でもとりあえず弾をもっと取っとく。"]]}, "trying_to": {"n": 28, "ex": [["Oh, Leon, I know what you trying to tell me.", "レオン、何が言いたいか分かるよ。"], ["It's I I'm not trying to be, you know, bothersome.", "うざくするつもりはないんだけど。"]]}, "here_we_go": {"n": 26, "ex": [["Here we go, baby.", "さあ行くぞ、ベイビー。"], ["Here we go.", "さあ行くぞ。"]]}, "how_do_i": {"n": 24, "ex": [["So, how do I get further up?", "で、どうやってもっと上に行くんだ？"], ["How do you even turn around?", "どうやって振り向くの？"], ["How do I run faster?", "どうやってもっと速く走るの？"]]}, "why_would": {"n": 24, "ex": [["Why would they send her here alone?", "なんで彼女を1人でここに送るんだ？"], ["Why would I ever do that?", "なんで俺がそんなことするんだよ？"], ["Why would I want that?", "なんでそんなもの欲しがるんだよ？"]]}, "what_if": {"n": 11, "ex": [["What if I use a the gun?", "もし銃を使ったら？"], ["What if I didn't find them?", "もし見つけられなかったら？"], ["What if we put this here and then over there?", "もしこれをここに置いて、それからあそこに置いたら？"]]}};
@@ -2376,6 +2381,166 @@ const RAW = [
 "sc": "車がボロボロになった",
 "x": "Look at my car. [Oh boy.]",
 "xj": "俺の車見て。うわー…"
+},
+{
+"k": "iguess",
+"en": "I guess I'm walking.",
+"jp": "まあ歩きかな",
+"sc": "★3で車禁止になった",
+"x": "[Okay,] I guess I'm walking.",
+"xj": "よし、まあ歩きかな"
+},
+{
+"k": "iguess",
+"en": "I guess I'm dead.",
+"jp": "まあ死んだかな",
+"sc": "ヘリと警察に囲まれた",
+"x": "I guess I'm dead [this time].",
+"xj": "今回はまあ死んだかな"
+},
+{
+"k": "iguess",
+"en": "I guess he's a cop.",
+"jp": "まあ警察かな",
+"sc": "怪しい車がずっとついてくる",
+"x": "I guess he's a cop[, right?]",
+"xj": "まあ警察かな、だよね？"
+},
+{
+"k": "iguess",
+"en": "I guess we're safe.",
+"jp": "まあ安全かな",
+"sc": "パトカーをまいた",
+"x": "I guess we're safe [for now].",
+"xj": "今のところまあ安全かな"
+},
+{
+"k": "iguess",
+"en": "I guess I was wrong.",
+"jp": "まあ間違ってたかな",
+"sc": "判定でNOが出た",
+"x": "[Oh no,] I guess I was wrong.",
+"xj": "うわ、まあ間違ってたかな"
+},
+{
+"k": "whydontyou",
+"en": "Why don't you drive?",
+"jp": "運転したら？",
+"sc": "仲間が助手席で文句ばかり言う",
+"x": "Why don't you drive [instead]?",
+"xj": "代わりに運転したら？"
+},
+{
+"k": "whydontyou",
+"en": "Why don't you go first?",
+"jp": "先に行ったら？",
+"sc": "暗い建物に入る前",
+"x": "Why don't you go first[, man]?",
+"xj": "お前が先に行ったら？"
+},
+{
+"k": "whydontyou",
+"en": "Why don't you get in the car?",
+"jp": "車に乗ったら？",
+"sc": "仲間が外で突っ立っている",
+"x": "[Hey,] why don't you get in the car?",
+"xj": "おい、車に乗ったら？"
+},
+{
+"k": "whydontyou",
+"en": "Why don't you help me?",
+"jp": "手伝ったら？",
+"sc": "1人で撃ち合いしている",
+"x": "Why don't you help me [for once]?",
+"xj": "たまには手伝ったら？"
+},
+{
+"k": "whydontyou",
+"en": "Why don't you shoot him?",
+"jp": "撃ったら？",
+"sc": "仲間が銃を持ったまま動かない",
+"x": "Why don't you shoot him [right now]?",
+"xj": "今すぐ撃ったら？"
+},
+{
+"k": "needyouto",
+"en": "I need you to drive.",
+"jp": "運転してくれ",
+"sc": "追ってくる車を撃ちたい",
+"x": "[Okay,] I need you to drive.",
+"xj": "よし、運転してくれ"
+},
+{
+"k": "needyouto",
+"en": "I need you to follow me.",
+"jp": "ついてきてくれ",
+"sc": "仲間を目的地まで連れて行く",
+"x": "I need you to follow me [this time].",
+"xj": "今回はついてきてくれ"
+},
+{
+"k": "needyouto",
+"en": "I need you to help me.",
+"jp": "手伝ってくれ",
+"sc": "敵が多すぎる",
+"x": "I need you to help me[, please].",
+"xj": "手伝ってくれ、お願い"
+},
+{
+"k": "needyouto",
+"en": "I need you to stop the car.",
+"jp": "車を止めてくれ",
+"sc": "目的地を通り過ぎた",
+"x": "I need you to stop the car [right now].",
+"xj": "今すぐ車を止めてくれ"
+},
+{
+"k": "needyouto",
+"en": "I need you to find him.",
+"jp": "あいつを見つけてくれ",
+"sc": "ターゲットを見失った",
+"x": "I need you to find him [before he gets away].",
+"xj": "逃げられる前にあいつを見つけてくれ"
+},
+{
+"k": "whatever",
+"en": "Whatever you say.",
+"jp": "言うことなら何でも(はいはい)",
+"sc": "AIに★を付けられた",
+"x": "Whatever you say[, AI].",
+"xj": "はいはい、言う通りにするよ、AI"
+},
+{
+"k": "whatever",
+"en": "Whatever you need.",
+"jp": "要るものなら何でも",
+"sc": "仲間に頼みごとをされた",
+"x": "Whatever you need[, man].",
+"xj": "要るものなら何でも言って"
+},
+{
+"k": "whatever",
+"en": "Whatever you want.",
+"jp": "したいことなら何でも",
+"sc": "仲間が行き先を勝手に決める",
+"x": "[Okay,] whatever you want.",
+"xj": "よし、好きにして"
+},
+{
+"k": "whatever",
+"en": "Whatever works.",
+"jp": "うまくいくなら何でも",
+"sc": "無茶な作戦で突っ込む",
+"x": "Whatever works[, I guess].",
+"xj": "うまくいくなら何でも、たぶん"
+},
+{
+"k": "whatever",
+"en": "Whatever you got.",
+"jp": "持ってるものなら何でも",
+"sc": "仲間に弾を分けてもらう",
+"x": "Whatever you got[, man].",
+"xj": "持ってるものなら何でも、頼む"
 }
 ];
 const ITEMS = RAW.map((r,i)=>({i, k:r.k, en:r.en, jp:r.jp, sc:r.sc, x:r.x, xj:r.xj, grp:KMAP[r.k].grp}));
@@ -2890,6 +3055,12 @@ function initApp(){
   Object.keys(RENAMED).forEach(o=>{ const n = RENAMED[o];
     if (status[o] && !status[n]) status[n] = status[o]; delete status[o];
     if (memo[o]) { if (!memo[n]) { memo[n] = memo[o]; memo[n].en = n; memo[n].k = 'mk_dkif'; } delete memo[o]; } });
+  // 2026-11-24 11/15に差し替えた2文（I'm almost dead! → I'm hurt! ／ I just died. → I just got out of the hospital.）のチェックを新しい文に引き継ぐ
+  const RENAMED2 = {"I'm almost dead!": ["I'm hurt!", "im"], "Help! I'm almost dead!": ["Help! I'm hurt!", "im"],
+                    "I just died.": ["I just got out of the hospital.", "ijust"], "What? I just died.": ["Come on, I just got out of the hospital!", "ijust"]};
+  Object.keys(RENAMED2).forEach(o=>{ const [n, k] = RENAMED2[o];
+    if (status[o] && !status[n]) status[n] = status[o]; delete status[o];
+    if (memo[o]) { if (!memo[n]) { memo[n] = memo[o]; memo[n].en = n; memo[n].k = k; } delete memo[o]; } });
   // 覚えるリストに保存された日本語・状況を最新の内容に合わせる(訳を直した時用)
   Object.keys(memo).forEach(key=>{ const d = memo[key], it = ITEMS[d.i]; if (!it) return; const k2 = d.long ? xPlain(it) : it.en; if (k2 !== key) { if (!memo[k2]) memo[k2] = {en:k2, jp: d.long ? it.xj : it.jp, sc: it.sc, k:it.k, long:!!d.long, i:it.i, added:d.added, w:1.5, n:0}; delete memo[key]; return; } d.jp = d.long ? it.xj : it.jp; d.sc = it.sc; });
   if (!autoShortDone) { ITEMS.forEach(it=>addMemo(it, false)); autoShortDone = true; autoMkDone = true; scheduleSave(); }
