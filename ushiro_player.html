@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>後ろの塊ドリル - 頭はもう言える、後ろだけ</title>
+<style>
+  :root{--bg:#14110f;--panel:#1c1815;--panel2:#231e1a;--amber:#ff8c2e;--amber-dim:#c4691a;--amber-deep:#7a4518;--text:#ede5d8;--text-dim:#968d7f;--line:#2e2822;--green:#4ade80;--red:#ff8080;--yellow:#ffd166;--blue:#9cc4ff;--mint:#7ee0b5;--purple:#c9a8e8;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;padding:16px 16px 60px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  a.back{color:var(--text-dim);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:12px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;}
+  .eyebrow{font-size:11px;letter-spacing:.2em;color:var(--amber-dim);font-weight:700;}
+  h1{font-size:24px;margin:4px 0 6px;} h1 span{color:var(--yellow);}
+  .lead{font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:14px;} .lead b{color:var(--amber);}
+  .tabs{display:flex;gap:6px;margin:0 0 14px;}
+  .tabbtn{flex:1;background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:12px;padding:11px 4px;font-size:13px;font-weight:700;cursor:pointer;}
+  .tabbtn.on{background:var(--amber);border-color:var(--amber);color:#1a1208;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+  .chip{background:var(--panel);border:1px solid var(--amber-deep);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;user-select:none;}
+  .chip.on{background:var(--amber);color:#1a1208;border-color:var(--amber);font-weight:700;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;}
+  .row label{font-size:11px;color:var(--text-dim);display:flex;flex-direction:column;gap:3px;}
+  select{background:var(--panel);color:var(--text);border:1px solid var(--amber-deep);border-radius:8px;padding:6px 10px;font-size:13px;}
+  .stats{font-size:12px;color:var(--text-dim);margin-bottom:12px;} .stats b{color:var(--text);}
+  .card{background:var(--panel);border:2px solid var(--amber-deep);border-radius:18px;padding:22px 18px;margin-bottom:14px;}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .tag{font-size:11px;border-radius:999px;padding:3px 10px;border:1px solid var(--amber-dim);color:var(--amber);}
+  .tag.mk{border-color:#6b4f8a;color:var(--purple);}
+  .tag.st-ok{border-color:#2f5a35;color:var(--green);} .tag.st-mid{border-color:#6b5a1f;color:var(--yellow);} .tag.st-ng{border-color:#6b2f2f;color:var(--red);}
+  .lbl{font-size:11px;color:var(--text-dim);letter-spacing:.1em;}
+  .jp{font-size:24px;font-weight:800;line-height:1.4;margin:2px 0 14px;}
+  .q{font-size:24px;font-weight:800;line-height:1.5;}
+  .q .h{color:var(--blue);} .q .blank{display:inline-block;min-width:120px;border-bottom:3px solid var(--yellow);color:var(--yellow);}
+  .cue{font-size:12.5px;color:var(--text-dim);margin-top:4px;}
+  .cj{font-size:14px;color:var(--yellow);margin-top:10px;}
+  .ans{margin-top:14px;padding:14px;background:var(--panel2);border-radius:12px;visibility:hidden;}
+  .ans.show{visibility:visible;}
+  .ans .en{font-size:24px;font-weight:800;line-height:1.4;cursor:pointer;}
+  .ans .en .h{color:var(--blue);} .ans .en .c{color:var(--yellow);}
+  .ans .sub{font-size:12.5px;color:var(--text-dim);margin-top:6px;}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn.main{background:var(--amber);color:#1a1208;} .btn.sub{background:var(--panel2);color:var(--text);border:1px solid var(--amber-deep);}
+  .judge{display:flex;gap:8px;margin-top:14px;}
+  .judge button{flex:1;border:none;border-radius:12px;padding:14px 6px;font-size:16px;font-weight:800;cursor:pointer;}
+  .judge small{display:block;font-size:10.5px;font-weight:400;opacity:.75;margin-top:2px;}
+  .j-ok{background:#2f4a30;color:#b3ffb8;} .j-mid{background:#4f4420;color:#ffe9a8;} .j-ng{background:#5a3030;color:#ffb3b3;}
+  .think{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:12px;} .think i{display:block;height:100%;width:0;background:var(--amber-dim);}
+  .auto-on{background:#2f4a30 !important;color:#b3ffb8 !important;border-color:#2f5a35 !important;}
+  .sec{font-size:13px;color:var(--amber);font-weight:700;margin:18px 0 6px;}
+  table.lst{width:100%;border-collapse:collapse;font-size:13px;}
+  table.lst td{padding:7px 4px;border-top:1px solid var(--line);vertical-align:top;}
+  table.lst .c{color:var(--yellow);font-weight:700;white-space:nowrap;}
+  table.lst .h{color:var(--blue);font-size:12px;}
+  table.lst .e{cursor:pointer;} table.lst .j{color:var(--text-dim);font-size:12px;}
+  .note{background:var(--panel);border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--text-dim);line-height:1.8;margin-top:12px;} .note b{color:var(--amber);}
+  .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;text-align:center;}
+  .login-box h2{font-size:18px;margin:0 0 6px;} .login-box p{font-size:12px;color:var(--text-dim);margin:0 0 20px;}
+  .login-box input{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;text-align:center;margin-bottom:12px;}
+  .login-box button{width:100%;background:var(--amber);border:none;color:#1a1208;font-weight:700;border-radius:8px;padding:12px;font-size:14px;cursor:pointer;}
+  .login-status{font-size:11px;color:var(--text-dim);margin-top:10px;min-height:14px;}
+  .sync-badge{position:fixed;top:10px;right:10px;font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:4px 10px;z-index:10;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>合言葉を入力</h2>
+    <p>PCとiPhoneで同じ合言葉を使うとデータが共有されます</p>
+    <input type="text" id="passInput" placeholder="例: kouji2026" autocomplete="off">
+    <button id="loginBtn">開始する</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+<div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+<div class="wrap">
+  <a class="back" href="index.html">← トップに戻る</a>
+  <div class="eyebrow">後ろの塊ドリル</div>
+  <h1>頭はもう言える、<span>後ろだけ</span>言う</h1>
+  <div class="lead">頭（青）は型ドリルで覚えたもの。<b>黄色の後ろの塊だけ</b>を声に出す。答えを見ると文全体が流れる。</div>
+
+  <div class="tabs">
+    <button class="tabbtn on" data-tab="drill">🔁 ドリル</button>
+    <button class="tabbtn" data-tab="list">📖 一覧</button>
+  </div>
+
+  <div id="tab-drill">
+    <div class="chips" id="sceneChips"></div>
+    <div class="row">
+      <label>出す順番<select id="orderSel"><option value="weak">苦手から</option><option value="new">まだのものから</option><option value="rand">ランダム</option><option value="ngonly">×と△だけ</option></select></label>
+      <label>考える時間（自動）<select id="thinkSel"><option value="3">3秒</option><option value="5" selected>5秒</option><option value="8">8秒</option></select></label>
+      <button class="btn sub" id="autoBtn">▶ 自動で回す</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="card" id="card"></div>
+    <div class="note">キー：<b>スペース</b>＝答えを見る ／ <b>1</b>＝○ <b>2</b>＝△ <b>3</b>＝× ／ <b>R</b>＝もう一度聞く<br>×はすぐ（3問後）、△は少し後（7問後）にもう一度出ます。自動で回すと記録はつけずに、答えと音声だけ流れます（ながら用）。</div>
+  </div>
+
+  <div id="tab-list" style="display:none;">
+    <div id="listBox"></div>
+  </div>
+</div>
+
+<script>
+const HEADS = {"Let's": "〜しよう", "Let me": "俺に〜させて", "I need to": "〜しなきゃ", "I want to": "〜したい", "I'm going to": "〜するぞ", "I'm not going to": "〜しないぞ", "I'm just going to": "とりあえず〜しとく", "I'm trying to": "〜しようとしてるんだけど", "How do I": "どうやって〜するの？", "I just": "〜したばっか", "I can't": "〜できない", "I didn't": "〜してない", "I don't know if": "〜か微妙", "I think": "〜と思う", "I guess": "まあ〜かな", "I feel like": "〜な気がする", "It looks like": "〜っぽい", "That was": "今の〜だった", "Too": "〜すぎ", "Look at": "〜見て！", "Can I get": "〜もらえる？", "What if": "もし〜たら？", "Why would I": "なんで俺が〜するんだよ", "Why don't you": "〜したら？", "I need you to": "〜してくれ", "Don't": "〜するな", "I'm": "俺、〜（今の状態）", "I have no idea": "全然分からん", "Why is she": "なんであいつ〜してるの？（he→she）", "I'm trying not to": "〜しないようにしてるんだけど（not を入れるだけ）", "Well, at least": "まあ、〜だけはいいな（皮肉）", ", I guess": "まあ〜かな（後ろに置く・しぶしぶ）"};
+const D = [["戦闘", "I need to", "take cover", "I need to take cover.", "物陰に隠れる", "物陰に隠れなきゃ。", 0], ["戦闘", "I'm going to", "fight back", "I'm going to fight back.", "やり返す", "やり返すぞ。", 0], ["戦闘", "I'm just going to", "go for it", "I'm just going to go for it.", "突っ込む", "とりあえず突っ込むわ。", 1], ["戦闘", "Let me", "take them out", "Let me take them out.", "片付ける", "俺に片付けさせて。", 0], ["戦闘", "Let's", "back off", "Let's back off.", "下がる", "下がろう。", 0], ["戦闘", "I'm trying to", "hold them off", "I'm trying to hold them off.", "食い止める", "食い止めようとしてるんだけど。", 0], ["戦闘", "I'm just going to", "run for it", "I'm just going to run for it.", "走って逃げる", "とりあえず走って逃げとく。", 1], ["戦闘", "Let me", "reload", "Let me reload.", "リロードする", "リロードさせて。", 0], ["戦闘", "How do I", "pick up that gun", "How do I pick up that gun?", "あの銃を拾う", "どうやってあの銃を拾うの？", 0], ["戦闘", "I need to", "lose the cops", "I need to lose the cops.", "警察を撒く", "警察を撒かなきゃ。", 0], ["水中", "I'm just going to", "dive in", "I'm just going to dive in.", "飛び込む", "とりあえず飛び込んどく。", 0], ["水中", "I'm going to", "swim up", "I'm going to swim up.", "上に泳ぐ", "上に泳ぐぞ。", 0], ["水中", "How do I", "hold my breath", "How do I hold my breath?", "息を止める", "どうやって息を止めるの？", 0], ["水中", "I want to", "get out of the water", "I want to get out of the water.", "水から上がる", "水から上がりたい。", 0], ["水中", "Let me", "come up for air", "Let me come up for air.", "息継ぎに上がる", "息継ぎさせて。", 0], ["水中", "Let's", "go under", "Let's go under.", "潜る", "潜ろう。", 0], ["水中", "I can't", "breathe", "I can't breathe!", "息をする", "息ができない！", 0], ["水中", "I'm trying to", "find a way out", "I'm trying to find a way out.", "出口を見つける", "出口を探そうとしてるんだけど。", 0], ["水中", "I'm just going to", "swim away", "I'm just going to swim away.", "泳いで逃げる", "とりあえず泳いで逃げとく。", 0], ["水中", "I need to", "get back on the boat", "I need to get back on the boat.", "船に戻る", "船に戻らなきゃ。", 0], ["クラブ", "I want to", "dance with her", "I want to dance with her.", "彼女と踊る", "あの子と踊りたい。", 0], ["クラブ", "Let me", "get a drink", "Let me get a drink.", "飲み物をもらう", "1杯もらわせて。", 0], ["クラブ", "I'm going to", "buy her a drink", "I'm going to buy her a drink.", "彼女に1杯おごる", "あの子に1杯おごるぞ。", 0], ["クラブ", "I'm just going to", "talk to her", "I'm just going to talk to her.", "話しかける", "とりあえず話しかけとく。", 0], ["クラブ", "How do I", "get past the bouncer", "How do I get past the bouncer?", "用心棒を抜ける", "どうやって用心棒を抜けるの？", 0], ["クラブ", "I'm not going to", "cut the line", "I'm not going to cut the line.", "列に割り込む", "列には割り込まないぞ。", 0], ["クラブ", "I need to", "chill out", "I need to chill out.", "落ち着く", "落ち着かなきゃ。", 0], ["クラブ", "I'm trying to", "show off", "I'm trying to show off.", "かっこつける", "かっこつけようとしてるんだけど。", 0], ["クラブ", "I just", "got kicked out", "I just got kicked out.", "追い出された", "追い出されたばっか。", 0], ["クラブ", "Let's", "party all night", "Let's party all night.", "朝まで遊ぶ", "朝まで遊ぼう。", 0], ["通りすがり", "Let me", "say hi", "Let me say hi.", "挨拶する", "ちょっと挨拶させて。", 0], ["通りすがり", "I need to", "ask for directions", "I need to ask for directions.", "道を聞く", "道を聞かなきゃ。", 0], ["通りすがり", "I just", "bumped into him", "I just bumped into him.", "あいつにぶつかった", "あいつにぶつかったばっか。", 0], ["通りすがり", "I'm just going to", "mess with him", "I'm just going to mess with him.", "ちょっかいを出す", "とりあえずちょっかい出しとく。", 0], ["通りすがり", "Let's", "leave him alone", "Let's leave him alone.", "放っておく", "放っておこう。", 0], ["通りすがり", "I want to", "take a picture", "I want to take a picture.", "写真を撮る", "写真撮りたい。", 0], ["通りすがり", "Why would I", "pick a fight", "Why would I pick a fight?", "けんかを売る", "なんで俺がけんか売るんだよ？", 0], ["通りすがり", "I'm not going to", "rob him", "I'm not going to rob him.", "強盗する", "こいつは襲わないぞ。", 0], ["通りすがり", "I'm going to", "walk away", "I'm going to walk away.", "立ち去る", "立ち去るぞ。", 0], ["通りすがり", "What if", "I ask him for help", "What if I ask him for help?", "助けを求める", "もしあいつに助けを頼んだら？", 0], ["ムービー", "I didn't", "catch that", "I didn't catch that.", "聞き取る", "今の聞き取れてない。", 0], ["ムービー", "I can't", "keep up", "I can't keep up.", "話についていく", "話についていけない。", 0], ["ムービー", "I'm trying to", "figure it out", "I'm trying to figure it out.", "理解する", "理解しようとしてるんだけど。", 0], ["ムービー", "I want to", "skip this", "I want to skip this.", "飛ばす", "これ飛ばしたい。", 0], ["ムービー", "I don't know if", "I trust him", "I don't know if I trust him.", "あいつを信じる", "あいつを信じていいか微妙。", 0], ["ムービー", "I have no idea", "what's going on", "I have no idea what's going on.", "何が起きてるか", "何が起きてるか全然分からん。", 0], ["ムービー", "I think", "he's the bad guy", "I think he's the bad guy.", "あいつが悪役", "あいつが悪役だと思う。", 0], ["ムービー", "I guess", "he's on our side", "I guess he's on our side.", "あいつは味方", "まあ、あいつは味方かな。", 0], ["ムービー", "I need to", "pay attention", "I need to pay attention.", "ちゃんと見る", "ちゃんと見なきゃ。", 0], ["ムービー", "I'm just going to", "play along", "I'm just going to play along.", "話を合わせる", "とりあえず話を合わせとく。", 0], ["女の子・皮肉", "Look at", "that outfit", "Look at that outfit!", "その格好", "あの格好見て！", 0], ["女の子・皮肉", "Why is she", "dressed like that", "Why is she dressed like that?", "そんな格好で", "なんであんな格好してんの？", 0], ["女の子・皮肉", "Too", "much skin", "Too much skin!", "露出", "露出しすぎ！", 0], ["女の子・皮肉", "I feel like", "she's going to catch a cold", "I feel like she's going to catch a cold.", "風邪をひく", "あの子、風邪ひきそうな気がする。", 0], ["女の子・皮肉", "It looks like", "she forgot her pants", "It looks like she forgot her pants.", "ズボンを忘れた", "ズボン忘れてきたっぽい。", 0], ["女の子・皮肉", "That was", "a lot of skin", "That was a lot of skin.", "露出がすごい", "今の露出すごかった。", 0], ["女の子・皮肉", "Can I get", "your number", "Can I get your number?", "連絡先", "連絡先もらえる？", 0], ["女の子・皮肉", "I'm trying not to", "look", "I'm trying not to look.", "見る", "見ないようにしてるんだけど。", 0], ["女の子・皮肉", "I'm not going to", "say anything", "I'm not going to say anything.", "何か言う", "何も言わないぞ。", 0], ["女の子・皮肉", "I think", "she's out of my league", "I think she's out of my league.", "高嶺の花", "あの子は高嶺の花だと思う。", 0], ["女の子・皮肉", "Well, at least", "her legs are nice", "Well, at least her legs are nice.", "足はきれい", "うん、足だけはきれいだね。", 0], ["女の子・皮肉", ", I guess", "Nice outfit", "Nice outfit, I guess.", "いい格好", "まあ、いい格好なんじゃない。", 0], ["どこでも", "I need to", "get rid of it", "I need to get rid of it.", "捨てる", "これ捨てなきゃ。", 1], ["どこでも", "Let me", "check it out", "Let me check it out.", "見てみる", "ちょっと見させて。", 0], ["どこでも", "I'm going to", "find out", "I'm going to find out.", "確かめる", "確かめるぞ。", 0], ["どこでも", "I'm not going to", "give up", "I'm not going to give up.", "諦める", "諦めないぞ。", 0], ["どこでも", "I need to", "slow down", "I need to slow down.", "スピードを落とす", "スピード落とさなきゃ。", 0], ["どこでも", "How do I", "turn around", "How do I turn around?", "向きを変える", "どうやって向きを変えるの？", 1], ["どこでも", "How do I", "get on the bike", "How do I get on the bike?", "バイクに乗る", "どうやってバイクに乗るの？", 0], ["どこでも", "Let me", "pull over", "Let me pull over.", "車を脇に止める", "ちょっと車止めさせて。", 0], ["どこでも", "I'm not going to", "run him over", "I'm not going to run him over.", "轢く", "こいつは轢かないぞ。", 0], ["どこでも", "How do I", "open the door", "How do I open the door?", "ドアを開ける", "どうやってドア開けるの？", 0], ["どこでも", "I'm trying to", "climb up", "I'm trying to climb up.", "よじ登る", "よじ登ろうとしてるんだけど。", 0], ["どこでも", "Let's", "sneak in", "Let's sneak in.", "忍び込む", "忍び込もう。", 0], ["どこでも", "Let's", "wait for him", "Let's wait for him.", "あいつを待つ", "あいつを待とう。", 0], ["どこでも", "I'm going to", "go after him", "I'm going to go after him.", "追いかける", "あいつを追いかけるぞ。", 0], ["どこでも", "I'm trying to", "catch up", "I'm trying to catch up.", "追いつく", "追いつこうとしてるんだけど。", 0], ["どこでも", "I just", "messed up", "I just messed up.", "しくじった", "今しくじったばっか。", 0], ["どこでも", "I want to", "change clothes", "I want to change clothes.", "着替える", "着替えたい。", 0], ["どこでも", "I'm going to", "work out", "I'm going to work out.", "筋トレする", "筋トレするぞ。", 0], ["どこでも", "Let's", "grab some food", "Let's grab some food.", "何か食べる", "何か食べよう。", 0], ["どこでも", "I need to", "take a break", "I need to take a break.", "休憩する", "休憩しなきゃ。", 0], ["どこでも", "I'm just going to", "sit down", "I'm just going to sit down.", "座る", "とりあえず座っとく。", 0], ["どこでも", "I need to", "make money", "I need to make money.", "金を稼ぐ", "金を稼がなきゃ。", 0], ["どこでも", "Let me", "call him", "Let me call him.", "電話する", "あいつに電話させて。", 0], ["どこでも", "How do I", "answer the phone", "How do I answer the phone?", "電話に出る", "どうやって電話に出るの？", 0], ["どこでも", "I'm going to", "text her", "I'm going to text her.", "メッセージを送る", "あの子にメッセージ送るぞ。", 0], ["どこでも", "Why don't you", "calm down", "Why don't you calm down?", "落ち着く", "落ち着いたら？", 0], ["どこでも", "I need you to", "cover me", "I need you to cover me.", "援護する", "援護してくれ。", 0], ["どこでも", "I need you to", "stay here", "I need you to stay here.", "ここにいる", "ここにいてくれ。", 0], ["どこでも", "I don't know if", "it's worth it", "I don't know if it's worth it.", "やる価値がある", "やる価値あるか微妙。", 1], ["どこでも", "I'm", "in trouble", "I'm in trouble.", "ピンチ", "俺、ピンチ。", 0], ["どこでも", "I'm", "broke", "I'm broke.", "金欠", "俺、金欠。", 0], ["どこでも", "I'm just going to", "drive away", "I'm just going to drive away.", "走り去る", "とりあえず走り去っとく。", 0], ["どこでも", "I need to", "heal up", "I need to heal up.", "回復する", "回復しなきゃ。", 0], ["どこでも", "How do I", "put it away", "How do I put it away?", "しまう", "どうやってしまうの？", 0], ["どこでも", "How do I", "switch weapons", "How do I switch weapons?", "武器を変える", "どうやって武器を変えるの？", 0], ["どこでも", "I'm trying to", "aim", "I'm trying to aim.", "狙う", "狙おうとしてるんだけど。", 0], ["どこでも", "I'm going to", "knock him out", "I'm going to knock him out.", "気絶させる", "こいつを気絶させるぞ。", 0], ["どこでも", "I'm just going to", "let him go", "I'm just going to let him go.", "逃がしてやる", "とりあえず逃がしとく。", 0], ["どこでも", "I need to", "get to the marker", "I need to get to the marker.", "目印まで行く", "目印まで行かなきゃ。", 0], ["どこでも", "I just", "failed the mission", "I just failed the mission.", "ミッションに失敗した", "ミッション失敗したばっか。", 0], ["どこでも", "I want to", "hang out with him", "I want to hang out with him.", "つるむ", "あいつとつるみたい。", 0], ["どこでも", "I need to", "look for the car", "I need to look for the car.", "車を探す", "車を探さなきゃ。", 0], ["どこでも", "I'm going to", "come back later", "I'm going to come back later.", "後で戻る", "後で戻ってくるぞ。", 0], ["どこでも", "I need to", "get some sleep", "I need to get some sleep.", "寝る", "寝なきゃ。", 0], ["どこでも", "Let's", "go shopping", "Let's go shopping.", "買い物に行く", "買い物に行こう。", 0], ["どこでも", "Let's", "blow it up", "Let's blow it up.", "爆破する", "爆破しよう。", 0], ["どこでも", "I'm trying to", "shoot the tires", "I'm trying to shoot the tires.", "タイヤを撃つ", "タイヤを撃とうとしてるんだけど。", 0], ["どこでも", "How do I", "get out of the car", "How do I get out of the car?", "車から降りる", "どうやって車から降りるの？", 0], ["どこでも", "Don't", "call the cops", "Don't call the cops!", "警察を呼ぶ", "警察呼ぶな！", 0], ["どこでも", "I'm not going to", "tell him", "I'm not going to tell him.", "あいつに言う", "あいつには言わないぞ。", 0], ["どこでも", "Let's", "see what happens", "Let's see what happens.", "様子を見る", "様子を見よう。", 0], ["どこでも", "I feel like", "I'm going to pass out", "I feel like I'm going to pass out.", "気絶する", "気絶しそうな気がする。", 0], ["どこでも", "I feel like", "I'm going to throw up", "I feel like I'm going to throw up.", "吐く", "吐きそうな気がする。", 1], ["どこでも", "I'm going to", "go up the stairs", "I'm going to go up the stairs.", "階段を上がる", "階段を上がるぞ。", 1], ["どこでも", "I need to", "get my stuff back", "I need to get my stuff back.", "取り返す", "俺の物を取り返さなきゃ。", 0], ["どこでも", "I need to", "go to the hospital", "I need to go to the hospital.", "病院に行く", "病院に行かなきゃ。", 0], ["どこでも", "I'm trying to", "be quiet", "I'm trying to be quiet.", "静かにする", "静かにしようとしてるんだけど。", 0], ["どこでも", "I need to", "find a ride", "I need to find a ride.", "乗り物を見つける", "乗り物を見つけなきゃ。", 0], ["どこでも", "I want to", "buy a gun", "I want to buy a gun.", "銃を買う", "銃を買いたい。", 0], ["どこでも", "Let's", "split up", "Let's split up.", "手分けする", "手分けしよう。", 0]];
+const SCENES = ["戦闘","水中","クラブ","通りすがり","ムービー","女の子・皮肉","どこでも"];
+const ITEMS = D.map((d,i)=>({i, s:d[0], h:d[1], c:d[2], en:d[3], cj:d[4], jp:d[5], mk:!!d[6]}));
+const esc = t=>String(t).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+// 文を 頭／塊／残り に分けて色付け
+function parts(it){
+  if (it.h === ', I guess') { return {pre:'', c:it.c, post:', I guess.'}; }
+  const k = it.en.indexOf(it.c);
+  return {pre: it.en.slice(0,k), c: it.c, post: it.en.slice(k+it.c.length)};
+}
+function qHtml(it){
+  const p = parts(it);
+  if (it.h === ', I guess') return '<span class="blank">　</span><span class="h">'+esc(p.post)+'</span>';
+  return '<span class="h">'+esc(p.pre.trim())+'</span> <span class="blank">　</span>'+esc(p.post);
+}
+function enHtml(it){ const p = parts(it); return '<span class="h">'+esc(p.pre)+'</span><span class="c">'+esc(p.c)+'</span><span class="h">'+esc(p.post)+'</span>'; }
+
+// ===== 音声 =====
+let enVoice = null;
+function loadVoices(){ const vs = speechSynthesis.getVoices(); enVoice = vs.find(v=>v.lang==='en-US') || vs.find(v=>v.lang.startsWith('en')) || null; }
+loadVoices(); if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+function speakEn(t, onend){ const u = new SpeechSynthesisUtterance(t); u.lang='en-US'; if(enVoice) u.voice=enVoice; u.rate=0.9; if (onend) u.onend = onend; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+
+// ===== 状態 =====
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyU-Nz-INLqD-OaBoETh9hDVWxILeNL4JsnMCeEQZrUpkl3eFc3D6vTBi2VtQcCG_BC/exec';
+const APP_KEY = 'ushiro';
+const LOCAL_USER_KEY = 'phraseAppUser_v1';
+let currentUser = null, saveTimer = null;
+let status = {};   // 英文 -> {s, w, n, t}
+let activeScenes = new Set(SCENES);
+let queue = [], qi = 0, current = null, retry = [], shown = false;
+let auto = {on:false, timers:[], raf:null, token:0};
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pool(){ return ITEMS.filter(it=>activeScenes.has(it.s)); }
+function rebuild(){
+  const order = document.getElementById('orderSel').value;
+  let arr = pool();
+  if (order === 'ngonly') arr = arr.filter(it=>status[it.en] && status[it.en].s !== 'ok');
+  if (order === 'weak' || order === 'ngonly') {
+    arr = arr.map(it=>{ const st=status[it.en]; const w = st ? st.w : 1.5; return {it, k: Math.random() - Math.min(w,5)*0.3}; }).sort((a,b)=>a.k-b.k).map(x=>x.it);
+  } else if (order === 'new') {
+    arr = shuffle(arr.filter(it=>!status[it.en])).concat(shuffle(arr.filter(it=>status[it.en])));
+  } else shuffle(arr);
+  queue = arr; qi = 0; retry = [];
+  renderStats();
+}
+function next(){
+  retry.forEach(r=>r.wait--);
+  const due = retry.findIndex(r=>r.wait<=0);
+  if (due !== -1) { current = retry.splice(due,1)[0].it; render(true); return; }
+  if (!queue.length) { current = null; render(); return; }
+  if (qi >= queue.length) { rebuild(); if (!queue.length) { current=null; render(); return; } }
+  current = queue[qi++]; render(false);
+}
+function stTag(it){
+  const st = status[it.en];
+  if (!st) return '<span class="tag">未</span>';
+  const m = {ok:['st-ok','○ 言えた'], mid:['st-mid','△ 微妙'], ng:['st-ng','× 無理']}[st.s];
+  return '<span class="tag '+m[0]+'">'+m[1]+' ('+st.n+'回)</span>';
+}
+function render(isRetry){
+  const card = document.getElementById('card'); shown = false;
+  if (!current) { card.innerHTML = '<div class="jp" style="font-size:18px">この条件の問題がありません</div><div class="lbl">場面や出す順番を変えてみてください。</div>'; return; }
+  const it = current;
+  card.innerHTML =
+    '<div class="tags"><span class="tag">'+esc(it.s)+'</span>'+stTag(it)+(it.mk?'<span class="tag mk">🎬 Markiplierも言う</span>':'')+(isRetry?'<span class="tag st-ng">もう一度</span>':'')+'</div>' +
+    '<div class="lbl">言いたいこと</div><div class="jp">'+esc(it.jp)+'</div>' +
+    '<div class="q">'+qHtml(it)+'</div>' +
+    '<div class="cue">頭：'+esc(it.h.replace(/^, /,''))+' ＝ '+esc(HEADS[it.h]||'')+'</div>' +
+    '<div class="cj">後ろの意味：'+esc(it.cj)+'</div>' +
+    '<div class="think" id="think" style="'+(auto.on?'':'display:none')+'"><i id="thinkBar"></i></div>' +
+    '<div class="ans" id="ans"><div class="en" id="ansEn">'+enHtml(it)+'</div><div class="sub">後ろの塊：<b style="color:var(--yellow)">'+esc(it.c)+'</b>（'+esc(it.cj)+'）　🔊タップでもう一度</div></div>' +
+    (auto.on ? '' :
+    '<div class="btns" id="revealBtns"><button class="btn main" id="showBtn">答えを見る</button></div>' +
+    '<div class="judge" id="judge" style="display:none"><button class="j-ok" data-s="ok">○ 言えた<small>後回し (1)</small></button><button class="j-mid" data-s="mid">△ 微妙<small>少し後 (2)</small></button><button class="j-ng" data-s="ng">× 無理<small>すぐ出す (3)</small></button></div>');
+  document.getElementById('ansEn').onclick = ()=>speakEn(it.en);
+  if (!auto.on) {
+    document.getElementById('showBtn').onclick = reveal;
+    document.querySelectorAll('#judge button').forEach(b=>b.onclick = ()=>judge(b.dataset.s));
+  } else autoStep();
+}
+function reveal(){
+  if (!current || shown) return; shown = true;
+  document.getElementById('ans').classList.add('show');
+  const rb = document.getElementById('revealBtns'); if (rb) rb.style.display='none';
+  const j = document.getElementById('judge'); if (j) j.style.display='flex';
+  speakEn(current.en);
+}
+function judge(s){
+  if (!current || !shown) return;
+  const st = status[current.en] || {s:'', w:1.5, n:0, t:0};
+  st.s = s; st.n++; st.t = Date.now();
+  st.w = s==='ok' ? Math.max(0.2, st.w*0.5) : s==='mid' ? st.w+0.7 : st.w+1.5;
+  status[current.en] = st;
+  if (s==='ng') retry.push({it:current, wait:3}); else if (s==='mid') retry.push({it:current, wait:7});
+  scheduleSave(); renderStats(); next();
+}
+function renderStats(){
+  const p = pool(); let ok=0, mid=0, ng=0;
+  p.forEach(it=>{ const st=status[it.en]; if(!st) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else if(st.s==='ng')ng++; });
+  document.getElementById('stats').innerHTML = '選んだ場面 <b>'+p.length+'</b>個 ・ ○ <b>'+ok+'</b> ・ △ <b>'+mid+'</b> ・ × <b>'+ng+'</b> ・ まだ <b>'+(p.length-ok-mid-ng)+'</b>';
+}
+
+// ===== 自動で回す（ながら用・記録なし） =====
+function autoClear(){ auto.token++; auto.timers.forEach(clearTimeout); auto.timers=[]; if(auto.raf) cancelAnimationFrame(auto.raf); auto.raf=null; try{speechSynthesis.cancel();}catch(e){} }
+function autoStep(){
+  const tok = ++auto.token; const sec = +document.getElementById('thinkSel').value;
+  const t0 = performance.now(), bar = document.getElementById('thinkBar');
+  const tick = ()=>{ if (tok!==auto.token) return; const r = Math.min(1,(performance.now()-t0)/(sec*1000)); if(bar) bar.style.width=(r*100)+'%'; if (r<1) auto.raf = requestAnimationFrame(tick); };
+  tick();
+  auto.timers.push(setTimeout(()=>{
+    if (tok!==auto.token) return; shown = true;
+    document.getElementById('ans').classList.add('show');
+    speakEn(current.en, ()=>{ if (tok!==auto.token) return; auto.timers.push(setTimeout(()=>{ if (tok===auto.token) speakEn(current.en, ()=>{ if (tok===auto.token) auto.timers.push(setTimeout(()=>{ if (tok===auto.token) next(); }, 1200)); }); }, 600)); });
+  }, sec*1000));
+}
+function toggleAuto(){
+  auto.on = !auto.on; autoClear();
+  const b = document.getElementById('autoBtn'); b.classList.toggle('auto-on', auto.on); b.textContent = auto.on ? '■ 自動を止める' : '▶ 自動で回す';
+  if (current) render(false); else next();
+}
+
+// ===== 一覧 =====
+function renderList(){
+  document.getElementById('listBox').innerHTML = SCENES.map(sc=>{
+    const rows = ITEMS.filter(it=>it.s===sc).map(it=>'<tr><td class="c">'+esc(it.c)+'<div class="j">'+esc(it.cj)+'</div></td><td><div class="e" data-i="'+it.i+'">🔊 '+enHtml(it)+'</div><div class="j">'+esc(it.jp)+'　'+(it.mk?'🎬':'')+'</div></td><td>'+stTag(it)+'</td></tr>').join('');
+    return '<div class="sec">'+esc(sc)+'（'+ITEMS.filter(it=>it.s===sc).length+'）</div><table class="lst">'+rows+'</table>';
+  }).join('') + '<div class="note">🎬＝Markiplierが実際に言っている塊。頭の意味は型ドリルと同じです。</div>';
+  document.querySelectorAll('#listBox .e').forEach(e=>e.onclick = ()=>speakEn(ITEMS[+e.dataset.i].en));
+}
+function switchTab(t){
+  document.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
+  document.getElementById('tab-drill').style.display = t==='drill'?'':'none';
+  document.getElementById('tab-list').style.display = t==='list'?'':'none';
+  if (t==='list') { if (auto.on) toggleAuto(); renderList(); }
+  try { localStorage.setItem('ushiro_tab', t); } catch(e){}
+}
+document.querySelectorAll('.tabbtn').forEach(b=>b.onclick = ()=>switchTab(b.dataset.tab));
+
+function renderChips(){
+  const box = document.getElementById('sceneChips');
+  box.innerHTML = '<span class="chip'+(activeScenes.size===SCENES.length?' on':'')+'" data-s="*">全部</span>' + SCENES.map(s=>'<span class="chip'+(activeScenes.has(s)&&activeScenes.size!==SCENES.length?' on':'')+'" data-s="'+esc(s)+'">'+esc(s)+' '+ITEMS.filter(it=>it.s===s).length+'</span>').join('');
+  box.querySelectorAll('.chip').forEach(c=>c.onclick = ()=>{
+    const s = c.dataset.s;
+    if (s==='*') activeScenes = new Set(SCENES);
+    else if (activeScenes.size===SCENES.length) activeScenes = new Set([s]);
+    else { activeScenes.has(s) ? activeScenes.delete(s) : activeScenes.add(s); if (!activeScenes.size) activeScenes = new Set(SCENES); }
+    try { localStorage.setItem('ushiro_scenes', JSON.stringify([...activeScenes])); } catch(e){}
+    renderChips(); autoClear(); rebuild(); next();
+  });
+}
+document.getElementById('orderSel').onchange = ()=>{ autoClear(); rebuild(); next(); };
+document.getElementById('autoBtn').onclick = toggleAuto;
+document.addEventListener('keydown', e=>{
+  if (e.target.tagName==='INPUT' || document.getElementById('tab-drill').style.display==='none' || auto.on) return;
+  if (e.key===' ') { e.preventDefault(); reveal(); }
+  else if (e.key==='1') judge('ok'); else if (e.key==='2') judge('mid'); else if (e.key==='3') judge('ng');
+  else if ((e.key==='r'||e.key==='R') && current) speakEn(current.en);
+});
+
+// ===== 同期(他アプリと同じGAS) =====
+function setSyncBadge(t){ const b=document.getElementById('syncBadge'); b.style.display='block'; b.textContent=t; }
+function scheduleSave(){ clearTimeout(saveTimer); setSyncBadge('保存中...'); saveTimer = setTimeout(()=>saveAll(), 600); }
+function saveAll(retryFlag){
+  if (!currentUser) return;
+  fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'save', user: APP_KEY+':'+currentUser, data: JSON.stringify({_status: status})})
+  }).then(r=>r.json()).then(res=>{ if (res && res.error) throw new Error(res.error); setSyncBadge('保存済み'); })
+  .catch(()=>{ if (!retryFlag) { setSyncBadge('保存リトライ中...'); setTimeout(()=>saveAll(true), 1500); } else setSyncBadge('⚠保存失敗 タップで再試行'); });
+}
+function loadFromServer(user){
+  return fetch(GAS_URL + '?action=load&user=' + encodeURIComponent(APP_KEY+':'+user)).then(r=>r.json()).then(res=>{
+    try { const p = JSON.parse(res.data || '{}'); status = p._status || {}; } catch(e){ status = {}; }
+  });
+}
+function initApp(){
+  try { const s = JSON.parse(localStorage.getItem('ushiro_scenes')||'null'); if (Array.isArray(s) && s.length) activeScenes = new Set(s.filter(x=>SCENES.includes(x))); if (!activeScenes.size) activeScenes = new Set(SCENES); } catch(e){}
+  renderChips(); rebuild(); next();
+  let t = 'drill'; try { t = localStorage.getItem('ushiro_tab') || 'drill'; } catch(e){}
+  if (t !== 'drill') switchTab(t);
+}
+function startSession(user){
+  currentUser = user;
+  try { localStorage.setItem(LOCAL_USER_KEY, user); } catch(e){}
+  document.getElementById('loginStatus').textContent = '読み込み中...';
+  loadFromServer(user).then(()=>{
+    document.getElementById('loginOverlay').style.display = 'none';
+    setSyncBadge(user + ' で同期中'); initApp();
+  }).catch(()=>{ document.getElementById('loginStatus').textContent = '通信に失敗しました。もう一度お試しください。'; });
+}
+document.getElementById('loginBtn').onclick = ()=>{
+  const v = document.getElementById('passInput').value.trim();
+  if (!v) { document.getElementById('loginStatus').textContent = '合言葉を入力してください'; return; }
+  startSession(v);
+};
+document.getElementById('passInput').onkeydown = e=>{ if (e.key==='Enter') document.getElementById('loginBtn').click(); };
+document.getElementById('syncBadge').onclick = ()=>{
+  if (document.getElementById('syncBadge').textContent.indexOf('失敗') !== -1) { saveAll(); return; }
+  if (currentUser) loadFromServer(currentUser).then(()=>{ setSyncBadge(currentUser+' で同期中(更新済み)'); renderStats(); });
+};
+const savedUser = (()=>{ try { return localStorage.getItem(LOCAL_USER_KEY); } catch(e){ return null; } })();
+if (savedUser) { document.getElementById('passInput').value = savedUser; startSession(savedUser); }
+</script>
+</body>
+</html>
