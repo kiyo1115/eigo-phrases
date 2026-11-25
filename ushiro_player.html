@@ -49,6 +49,16 @@
   .j-ok{background:#2f4a30;color:#b3ffb8;} .j-mid{background:#4f4420;color:#ffe9a8;} .j-ng{background:#5a3030;color:#ffb3b3;}
   .think{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:12px;} .think i{display:block;height:100%;width:0;background:var(--amber-dim);}
   .auto-on{background:#2f4a30 !important;color:#b3ffb8 !important;border-color:#2f5a35 !important;}
+  .mp-stage{min-height:260px;}
+  .mp-ans{margin-top:14px;padding:14px;background:var(--panel2);border-radius:12px;visibility:hidden;}
+  .mp-ans.show{visibility:visible;}
+  .mp-ans .en{font-size:24px;font-weight:800;line-height:1.4;cursor:pointer;}
+  .mp-ans .en .h{color:var(--blue);} .mp-ans .en .c{color:var(--yellow);}
+  .mp-ans .flow{font-size:15px;margin-top:10px;line-height:1.7;}
+  .mp-prog{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-top:12px;}
+  .mp-ctl{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:12px;}
+  .mp-ctl .btn{min-width:56px;font-size:18px;}
+  .mp-ctl #mpPlay{min-width:84px;font-size:22px;}
   .sec{font-size:13px;color:var(--amber);font-weight:700;margin:18px 0 6px;}
   table.lst{width:100%;border-collapse:collapse;font-size:13px;}
   table.lst td{padding:7px 4px;border-top:1px solid var(--line);vertical-align:top;}
@@ -91,16 +101,35 @@
   <div id="tab-drill">
     <div class="chips" id="sceneChips"></div>
     <div class="row">
-      <label>出す順番<select id="orderSel"><option value="weak">苦手から</option><option value="new">まだのものから</option><option value="rand">ランダム</option><option value="ngonly">×と△だけ</option></select></label>
+      <label>モード<select id="mpMode"><option value="test" selected>テスト(日本語→英語)</option><option value="listen">聞き流し(英語→日本語)</option></select></label>
+      <label>出す順番<select id="mpOrder"><option value="random" selected>ランダム(1周で全部)</option><option value="weak">苦手を優先</option><option value="scene">場面ごと</option></select></label>
       <label>頭<select id="headSel"><option value="show">見せる（後ろだけ言う）</option><option value="hide">隠す（日本語から全部言う）</option></select></label>
-      <label>考える時間（自動）<select id="thinkSel"><option value="3">3秒</option><option value="5" selected>5秒</option><option value="8">8秒</option></select></label>
-      <button class="btn sub" id="autoBtn">▶ 自動で回す</button>
+      <label>考える時間<select id="mpThink"><option value="3000">3秒</option><option value="5000" selected>5秒</option><option value="8000">8秒</option><option value="12000">12秒</option><option value="20000">20秒</option></select></label>
+      <label>英語の回数<select id="mpRep"><option value="1">1回</option><option value="2" selected>2回</option><option value="3">3回</option><option value="5">5回</option></select></label>
+      <label>速さ<select id="mpRate"><option value="0.8">遅め</option><option value="0.9" selected>ふつう</option><option value="1.1">速め</option></select></label>
+      <label>日本語読み上げ<select id="mpJp"><option value="off" selected>なし</option><option value="on">あり</option></select></label>
+      <label>○△×判定<select id="mpJudgeMode"><option value="on" selected>あり(押すまで待つ)</option><option value="off">なし(自動で次へ)</option></select></label>
+      <label>答えのあと<select id="mpReview"><option value="2000">2秒</option><option value="4000" selected>4秒</option><option value="8000">8秒</option></select></label>
     </div>
     <div class="stats" id="stats"></div>
-    <div class="card" id="card"></div>
-    <div class="note">考え方：<b>日本語のひと言 → 英語</b>。「とりあえず」→ I’m just going to、「突っ込む」→ go for it のように、頭と後ろをそれぞれ決まった日本語で思い出す。答えを見ると、その流れが出ます。<br>キー：<b>スペース</b>＝答えを見る ／ <b>1</b>＝○ <b>2</b>＝△ <b>3</b>＝× ／ <b>R</b>＝もう一度聞く<br>×はすぐ（3問後）、△は少し後（7問後）にもう一度出ます。自動で回すと記録はつけずに、答えと音声だけ流れます（ながら用）。</div>
+    <div class="card">
+      <div class="mp-stage" id="mpStage"></div>
+      <div class="judge" id="mpJudgeRow">
+        <button class="j-ok" id="mpOk">○ 言えた<small>後回し (1)</small></button>
+        <button class="j-mid" id="mpMid">△ 微妙<small>15〜30問後 (2)</small></button>
+        <button class="j-ng" id="mpNg">× 無理<small>8〜15問後 (3)</small></button>
+      </div>
+      <div class="mp-prog"><span><span id="mpCycle">1</span>周目 ・ <span id="mpDone">0</span> / <span id="mpTotal">0</span></span><span>スペース=再生/停止 ・ ←→=前/次</span></div>
+      <div class="mp-ctl">
+        <button class="btn sub" id="mpPrev">⏮</button>
+        <button class="btn main" id="mpPlay">▶</button>
+        <button class="btn sub" id="mpNext">⏭</button>
+      </div>
+    </div>
+    <div class="note">考え方：<b>日本語のひと言 → 英語</b>。「とりあえず」→ I’m just going to、「突っ込む」→ go for it のように、頭と後ろをそれぞれ決まった日本語で思い出す。答えのところに、その流れが出ます。<br>
+    ▶で再生：問題 → 考える時間 → 答えと英語の音声 → ○△×（押すまで待つ）→ 次の問題。×は8〜15問後、△は15〜30問後のどこかでランダムにもう一度出ます（忘れたころに聞く）。<br>
+    キー：<b>スペース</b>＝再生/停止 ・ <b>←→</b>＝前/次 ・ <b>1 2 3</b>＝○△× ・ <b>R</b>＝もう一度聞く</div>
   </div>
-
   <div id="tab-list" style="display:none;">
     <div id="listBox"></div>
   </div>
@@ -139,101 +168,144 @@ const LOCAL_USER_KEY = 'phraseAppUser_v1';
 let currentUser = null, saveTimer = null;
 let status = {};   // 英文 -> {s, w, n, t}
 let activeScenes = new Set(SCENES);
-let queue = [], qi = 0, current = null, retry = [], shown = false;
-let auto = {on:false, timers:[], raf:null, token:0};
+const KEYMAP = Object.fromEntries(ITEMS.map(it=>[it.en, it]));
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function pool(){ return ITEMS.filter(it=>activeScenes.has(it.s)); }
-function rebuild(){
-  const order = document.getElementById('orderSel').value;
-  let arr = pool();
-  if (order === 'ngonly') arr = arr.filter(it=>status[it.en] && status[it.en].s !== 'ok');
-  if (order === 'weak' || order === 'ngonly') {
-    arr = arr.map(it=>{ const st=status[it.en]; const w = st ? st.w : 1.5; return {it, k: Math.random() - Math.min(w,5)*0.3}; }).sort((a,b)=>a.k-b.k).map(x=>x.it);
-  } else if (order === 'new') {
-    arr = shuffle(arr.filter(it=>!status[it.en])).concat(shuffle(arr.filter(it=>status[it.en])));
-  } else shuffle(arr);
-  queue = arr; qi = 0; retry = [];
-  renderStats();
-}
-function next(){
-  retry.forEach(r=>r.wait--);
-  const due = retry.findIndex(r=>r.wait<=0);
-  if (due !== -1) { current = retry.splice(due,1)[0].it; render(true); return; }
-  if (!queue.length) { current = null; render(); return; }
-  if (qi >= queue.length) { rebuild(); if (!queue.length) { current=null; render(); return; } }
-  current = queue[qi++]; render(false);
-}
-function stTag(it){
-  const st = status[it.en];
-  if (!st) return '<span class="tag">未</span>';
-  const m = {ok:['st-ok','○ 言えた'], mid:['st-mid','△ 微妙'], ng:['st-ng','× 無理']}[st.s];
-  return '<span class="tag '+m[0]+'">'+m[1]+' ('+st.n+'回)</span>';
-}
-function render(isRetry){
-  const card = document.getElementById('card'); shown = false;
-  if (!current) { card.innerHTML = '<div class="jp" style="font-size:18px">この条件の問題がありません</div><div class="lbl">場面や出す順番を変えてみてください。</div>'; return; }
-  const it = current;
-  card.innerHTML =
-    '<div class="tags"><span class="tag">'+esc(it.s)+'</span>'+stTag(it)+(it.mk?'<span class="tag mk">🎬 Markiplierも言う</span>':'')+(isRetry?'<span class="tag st-ng">もう一度</span>':'')+'</div>' +
-    '<div class="lbl">言いたいこと</div><div class="jp">'+esc(it.jp)+'</div>' +
-    (hideHead() ? '<div class="q"><span class="blank" style="min-width:220px">　</span></div>' :
-    '<div class="q">'+qHtml(it)+'</div>' +
-    '<div class="cue">頭：'+esc(it.h.replace(/^, /,''))+' ＝ '+esc(HEADS[it.h]||'')+'</div>' +
-    '<div class="cj">後ろの意味：'+esc(it.cj)+'</div>') +
-    '<div class="think" id="think" style="'+(auto.on?'':'display:none')+'"><i id="thinkBar"></i></div>' +
-    '<div class="ans" id="ans"><div class="en" id="ansEn">'+enHtml(it)+'</div><div class="flow">「'+esc(hcue(it.h))+'」→ <span style="color:var(--blue)">'+esc(it.h.replace(/^, /,''))+'</span>　＋　「'+esc(it.cj)+'」→ <span style="color:var(--yellow)">'+esc(it.c)+'</span></div><div class="sub">🔊タップでもう一度</div></div>' +
-    (auto.on ? '' :
-    '<div class="btns" id="revealBtns"><button class="btn main" id="showBtn">答えを見る</button></div>' +
-    '<div class="judge" id="judge" style="display:none"><button class="j-ok" data-s="ok">○ 言えた<small>後回し (1)</small></button><button class="j-mid" data-s="mid">△ 微妙<small>少し後 (2)</small></button><button class="j-ng" data-s="ng">× 無理<small>すぐ出す (3)</small></button></div>');
-  document.getElementById('ansEn').onclick = ()=>speakEn(it.en);
-  if (!auto.on) {
-    document.getElementById('showBtn').onclick = reveal;
-    document.querySelectorAll('#judge button').forEach(b=>b.onclick = ()=>judge(b.dataset.s));
-  } else autoStep();
-}
 function hideHead(){ return document.getElementById('headSel').value==='hide'; }
 function hcue(h){ return (HEADS[h]||'').replace(/（.*?）|\(.*?\)/g,''); }
-function reveal(){
-  if (!current || shown) return; shown = true;
-  document.getElementById('ans').classList.add('show');
-  const rb = document.getElementById('revealBtns'); if (rb) rb.style.display='none';
-  const j = document.getElementById('judge'); if (j) j.style.display='flex';
-  speakEn(current.en);
-}
-function judge(s){
-  if (!current || !shown) return;
-  const st = status[current.en] || {s:'', w:1.5, n:0, t:0};
-  st.s = s; st.n++; st.t = Date.now();
-  st.w = s==='ok' ? Math.max(0.2, st.w*0.5) : s==='mid' ? st.w+0.7 : st.w+1.5;
-  status[current.en] = st;
-  if (s==='ng') retry.push({it:current, wait:3}); else if (s==='mid') retry.push({it:current, wait:7});
-  scheduleSave(); renderStats(); next();
+function stTag(it){
+  const st = status[it.en];
+  if (!st || !st.s) return '<span class="tag">未</span>';
+  const m = {ok:['st-ok','○'], mid:['st-mid','△'], ng:['st-ng','×']}[st.s];
+  return '<span class="tag '+m[0]+'">'+m[1]+' ('+st.n+'回)</span>';
 }
 function renderStats(){
   const p = pool(); let ok=0, mid=0, ng=0;
-  p.forEach(it=>{ const st=status[it.en]; if(!st) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else if(st.s==='ng')ng++; });
-  document.getElementById('stats').innerHTML = '選んだ場面 <b>'+p.length+'</b>個 ・ ○ <b>'+ok+'</b> ・ △ <b>'+mid+'</b> ・ × <b>'+ng+'</b> ・ まだ <b>'+(p.length-ok-mid-ng)+'</b>';
+  p.forEach(it=>{ const st=status[it.en]; if(!st||!st.s) return; if(st.s==='ok')ok++; else if(st.s==='mid')mid++; else ng++; });
+  document.getElementById('stats').innerHTML = '選んだ場面 <b>'+p.length+'</b>個 ・ <b style="color:var(--green)">○'+ok+'</b> <b style="color:var(--yellow)">△'+mid+'</b> <b style="color:var(--red)">×'+ng+'</b> 未'+(p.length-ok-mid-ng);
 }
 
-// ===== 自動で回す（ながら用・記録なし） =====
-function autoClear(){ auto.token++; auto.timers.forEach(clearTimeout); auto.timers=[]; if(auto.raf) cancelAnimationFrame(auto.raf); auto.raf=null; try{speechSynthesis.cancel();}catch(e){} }
-function autoStep(){
-  const tok = ++auto.token; const sec = +document.getElementById('thinkSel').value;
-  const t0 = performance.now(), bar = document.getElementById('thinkBar');
-  const tick = ()=>{ if (tok!==auto.token) return; const r = Math.min(1,(performance.now()-t0)/(sec*1000)); if(bar) bar.style.width=(r*100)+'%'; if (r<1) auto.raf = requestAnimationFrame(tick); };
-  tick();
-  auto.timers.push(setTimeout(()=>{
-    if (tok!==auto.token) return; shown = true;
-    document.getElementById('ans').classList.add('show');
-    speakEn(current.en, ()=>{ if (tok!==auto.token) return; auto.timers.push(setTimeout(()=>{ if (tok===auto.token) speakEn(current.en, ()=>{ if (tok===auto.token) auto.timers.push(setTimeout(()=>{ if (tok===auto.token) next(); }, 1200)); }); }, 600)); });
-  }, sec*1000));
+// ===== 再生（型ドリルの覚えるリストと同じ流れ） =====
+const MP = {queue:[], qi:0, cur:null, playing:false, token:0, cycle:1, waiting:false, timers:[], raf:null};
+const mpVal = id => document.getElementById(id).value;
+function mpSettings(){ return { mode: mpVal('mpMode'), think: +mpVal('mpThink'), rep: +mpVal('mpRep'), rate: +mpVal('mpRate'), jp: mpVal('mpJp')==='on', judge: mpVal('mpJudgeMode')==='on', review: +mpVal('mpReview') }; }
+function mpBuild(){
+  const order = mpVal('mpOrder');
+  let arr = pool();
+  if (order === 'scene') arr = arr.slice();
+  else if (order === 'weak') arr = arr.map(it=>{ const st=status[it.en]; return {it, k: Math.random() - Math.min(st&&st.w!=null?st.w:1.5, 5)*0.3}; }).sort((a,b)=>a.k-b.k).map(x=>x.it);
+  else shuffle(arr);
+  MP.queue = arr.map(it=>it.en); MP.qi = 0;
 }
-function toggleAuto(){
-  auto.on = !auto.on; autoClear();
-  const b = document.getElementById('autoBtn'); b.classList.toggle('auto-on', auto.on); b.textContent = auto.on ? '■ 自動を止める' : '▶ 自動で回す';
-  if (current) render(false); else next();
+function mpClear(){ MP.token++; MP.timers.forEach(clearTimeout); MP.timers = []; if (MP.raf) cancelAnimationFrame(MP.raf); MP.raf = null; try { speechSynthesis.cancel(); } catch(e){} }
+function mpWait(ms, tok){ return new Promise(res=>{ MP.timers.push(setTimeout(()=>res(tok===MP.token), ms)); }); }
+function mpSay(text, lang, rate, tok){
+  return new Promise(res=>{
+    if (tok !== MP.token) return res(false);
+    let done = false; const fin = ()=>{ if (done) return; done = true; res(tok === MP.token); };
+    const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = rate;
+    if (lang === 'en-US' && enVoice) u.voice = enVoice;
+    u.onend = fin; u.onerror = fin;
+    MP.timers.push(setTimeout(fin, 2500 + text.length * (lang==='ja-JP' ? 260 : 110) / rate));
+    speechSynthesis.speak(u);
+  });
 }
+function mpBar(ms, tok){
+  const bar = document.getElementById('mpBar'); if (!bar) return;
+  const t0 = performance.now();
+  const step = ()=>{ if (tok !== MP.token) return; const r = Math.min(1, (performance.now()-t0)/ms); bar.style.width = (r*100)+'%'; if (r < 1) MP.raf = requestAnimationFrame(step); };
+  step();
+}
+function mpRender(show){
+  const box = document.getElementById('mpStage');
+  const it = MP.cur && KEYMAP[MP.cur];
+  if (!it) { box.innerHTML = '<div class="jp" style="margin-top:30px;font-size:18px">▶ を押すとスタート</div><div class="lbl">場面のボタンで、出す場面をしぼれます。</div>'; mpRenderCtl(); return; }
+  const listen = mpVal('mpMode') === 'listen';
+  box.innerHTML =
+    '<div class="tags"><span class="tag">'+esc(it.s)+'</span>'+stTag(it)+(it.mk?'<span class="tag mk">🎬 Markiplierも言う</span>':'')+'</div>' +
+    '<div class="lbl">言いたいこと</div><div class="jp">'+esc(it.jp)+'</div>' +
+    (hideHead() ? '<div class="q"><span class="blank" style="min-width:220px">　</span></div>' :
+      '<div class="q">'+qHtml(it)+'</div>' +
+      '<div class="cue">頭：'+esc(it.h.replace(/^, /,''))+' ＝ '+esc(HEADS[it.h]||'')+'</div>' +
+      '<div class="cj">後ろの意味：'+esc(it.cj)+'</div>') +
+    (listen ? '' : '<div class="think"><i id="mpBar"></i></div>') +
+    '<div class="mp-ans'+(show?' show':'')+'" id="mpAns"><div class="en" id="mpEn">🔊 '+enHtml(it)+'</div>' +
+      '<div class="flow">「'+esc(hcue(it.h))+'」→ <span style="color:var(--blue)">'+esc(it.h.replace(/^, /,''))+'</span>　＋　「'+esc(it.cj)+'」→ <span style="color:var(--yellow)">'+esc(it.c)+'</span></div></div>' +
+    (show ? '' : '<div class="btns"><button class="btn sub" id="mpReveal">答えを見る</button></div>');
+  document.getElementById('mpEn').onclick = ()=>speakEn(it.en);
+  const rv = document.getElementById('mpReveal');
+  if (rv) rv.onclick = ()=>{ mpClear(); mpReveal(); speakEn(it.en); if (mpSettings().judge) MP.waiting = true; mpRenderCtl(); };
+  mpRenderCtl();
+}
+function mpReveal(){
+  const a = document.getElementById('mpAns'); if (a) a.classList.add('show');
+  const rv = document.getElementById('mpReveal'); if (rv) rv.remove();
+  const bar = document.getElementById('mpBar'); if (bar) bar.style.width = '100%';
+}
+function mpRenderCtl(){
+  document.getElementById('mpPlay').textContent = MP.playing ? '⏸' : '▶';
+  document.getElementById('mpJudgeRow').style.display = (MP.cur && mpVal('mpJudgeMode')==='on') ? 'flex' : 'none';
+  document.getElementById('mpCycle').textContent = MP.cycle;
+  document.getElementById('mpDone').textContent = Math.min(MP.qi, MP.queue.length);
+  document.getElementById('mpTotal').textContent = MP.queue.length || pool().length;
+}
+async function mpSequence(){
+  mpClear();
+  const tok = MP.token, s = mpSettings(), it = MP.cur && KEYMAP[MP.cur];
+  if (!it) return;
+  MP.waiting = false;
+  if (s.mode === 'test') {
+    mpRender(false);
+    if (s.jp && !await mpSay(it.jp, 'ja-JP', 1, tok)) return;
+    mpBar(s.think, tok);
+    if (!await mpWait(s.think, tok)) return;
+    mpReveal();
+    for (let r = 0; r < s.rep; r++) { if (!await mpSay(it.en, 'en-US', s.rate, tok)) return; if (r < s.rep - 1 && !await mpWait(600, tok)) return; }
+  } else {
+    mpRender(true);
+    for (let r = 0; r < s.rep; r++) { if (!await mpSay(it.en, 'en-US', s.rate, tok)) return; if (!await mpWait(600, tok)) return; }
+    if (s.jp && !await mpSay(it.jp, 'ja-JP', 1, tok)) return;
+  }
+  if (s.judge) { MP.waiting = true; mpRenderCtl(); return; }
+  if (!await mpWait(s.review, tok)) return;
+  if (MP.playing && tok === MP.token) mpNext();
+}
+function mpLoad(){
+  if (MP.qi >= MP.queue.length) { if (!pool().length) { MP.cur = null; return false; } if (MP.queue.length) MP.cycle++; mpBuild(); }
+  MP.cur = MP.queue[MP.qi++];
+  return true;
+}
+function mpNext(){
+  mpClear(); MP.waiting = false;
+  if (!mpLoad()) { MP.playing = false; mpRender(false); return; }
+  if (MP.playing) mpSequence(); else mpRender(mpVal('mpMode')==='listen');
+}
+function mpPrev(){
+  if (MP.qi < 2) return;
+  mpClear(); MP.waiting = false; MP.qi -= 2; MP.cur = MP.queue[MP.qi++];
+  if (MP.playing) mpSequence(); else mpRender(mpVal('mpMode')==='listen');
+}
+function mpStop(){ MP.playing = false; mpClear(); mpRenderCtl(); }
+function mpToggle(){
+  if (MP.playing) { mpStop(); return; }
+  if (!pool().length) { mpRender(false); return; }
+  MP.playing = true;
+  if (!MP.cur || MP.waiting) mpNext(); else mpSequence();
+}
+function mpJudge(s){
+  const it = MP.cur && KEYMAP[MP.cur];
+  if (!it) return;
+  const st = status[it.en] || {w:1.5, n:0};
+  st.s = s; st.n = (st.n||0) + 1; st.t = Date.now();
+  const w = st.w == null ? 1.5 : st.w;
+  st.w = s==='ok' ? Math.max(0, w-1) : s==='mid' ? w+1 : w+2;
+  status[it.en] = st;
+  if (s !== 'ok') MP.queue.splice(Math.min(MP.qi + (s==='ng' ? 8+Math.floor(Math.random()*8) : 15+Math.floor(Math.random()*16)), MP.queue.length), 0, MP.cur);
+  scheduleSave(); renderStats();
+  mpNext();
+}
+function mpRestart(){ mpStop(); MP.cycle = 1; mpBuild(); MP.cur = null; mpRender(false); renderStats(); }
 
 // ===== 一覧 =====
 function renderList(){
@@ -247,7 +319,7 @@ function switchTab(t){
   document.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
   document.getElementById('tab-drill').style.display = t==='drill'?'':'none';
   document.getElementById('tab-list').style.display = t==='list'?'':'none';
-  if (t==='list') { if (auto.on) toggleAuto(); renderList(); }
+  if (t==='list') { mpStop(); renderList(); }
   try { localStorage.setItem('ushiro_tab', t); } catch(e){}
 }
 document.querySelectorAll('.tabbtn').forEach(b=>b.onclick = ()=>switchTab(b.dataset.tab));
@@ -261,17 +333,30 @@ function renderChips(){
     else if (activeScenes.size===SCENES.length) activeScenes = new Set([s]);
     else { activeScenes.has(s) ? activeScenes.delete(s) : activeScenes.add(s); if (!activeScenes.size) activeScenes = new Set(SCENES); }
     try { localStorage.setItem('ushiro_scenes', JSON.stringify([...activeScenes])); } catch(e){}
-    renderChips(); autoClear(); rebuild(); next();
+    renderChips(); mpRestart();
   });
 }
-document.getElementById('headSel').onchange = ()=>{ try{localStorage.setItem('ushiro_head', document.getElementById('headSel').value);}catch(e){} autoClear(); if (current) render(false); };
-document.getElementById('orderSel').onchange = ()=>{ autoClear(); rebuild(); next(); };
-document.getElementById('autoBtn').onclick = toggleAuto;
-document.addEventListener('keydown', e=>{
-  if (e.target.tagName==='INPUT' || document.getElementById('tab-drill').style.display==='none' || auto.on) return;
-  if (e.key===' ') { e.preventDefault(); reveal(); }
-  else if (e.key==='1') judge('ok'); else if (e.key==='2') judge('mid'); else if (e.key==='3') judge('ng');
-  else if ((e.key==='r'||e.key==='R') && current) speakEn(current.en);
+const SAVE_IDS = ['mpMode','mpOrder','headSel','mpThink','mpRep','mpRate','mpJp','mpJudgeMode','mpReview'];
+SAVE_IDS.forEach(id=>{ const el = document.getElementById(id);
+  try { const v = localStorage.getItem('ushiro_'+id); if (v && [...el.options].some(o=>o.value===v)) el.value = v; } catch(e){}
+  el.onchange = ()=>{ try { localStorage.setItem('ushiro_'+id, el.value); } catch(e){}
+    if (id==='mpOrder') mpRestart(); else if (id==='mpMode' || id==='headSel') { mpStop(); if (MP.cur) mpRender(mpVal('mpMode')==='listen'); } else mpRenderCtl(); };
+});
+document.getElementById('mpPlay').onclick = mpToggle;
+document.getElementById('mpNext').onclick = mpNext;
+document.getElementById('mpPrev').onclick = mpPrev;
+document.getElementById('mpOk').onclick = ()=>mpJudge('ok');
+document.getElementById('mpMid').onclick = ()=>mpJudge('mid');
+document.getElementById('mpNg').onclick = ()=>mpJudge('ng');
+document.addEventListener('keydown', ev=>{
+  if (ev.target.tagName==='INPUT' || ev.target.tagName==='SELECT' || document.getElementById('tab-drill').style.display==='none') return;
+  if (ev.key === ' ') { ev.preventDefault(); mpToggle(); }
+  else if (ev.key === 'ArrowRight') mpNext();
+  else if (ev.key === 'ArrowLeft') mpPrev();
+  else if (MP.cur && mpVal('mpJudgeMode')==='on' && ev.key === '1') mpJudge('ok');
+  else if (MP.cur && mpVal('mpJudgeMode')==='on' && ev.key === '2') mpJudge('mid');
+  else if (MP.cur && mpVal('mpJudgeMode')==='on' && ev.key === '3') mpJudge('ng');
+  else if ((ev.key==='r'||ev.key==='R') && MP.cur) speakEn(MP.cur);
 });
 
 // ===== 同期(他アプリと同じGAS) =====
@@ -290,9 +375,8 @@ function loadFromServer(user){
   });
 }
 function initApp(){
-  try { const h = localStorage.getItem('ushiro_head'); if (h) document.getElementById('headSel').value = h; } catch(e){}
   try { const s = JSON.parse(localStorage.getItem('ushiro_scenes')||'null'); if (Array.isArray(s) && s.length) activeScenes = new Set(s.filter(x=>SCENES.includes(x))); if (!activeScenes.size) activeScenes = new Set(SCENES); } catch(e){}
-  renderChips(); rebuild(); next();
+  renderChips(); mpRestart();
   let t = 'drill'; try { t = localStorage.getItem('ushiro_tab') || 'drill'; } catch(e){}
   if (t !== 'drill') switchTab(t);
 }
